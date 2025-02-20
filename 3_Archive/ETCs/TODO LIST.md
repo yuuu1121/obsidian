@@ -28,8 +28,6 @@ kanban-plugin: board
 
 ## Pause
 
-- [ ] #priority/low 
-	학자금 대출 신청 완료 하기
 
 
 ## Done
@@ -37,6 +35,8 @@ kanban-plugin: board
 **Complete**
 - [x] #priority/highest 
 	국기연 - 출장 신청
+- [x] #priority/low 
+	학자금 대출 신청 완료 하기
 - [x] #priority/highest KROC - 사후정산
 - [x] #priority/highest 
 	신입생 시간표 정리
@@ -81,6 +81,6 @@ kanban-plugin: board
 
 %% kanban:settings
 ```
-{"kanban-plugin":"board","list-collapse":[false,false,false,false],"show-checkboxes":true,"tag-sort":[{"tag":"#priority/highest"},{"tag":"#priority/high"},{"tag":"#priority/low"},{"tag":"#priority/lowest"}],"tag-colors":[{"tagKey":"#priority/highest","color":"rgba(227, 32, 32, 1)","backgroundColor":""},{"tagKey":"#priority/high","color":"rgba(255, 102, 17, 1)","backgroundColor":""},{"tagKey":"#priority/low","color":"rgba(32, 180, 227, 1)","backgroundColor":""},{"tagKey":"#priority/lowest","color":"rgba(32, 104, 227, 1)","backgroundColor":""}],"move-tags":true,"tag-action":"obsidian","move-dates":true,"show-relative-date":true,"link-date-to-daily-note":true,"archive-with-date":false,"append-archive-date":true}
+{"kanban-plugin":"board","list-collapse":[false,false,false],"show-checkboxes":true,"tag-sort":[{"tag":"#priority/highest"},{"tag":"#priority/high"},{"tag":"#priority/low"},{"tag":"#priority/lowest"}],"tag-colors":[{"tagKey":"#priority/highest","color":"rgba(227, 32, 32, 1)","backgroundColor":""},{"tagKey":"#priority/high","color":"rgba(255, 102, 17, 1)","backgroundColor":""},{"tagKey":"#priority/low","color":"rgba(32, 180, 227, 1)","backgroundColor":""},{"tagKey":"#priority/lowest","color":"rgba(32, 104, 227, 1)","backgroundColor":""}],"move-tags":true,"tag-action":"obsidian","move-dates":true,"show-relative-date":true,"link-date-to-daily-note":true,"archive-with-date":false,"append-archive-date":true}
 ```
 %%
