@@ -25,6 +25,8 @@ kanban-plugin: board
 - [ ] #priority/high 
 	@[[2025-02-20]]
 	사후정산 완료
+- [ ] #priority/high @[[2025-02-20]]
+	test
 
 
 ## Pause
