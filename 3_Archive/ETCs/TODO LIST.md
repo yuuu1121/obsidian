@@ -19,9 +19,6 @@ kanban-plugin: board
 	자동차 정기 점검
 - [ ] #priority/highest @[[2025-02-17]]
 	Agent `inv_mode = 2` 오류 해결하기
-- [ ] #priority/lowest 
-	@[[2025-02-23]]
-	논문 실적 추가
 - [ ] #priority/high 
 	@[[2025-02-20]]
 	사후정산 완료
