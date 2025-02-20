@@ -1,0 +1,1 @@
+Inlet과 outlet을 제외한 나머지 enclosure 면

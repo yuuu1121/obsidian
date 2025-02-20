@@ -1,0 +1,1 @@
+물체를 `hide`한 후에, fluid-domain에서 solid와 접하는 면

@@ -1,0 +1,1 @@
+Fluid-domain을 `hide`한 후에 solid-domain에서 fluid와 접하는 면
