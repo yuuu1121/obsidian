@@ -15,8 +15,6 @@ kanban-plugin: board
 	Agent - 파라미터 수정
 - [ ] #priority/high @[[2025-02-23]]
 	SLAM 스터디 강의 듣기
-- [ ] #priority/low @[[2025-02-25]]
-	청년 월세 지원 신청
 - [ ] #priority/lowest 
 	자동차 정기 점검
 - [ ] #priority/highest @[[2025-02-17]]
