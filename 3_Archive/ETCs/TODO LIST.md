@@ -10,7 +10,8 @@ kanban-plugin: board
 
 ## On Going
 
-- [ ] #DailyNote test
+- [ ] #priority/highest @[[2025-02-21]]
+	ㅅㄷㄴㅅ
 
 
 ## Pause
