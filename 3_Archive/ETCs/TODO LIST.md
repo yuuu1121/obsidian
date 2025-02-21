@@ -10,9 +10,9 @@ kanban-plugin: board
 
 ## On Going
 
-- [ ] #priority/highest @[[2025-02-21]]
+- [x] #priority/highest @[[2025-02-21]]
 	시민제과 들르기
-- [ ] @[[2025-02-21]] #priority/low 카톡파일보내기
+- [x] @[[2025-02-21]] #priority/low 카톡파일보내기
 
 
 ## Pause
