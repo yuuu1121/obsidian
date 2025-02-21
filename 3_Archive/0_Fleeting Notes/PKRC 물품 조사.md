@@ -86,6 +86,7 @@
 - **MARINE THINKING**
     - FIFISH Parallel Gripper (2-Finger Robotic Arm) - $899
     - [https://store.marinethinking.com/products/fifish-parallel-gripper-2-finger-robotic-arm?variant=45170114134167](https://store.marinethinking.com/products/fifish-parallel-gripper-2-finger-robotic-arm?variant=45170114134167)
+    - <iframe src="https://store.marinethinking.com/products/fifish-parallel-gripper-2-finger-robotic-arm?variant=45170114134167" allow="fullscreen" allowfullscreen="" style="height:100%;width:100%; aspect-ratio: 16 / 9; "></iframe>
 - **BLUEROBOTICS**
     - Newton Subsea Gripper - $640
     - [https://bluerobotics.com/store/thrusters/grippers/newton-gripper-asm-r2-rp/](https://bluerobotics.com/store/thrusters/grippers/newton-gripper-asm-r2-rp/)
