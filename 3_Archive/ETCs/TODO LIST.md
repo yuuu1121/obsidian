@@ -11,7 +11,8 @@ kanban-plugin: board
 ## On Going
 
 - [ ] #priority/highest @[[2025-02-21]]
-	ㅅㄷㄴㅅ
+	시민제과 들르기
+- [ ] @[[2025-02-21]] #priority/low
 
 
 ## Pause
