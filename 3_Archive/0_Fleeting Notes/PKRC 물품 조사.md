@@ -1,0 +1,101 @@
+## USV
+
+- **TELEDYNE**
+    
+    - Z-Boat 1250
+        - (L)127cm * (W)94cm~64cm * (H)32cm
+            
+            [Z-Boat 1250 Data Sheet-2021.pdf](attachment:d0a7aef6-7a82-4116-9449-2efe64fac65c:Z-Boat_1250_Data_Sheet-2021.pdf)
+            
+- Q-Boat 1250
+    
+    - (L)127cm * (W)94cm~64cm * (H)32cm
+        
+        [Q-Boat 1250 Data Sheet-2021.pdf](attachment:bbae6268-99fb-404e-a26c-c1506cb121ee:Q-Boat_1250_Data_Sheet-2021.pdf)
+        
+- **DRONE-PAYLOAD**
+    
+    - 긴급 구조 무인 수상함 소형 USV 보트
+        - (L)95cm * (W)62cm * (H)25cm
+        - [https://www.drone-payload.com/ko/product/emergency-rescue-unmanned-surface-vessel-usvs-boat/](https://www.drone-payload.com/ko/product/emergency-rescue-unmanned-surface-vessel-usvs-boat/)
+
+- **OCEANALPHA**
+    
+    - SS20
+        - (L)105 cm * (W)55 cm * (H)35cm
+        - [https://oceanalpha.com/product-item/ss20/](https://oceanalpha.com/product-item/ss20/)
+    - SL20
+	    - (L)105cm * (W)55cm
+	    - [SL20 \| OceanAlpha USV](https://oceanalpha.com/product-item/sl20/)
+- **SATLAB GEOSOLUTIONS**
+    
+    - HydroBoat 990
+        - (L)103.5cm * (W)56cm * (H)34.5cm
+        - [https://www.satlab.com.se/product/hydroboat-990-bathymetric-usv-system/](https://www.satlab.com.se/product/hydroboat-990-bathymetric-usv-system/)
+- **CHCNAV**
+    
+    - Apache 3, 3 pro, 4
+        - (L)100cm * (W)65cm * (H)30cm
+        - [https://geospatial.chcnav.com/products?tid=1-3-1](https://geospatial.chcnav.com/products?tid=1-3-1)
+- **CLEARPATH ROBOTICS**
+	- Heron
+		- (L)130cm * (W)94cm * (H)34cm
+		- simulator, ros package provided
+		- $14999~
+		- [Heron USV Tutorials — Heron Tu...](https://www.clearpathrobotics.com/assets/guides/kinetic/heron/index.html)
+- **SEAFLOOR SYSTEM**
+	- Hydrone
+		- (L)116cm * (W)73cm 
+		- [HyDrone \| Seafloor Systems Inc](https://www.seafloorsystems.com/hydrone)
+	- Tridrone
+		- (L)121.92cm * (W)86.36cm
+		- [TriDrone \| Seafloor Systems Inc](https://www.seafloorsystems.com/tridrone)
+	- Weedrone
+		- (L)121.9cm * (W)91.4cm 
+		-
+	- $8920 ~ $9000
+	- [[3_Archive/1_Attachments/8585025a41b745f4467221af3432734b_MD5.pdf]]
+		
+
+## CMG
+
+- **MicroCMG**
+    - [https://satsearch.co/products/veoware-space-micro-cmg](https://satsearch.co/products/veoware-space-micro-cmg)
+        
+    - 50-250kg
+        
+    - 4x MicroCMGs offer angular momentum storage (roll, pitch, yaw) of 2.3 N m s and a maximum torque of 3.5 N m.
+        
+        [datasheet-veoware-space-microcmg-control-moment-gyroscope-87y22b.pdf](attachment:40c8cf45-8fb4-4d97-89cb-96b0f67a613e:datasheet-veoware-space-microcmg-control-moment-gyroscope-87y22b.pdf)
+
+		[[3_Archive/1_Attachments/68ae0373ab2fd4c12fd0daf53b7d7026_MD5.pdf]]
+		[[3_Archive/1_Attachments/69ecdb8cd711d9f835aa1fd1e6e40821_MD5.pdf]]
+
+- **SATSEARCH**
+	- [MicroCMG - Control Moment Gyro...](https://satsearch.co/products/veoware-space-micro-cmg)
+- **MOMENTUM SPACE**
+	- [MOMENTUM in SPACE](https://mmtspace.cafe24.com/)
+- **INNALAB GYROS**
+	- [ARIETIS](https://www.innalabs.com/arietis)
+- **SAT CATALOG**
+	- CMGM-5-5-1A
+		- [CMGM-5-5-1A - CMG \| SatCatalog](https://www.satcatalog.com/component/cmgm-5-5-1a/)
+
+## 2 DOF Manipulator
+
+- **MARINE THINKING**
+    - FIFISH Parallel Gripper (2-Finger Robotic Arm) - $899
+    - [https://store.marinethinking.com/products/fifish-parallel-gripper-2-finger-robotic-arm?variant=45170114134167](https://store.marinethinking.com/products/fifish-parallel-gripper-2-finger-robotic-arm?variant=45170114134167)
+- **BLUEROBOTICS**
+    - Newton Subsea Gripper - $640
+    - [https://bluerobotics.com/store/thrusters/grippers/newton-gripper-asm-r2-rp/](https://bluerobotics.com/store/thrusters/grippers/newton-gripper-asm-r2-rp/)
+- **REACH ROBOTICS**
+    - ROV GRABBERS
+    - ALPHA GRABBER EXTENSION TUBE
+    - [https://reachrobotics.com/products/rov-grippers/](https://reachrobotics.com/products/rov-grippers/)
+- **QYSEA**
+    - [https://kr.store.qysea.com/add-ons/equipment_types-193.html](https://kr.store.qysea.com/add-ons/equipment_types-193.html)
+- **SCHILLING ROBOTICS**
+	- RigMaster Manipulator
+		- 4 DOF 유압식 매니퓰레이터로 높은 하중 지지율
+		- [FMC Schilling Robotics RigMast...](https://www.ashtead-technology.com/product/fmc-schilling-robotics-rigmaster/)
