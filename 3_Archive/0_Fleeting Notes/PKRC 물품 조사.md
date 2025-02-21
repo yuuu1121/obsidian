@@ -99,3 +99,21 @@
 	- RigMaster Manipulator
 		- 4 DOF 유압식 매니퓰레이터로 높은 하중 지지율
 		- [FMC Schilling Robotics RigMast...](https://www.ashtead-technology.com/product/fmc-schilling-robotics-rigmaster/)
+
+
+- **흡입 기반 그리퍼**
+	소프트 로봇 흡입 그리퍼를 수중에서 사용하곤 한다.
+	소프트로봇을 사용한 흡입 기반 그리퍼, 물체의 크기와 상관없이 쉽게 물체를 집을 수 있다.
+	- Nautilus marine sunction manipulator
+	- ![[3_Archive/1_Attachments/43c59ff3b892d76f239e28ed59c29bd6_MD5.jpeg]]
+
+- **Vacuum Gripper**
+	- VG10 vacuum gripper - OnRobot
+		- 진공 압력을 사용하여 물체를 들어 올림.
+		![[3.png]]
+
+- **Schmalz**
+	- Magnetic Grippers - Schmalz
+		- 수중에서 자력을 이용해서 금속 물체를 쉽게 집을 수 있음
+	![[2.png]]
+	
