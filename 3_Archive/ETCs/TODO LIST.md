@@ -12,7 +12,7 @@ kanban-plugin: board
 
 - [ ] #priority/highest @[[2025-02-21]]
 	시민제과 들르기
-- [ ] @[[2025-02-21]] #priority/low
+- [ ] @[[2025-02-21]] #priority/low 카톡파일보내기
 
 
 ## Pause
