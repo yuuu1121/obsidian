@@ -10,13 +10,13 @@ kanban-plugin: board
 
 ## On Going
 
-- [x] #priority/highest @[[2025-02-21]]
-	시민제과 들르기
-- [x] @[[2025-02-21]] #priority/low 카톡파일보내기
 
 
 ## Pause
 
+- [x] @[[2025-02-21]] #priority/low 카톡파일보내기
+- [x] #priority/highest @[[2025-02-21]]
+	시민제과 들르기
 
 
 ## Done
