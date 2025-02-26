@@ -10,17 +10,19 @@ kanban-plugin: board
 
 ## On Going
 
+- [ ] @[[2025-02-26]] #priority/highest SLAM 인강 듣기
+- [ ] @[[2025-02-26]] #priority/high OpenCV 4,5강
 
 
 ## Pause
 
-- [x] @[[2025-02-21]] #priority/low 카톡파일보내기
-- [x] #priority/highest @[[2025-02-21]]
-	시민제과 들르기
 
 
 ## Done
 
+- [x] @[[2025-02-21]] #priority/low 카톡파일보내기
+- [x] #priority/highest @[[2025-02-21]]
+	시민제과 들르기
 
 
 
