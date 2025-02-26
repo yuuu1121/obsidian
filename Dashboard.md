@@ -28,18 +28,16 @@ dv.paragraph(`[[${filePath}|Today's Daily Note]]`);
 >>[!note] #### In progress
 >>- [ ] [[Kanban - Reinforcement Learning|Reinforcement Learning]]
 >>- [ ] [[Kanban - PKRC]]
+>>- [ ] [[2025-02-26 OpenCV]]
 >
 >>[!abstract] ##### On going
 >>
 >
 >>[!info] ##### Pause
->>- [ ] [[Kanban - 3D Reconstruction from Stereo Images|3D Reconstruction from Stereo Images]]
->
+>>
 >>[!check] ##### Done
 >>- [x] [[Kanban - PKRC|PKRC - 균열 검출 로봇]]
->>- [x] [[Kanban - VideoRay|Kanban - VideoRay]]
->>- [x] [[Fluid Solid Interaction Analysis (FSI) in Ansys]]
->
+>>
 
 <br><br>
 
