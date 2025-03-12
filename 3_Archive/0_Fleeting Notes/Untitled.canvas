@@ -1,0 +1,9 @@
+{
+	"nodes":[
+		{"id":"6c8ddb5553f06dda","x":0,"y":0,"width":400,"height":400,"type":"file","file":"3_Archive/0_Fleeting Notes/PKRC 물품 조사.md"},
+		{"id":"0093271041f4ffcc","x":-400,"y":-240,"width":250,"height":60,"type":"text","text":""}
+	],
+	"edges":[
+		{"id":"4104b6d29f925559","fromNode":"0093271041f4ffcc","fromSide":"bottom","toNode":"6c8ddb5553f06dda","toSide":"left"}
+	]
+}
