@@ -36,7 +36,7 @@ banner_x: 0.5
 
 <br>
 
-**PROJECT TRACKING**
+# PROJECT TRACKING
 
 %%
 sourceTag:: #project
@@ -91,7 +91,7 @@ dv.span(table);
 
 <br>
 
-**DEADLINE**
+# DEADLINE
 
 ```dataviewjs
 // 현재 파일에서 태스크 가져오기
@@ -137,7 +137,7 @@ dv.span(table);
 
 <br>
 
-**DAILY SUMMARY**
+# DAILY SUMMARY
 
 ```dataviewjs
 function isWithinWeek(page) {
@@ -160,18 +160,3 @@ dv.table(["Date","Note"], dv.pages('"Daily Notes"')
 ```
 
 <br>
-
-**OBSIDIAN ACTIVITY**
-
-```dataviewjs
-let allFile = dv.pages('!"Templates"').file
-let total = allFile.length
-let studyNotes = dv.pages('"Study"').length
-let paperNotes = dv.pages('"Paper"').length
-let dailyNotes = dv.pages('"Daily Notes"').length
-let totalTask = allFile.tasks.length
-
-dv.paragraph(
-	`📁 **${total}** files | 📚 Study: **${studyNotes}** | 📄 Paper: **${paperNotes}** | 📅 Daily: **${dailyNotes}** | ✅ Tasks: **${totalTask}**`
-)
-```
