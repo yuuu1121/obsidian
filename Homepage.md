@@ -18,6 +18,8 @@ banner_x: 0.5
 		- [ ] Active Marker 전선 주문 #논문
 	- PKRC
 		- [ ] 수중로봇 Wall Following 실제 구현 #PKRC
+		- [x] 수중로봇 IMU PID 제어 
+		- [x] 수중로봇 Depth 제어
 		- [ ] Laser + Camera Altitude Estimation #PKRC 
 		- [ ] 전장 V3 #PKRC 
 	-  Cyclops
@@ -44,25 +46,29 @@ target:: 10000
 %%
 
 ```dataviewjs
-// 프로젝트별 태그와 이름 매핑
-const projects = [
-    { name: "📝 논문 작성", tag: "#논문" },
-    { name: "🔬 실험", tag: "#실험" },
-    { name: "📊 데이터 분석", tag: "#데이터" },
-    { name: "🎓 학위 과정", tag: "#학위" },
-];
-
 // 현재 파일에서 태스크 가져오기
 const currentFile = dv.page("Homepage");
 const allTasks = currentFile?.file?.tasks || [];
+
+// 모든 태스크에서 태그 자동 추출
+const tagSet = new Set();
+allTasks.forEach(t => {
+    const matches = t.text.match(/#[\w가-힣]+/g);
+    if (matches) {
+        matches.forEach(tag => tagSet.add(tag));
+    }
+});
+
+// 태그 배열로 변환 후 정렬
+const tags = Array.from(tagSet).sort();
 
 let table = `| Project | Progress | Status |
 | --- | --- | --- |
 `;
 
-projects.forEach(p => {
+tags.forEach(tag => {
     // 해당 태그가 있는 태스크 필터링
-    const projectTasks = allTasks.filter(t => t.text.includes(p.tag));
+    const projectTasks = allTasks.filter(t => t.text.includes(tag));
     const total = projectTasks.length;
     const completed = projectTasks.filter(t => t.completed).length;
 
@@ -74,7 +80,9 @@ projects.forEach(p => {
     if (progress === 100) status = "✅ 완료";
     else if (progress > 0) status = "진행중";
 
-    table += `| **${p.name}** | <progress value="${progress}" max="100"></progress> ${progress}% (${completed}/${total}) | ${status} |
+    // 태그 이름에서 # 제거하고 표시
+    const displayName = tag.replace("#", "");
+    table += `| **${displayName}** | <progress value="${progress}" max="100"></progress> ${progress}% (${completed}/${total}) | ${status} |
 `;
 });
 
