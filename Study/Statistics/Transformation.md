@@ -15,10 +15,10 @@ url:
 ---
 # 확률변수의 변환 (Transformation)
 
-- ==[[2_Resource/1_Study/4_Statistics/Random Variables|확률 변수]] $X$ 의 분포를 알고 있을 때 $X$ 와 연관된 확률변수 $Y=g(X)$ 의 분포를 구할 수 있다는 개념==
+- ==[[Study/Statistics/Random Variables|확률 변수]] $X$ 의 분포를 알고 있을 때 $X$ 와 연관된 확률변수 $Y=g(X)$ 의 분포를 구할 수 있다는 개념==
 
 ---
-## [[2_Resource/1_Study/4_Statistics/Discrete RV|이산확률변수]]의 변환
+## [[Study/Statistics/Discrete RV|이산확률변수]]의 변환
 
 - $X$: Discrete RV with space $D_X$, then
 - $Y$: Discrete RV with space $D_Y=\{g(x):x\in D_X\}$
@@ -32,7 +32,7 @@ url:
 - ==$g(\cdot)$ 가 1-1 대응 함수가 아닌 경우==
 	- 각 이산적인 값에 따라 일일이 PMF 를 구해줘야 함
 ---
-## [[2_Resource/1_Study/4_Statistics/Continuous RV|연속확률변수]]의 변환
+## [[Study/Statistics/Continuous RV|연속확률변수]]의 변환
 
 - $X$: Continuous RV with PDF $f_X(x)$ and $S_X$
 - $Y=g(X)$, ==$g(\cdot)$: 1-1 / differentiable function==

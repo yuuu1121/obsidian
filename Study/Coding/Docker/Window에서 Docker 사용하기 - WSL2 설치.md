@@ -13,15 +13,15 @@ dg-publish: true
 ---
 >[!note] 목차
 >1. **WSL2 설치**
->2. [[2_Resource/1_Study/1_Coding/Docker/Window에서 Docker 사용하기 - Docker 설치|Docker 설치]]
->3. [[2_Resource/1_Study/1_Coding/Docker/Window에서 Docker 사용하기 - IDE 연결|IDE 연결]]
+>2. [[Study/Coding/Docker/Window에서 Docker 사용하기 - Docker 설치|Docker 설치]]
+>3. [[Study/Coding/Docker/Window에서 Docker 사용하기 - IDE 연결|IDE 연결]]
 
 # WSL2 설치
 1. Windows PowerShell 관리자 권한으로 실행
-	![[3_Archive/1_Attachments/Pasted image 20240731141439.png]]
+	![[Attachments/Pasted image 20240731141439.png]]
 	
 	- 문제 발생 시 해결방법
-	  [[2_Resource/1_Study/1_Coding/ErrorFix/이 시스템에서 스크립트를 실행 할 수 없으므로 파일을 로드 할 수 없습니다.|이 시스템에서 스크립트를 실행 할 수 없으므로 파일을 로드 할 수 없습니다.]]
+	  [[Study/Coding/ErrorFix/이 시스템에서 스크립트를 실행 할 수 없으므로 파일을 로드 할 수 없습니다.|이 시스템에서 스크립트를 실행 할 수 없으므로 파일을 로드 할 수 없습니다.]]
 
 2. 리눅스를 위한 window 하위 시스템 사용
 	```powershell

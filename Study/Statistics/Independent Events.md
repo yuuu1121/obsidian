@@ -7,7 +7,7 @@ aliases:
 keywords:
   - 독립 사건
 related notes:
-  - "[[2_Resource/1_Study/4_Statistics/Conditional Probability]]"
+  - "[[Study/Statistics/Conditional Probability]]"
 reference: 
 author: 
 url: 

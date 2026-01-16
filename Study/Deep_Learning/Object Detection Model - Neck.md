@@ -28,10 +28,10 @@ url:
 # Methods
 ## Additional Blocks
 ### Enhancement of Receptive Field
-![[3_Archive/1_Attachments/Pasted image 20240304095110.png|+grid]]![[3_Archive/1_Attachments/Pasted image 20240304095120.png|+grid]]
+![[Attachments/Pasted image 20240304095110.png|+grid]]![[Attachments/Pasted image 20240304095120.png|+grid]]
 <center style='font-size:14;opacity:0.7;'>SPP layer (좌), ASPP layer (우)</center>
 
-![[3_Archive/1_Attachments/Pasted image 20240304095157.png|+grid]]![[3_Archive/1_Attachments/Pasted image 20240304191334.png|+grid]]
+![[Attachments/Pasted image 20240304095157.png|+grid]]![[Attachments/Pasted image 20240304191334.png|+grid]]
 <center style='font-size:14;opacity:0.7;'>RFB module (좌), Dilated convolution (우)</center>
 
 - Spatial Pyramid Pooling (SPP):
@@ -51,10 +51,10 @@ url:
 	- 경량화된 CNN 모델에서 학습된 Feature 를 강조하여, 빠른 추론 속도와 더불어 향상된 정확도에 기여한 구조
 ---
 ### Attention Module
-![[3_Archive/1_Attachments/Pasted image 20240304110433.png]]
+![[Attachments/Pasted image 20240304110433.png]]
 <center style='font-size:14;opacity:0.7'>Squeeze-and-Excitation module</center>
 
-![[3_Archive/1_Attachments/Pasted image 20240304095203.png]]
+![[Attachments/Pasted image 20240304095203.png]]
 <center style='font-size:14;opacity:0.7'>CBAM module</center>
 
 - Squeeze-and Excitation (SE):
@@ -70,7 +70,7 @@ url:
 		- [[2_Resource/0_Paper Review/YOLO/4_YOLO v4/Methodology/YOLO v4 - New Ideas and Modifications#PAN & SAM|YOLO v4 - Modified SAM]]
 ---
 ## Feature Integration Modules
-![[3_Archive/1_Attachments/Pasted image 20240304095340.png|+grid]]![[3_Archive/1_Attachments/Pasted image 20240304095348.png|+grid]]
+![[Attachments/Pasted image 20240304095340.png|+grid]]![[Attachments/Pasted image 20240304095348.png|+grid]]
 <center style='font-size:14;opacity:0.7;'>FPN(좌), PAN 프레임워크(우)</center>
 
 - Feature Pyramid Network (FPN)
@@ -84,7 +84,7 @@ url:
 		- [[2_Resource/0_Paper Review/YOLO/4_YOLO v4/Methodology/YOLO v4 - New Ideas and Modifications#PAN & SAM|YOLO v4 - Modified PAN]]
 ---
 
-![[3_Archive/1_Attachments/Pasted image 20240304095422.png|+grid]]![[3_Archive/1_Attachments/Pasted image 20240304095431.png|+grid]]![[3_Archive/1_Attachments/Pasted image 20240304095453.png|+grid]]
+![[Attachments/Pasted image 20240304095422.png|+grid]]![[Attachments/Pasted image 20240304095431.png|+grid]]![[Attachments/Pasted image 20240304095453.png|+grid]]
 <center style='font-size:14;opacity:0.7;'>NAS-FPN with RetinaNet(좌), Fully-connected FPN(중간), BiFPN(우)</center>
 
 - Neural Architecture Search-FPN (NAS-FPN)
@@ -97,7 +97,7 @@ url:
 	- Scale-wise level 의 re-weighting 을 수행한 후 서로 다른 Scale 의 Feature map 들을 추가하기 위해 Multi-input 의 Weighted residual connection 가 제안됨
 ---
 
-![[3_Archive/1_Attachments/Pasted image 20240304095507.png|+grid]]![[3_Archive/1_Attachments/Pasted image 20240304095513.png|+grid]]
+![[Attachments/Pasted image 20240304095507.png|+grid]]![[Attachments/Pasted image 20240304095513.png|+grid]]
 <center style='font-size:14;opacity:0.7;'>ASFF(좌), SFAM(우)</center>
 
 - Adaptively Spatial Feature Fusion (ASFF)

@@ -12,7 +12,7 @@ author:
 url:
   - https://velog.io/@qtly_u/Object-Detection-Architecture-1-or-2-stage-detector-%EC%B0%A8%EC%9D%B4
 ---
-![[3_Archive/1_Attachments/Pasted image 20240225163954.png]]
+![[Attachments/Pasted image 20240225163954.png]]
 
 - Localization 과 Classification 과 동시에 이루어지는 1-Stage detector
 	- Region proposal 과정을 거치지 않고, CNN 의 결과인 Feature map 에서 Localization 과 Bounding box regression 수행
@@ -25,18 +25,18 @@ url:
 ## Limitations of 1-Stage Detector
 - 속도는 빠르지만 2-Stage detector 에 비해 정확도가 낮음
 - Region proposal 과정 없이 전체 이미지를 빽빽하게 순회하면서 Sampling 을 하는 Dense sampling 방법을 수행하기 때문에 훨씬 더 많은 후보 영역 생성
-	- 즉, [[2_Resource/1_Study/2_DL/Class Imbalance]] 문제가 2-Stage detector 보다 더 심각함
-- [[2_Resource/1_Study/2_DL/2-Stage Detector#^s7ox99|Sample heuristic]] 방법을 적용해도 여전히 배경으로 쉽게 분류된 Sample 이 압도적으로 많기 때문에 학습이 비효율적
+	- 즉, [[Study/Deep_Learning/Class Imbalance]] 문제가 2-Stage detector 보다 더 심각함
+- [[Study/Deep_Learning/2-Stage Detector#^s7ox99|Sample heuristic]] 방법을 적용해도 여전히 배경으로 쉽게 분류된 Sample 이 압도적으로 많기 때문에 학습이 비효율적
 	- [[Focal Loss]] 를 사용하면 해당 문제를 완화할 수 있음
 ---
 ## Representative Model
 ### Anchor-Based
-![[3_Archive/1_Attachments/Pasted image 20240304091918.png|+grid]]![[3_Archive/1_Attachments/Pasted image 20240304091928.png|+grid]]<center style='font-size: 14; opacity: 0.7;'>YOLO v1 (좌), YOLO v3 (우)</center>
+![[Attachments/Pasted image 20240304091918.png|+grid]]![[Attachments/Pasted image 20240304091928.png|+grid]]<center style='font-size: 14; opacity: 0.7;'>YOLO v1 (좌), YOLO v3 (우)</center>
 
-![[3_Archive/1_Attachments/Pasted image 20240304092037.png]]
+![[Attachments/Pasted image 20240304092037.png]]
 <center style='font-size: 14; opacity: 0.7;'>SSD architecture</center>
 
-![[3_Archive/1_Attachments/Pasted image 20240304092106.png]]
+![[Attachments/Pasted image 20240304092106.png]]
 <center style='font-size: 14; opacity: 0.7;'>RetinaNet architecture</center>
 
 - **YOLO**: 
@@ -49,13 +49,13 @@ url:
 	- Darkent-53을 backbone network로 사용하며 multi-scale feature map을 사용하여 빠른 추론 속도를 보인 모델
 ---
 ### Anchor-Free
-![[3_Archive/1_Attachments/Pasted image 20240304092249.png|+grid]]![[3_Archive/1_Attachments/Pasted image 20240304092301.png|+grid]]
+![[Attachments/Pasted image 20240304092249.png|+grid]]![[Attachments/Pasted image 20240304092301.png|+grid]]
 <center style='font-size: 14; opacity: 0.7;'>CornerNet (좌), MatrixNet (우)</center>
 
-![[3_Archive/1_Attachments/Pasted image 20240304092348.png]]
+![[Attachments/Pasted image 20240304092348.png]]
 <center style='font-size: 14; opacity: 0.7;'>CenterNet</center>
 
-![[3_Archive/1_Attachments/Pasted image 20240304092410.png]]
+![[Attachments/Pasted image 20240304092410.png]]
 <center style='font-size: 14; opacity: 0.7;'>FCOS architecture</center>
 
 - **CornerNet**: 

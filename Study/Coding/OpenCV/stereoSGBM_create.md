@@ -28,7 +28,7 @@ cv2.stereoSGBM_create(minDisparity, numDisparities, blockSize, P1, P2, disp12Max
 
 - `minDisparity`
 	- 최소 시차(Disparity) 값 (default: 0)
-	- 시차와 깊이(Depth)는 반비례 관계를 가지기 때문에 최대 깊이 값을 제한하는 것과 같은 효과를 가짐 ([[2_Resource/1_Study/5_Sensors/Stereo Camera/Stereo Camera Depth Estimation#Depth Estimation|Depth Estimation]])
+	- 시차와 깊이(Depth)는 반비례 관계를 가지기 때문에 최대 깊이 값을 제한하는 것과 같은 효과를 가짐 ([[Study/Sensors/Stereo Camera/Stereo Camera Depth Estimation#Depth Estimation|Depth Estimation]])
 - `numDisparities`
 	- 최소, 최대 시차의 차이 값
 	- 항상 0보다 커야하며, 16 배수

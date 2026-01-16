@@ -21,7 +21,7 @@ url:
 ---
 # 이산 확률 변수 (Discrete Random Variable)
 
-- 확률변수 ([[2_Resource/1_Study/4_Statistics/Random Variables|Random Variable, RV]]) 의 공간이 ==유한하거나 (Finite) 셀수 있는 경우 (Countable)==
+- 확률변수 ([[Study/Statistics/Random Variables|Random Variable, RV]]) 의 공간이 ==유한하거나 (Finite) 셀수 있는 경우 (Countable)==
 
 ---
 ## 확률 질량 함수 (Probability Mass Function, PMF)

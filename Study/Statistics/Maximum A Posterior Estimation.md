@@ -25,7 +25,7 @@ $$p(\theta|D)={p(D|\theta)p(\theta)\over p(D)}$$
 $$\hat{\theta}_{MAP}:=\underset{\theta}{\arg{\max}}\text{ }p(\theta|D)=\underset{\theta}{\arg{\max}}\text{ }[\log p(D|\theta)+\log p(\theta)]$$
 
 - 이때, 사전 확률 분포 $p(\theta)$는 우리가 매개변수 $\theta$에 대해 가지는 사전 정보를 나타내며, 모델이 과적합([[Overfitting]]) 되는 것을 방지
-	- 만약 사전 분포가 단순한 모델을 선호한다고 가정하면, 사전 분포는 너무 복잡한 모델을 규제([[2_Resource/1_Study/3_ML/Regularization|Regularization]])하고 더 단순한 모델을 선호하게 함
+	- 만약 사전 분포가 단순한 모델을 선호한다고 가정하면, 사전 분포는 너무 복잡한 모델을 규제([[Study/Machine_Learning/Regularization|Regularization]])하고 더 단순한 모델을 선호하게 함
 
 <br>
 

@@ -10,7 +10,7 @@ url:
   - https://ropiens.tistory.com/128
   - https://coding-nyan.tistory.com/12
 related notes:
-  - "[[2_Resource/1_Study/3_ML/Clustering/Euclidean Clustering]]"
+  - "[[Study/Machine_Learning/Clustering/Euclidean Clustering]]"
   - "[[Binary Tree]]"
 ---
 # KD Tree (K-Dimensional Tree)
@@ -18,4 +18,4 @@ related notes:
 	- K 차원 공간의 점을 구성하기 위한 공간 분할 구조
 - Range나 Nearest Neighbor 탐색에 매우 유용
 - 포인트 클라우드는 일반적으로 3차원이므로 여기서 사용되는 KDTree의 차원은 3차원이며, 다음과 같이 표현됨
-![[3_Archive/1_Attachments/Pasted image 20240221150310.png|300]]
+![[Attachments/Pasted image 20240221150310.png|300]]

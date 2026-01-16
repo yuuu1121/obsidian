@@ -18,9 +18,9 @@ author:
 url:
 ---
 # 누적 분포 함수 (Cumulative Distribution Function, CDF)
-![[3_Archive/1_Attachments/Pasted image 20240506181259.png]]
+![[Attachments/Pasted image 20240506181259.png]]
 
-- [[2_Resource/1_Study/4_Statistics/Random Variables|확률 변수]]가 특정 값보다 작거나 같을 확률을 나타내는 함수
+- [[Study/Statistics/Random Variables|확률 변수]]가 특정 값보다 작거나 같을 확률을 나타내는 함수
 - 다변량 함수(multivariate real-valued variable $X,\quad x\in R^D$)에 대하여 정의된 확률을 $P$ 라고 할 때, 다음과 같이 정의되는 함수 $F_X(x)$ 를 $X$ 의 누적 분포 함수라고 정의
 
   >$$F_X(x)=P(X_1 \le x_1,\dots, X_D\le x_D)$$

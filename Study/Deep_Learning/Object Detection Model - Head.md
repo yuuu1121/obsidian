@@ -26,10 +26,10 @@ url:
 		- 크게 Dense prediction (1-stage) 과 Sparse prediction (2-stage) 으로 나뉨
 ---
 # Methods
-- [[2_Resource/1_Study/2_DL/1-Stage Detector|Dense Prediction (one-stage)]]: 일반적으로 인코더와 디코더로 분리된 네트워크
+- [[Study/Deep_Learning/1-Stage Detector|Dense Prediction (one-stage)]]: 일반적으로 인코더와 디코더로 분리된 네트워크
 	- **Anchor based**: Region Proposal Network (RPN), SSD, [[2_Resource/0_Paper Review/YOLO/2_YOLO 9000/Methodology/YOLO v2 - DarkNet-19#DarkNet-19 for Detection Task|YOLO v2]], RetinaNet
 	- **Anchor free**: CornerNet, CenterNet, MatrixNet, FCOS, YOLO v1
-- [[2_Resource/1_Study/2_DL/2-Stage Detector|Sparse Prediction (two-stage)]]: 
+- [[Study/Deep_Learning/2-Stage Detector|Sparse Prediction (two-stage)]]: 
 	- **Anchor based**: Faster R-CNN, R-FCN, Mask RCNN
 	- **Anchor free**: RepPoints
 ---

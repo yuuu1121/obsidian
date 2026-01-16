@@ -11,19 +11,19 @@ author:
 url:
   - https://wkddmswh99.tistory.com/6
 related notes:
-  - "[[2_Resource/1_Study/3_ML/Clustering/Clustering]]"
-  - "[[2_Resource/1_Study/3_ML/Clustering/Distance]]"
+  - "[[Study/Machine_Learning/Clustering/Clustering]]"
+  - "[[Study/Machine_Learning/Clustering/Distance]]"
 ---
 
 # Clustering 종류
-![[3_Archive/1_Attachments/Pasted image 20240221114027.png]]
+![[Attachments/Pasted image 20240221114027.png]]
 ## 계층적 군집 (Hierarchical Clustering)
-![[3_Archive/1_Attachments/Pasted image 20240221143445.png]]
+![[Attachments/Pasted image 20240221143445.png]]
 - **군집의 개수가 정해지지 않았을 때** 사용
 	- 몇 개의 군집으로 나누어야 하는지 결정하기 위해 사용되기도 함
 - 계층적 트리 모형을 이용해 개체들을 **순차적** 혹은 **계층적**으로 유사한 개체 내지 그룹과 통합하여 군집화 수행
 	- 각각의 데이터들을 **하나의 클러스터로 가정**하고 이들의 거리를 측정해, 거리가 가까운 데이터들끼리 병합하며 점점 상위 단계의 클러스터로 구성하는 방법
-- 유사도 측정 방법으로 [[2_Resource/1_Study/3_ML/Clustering/Distance#유클리디안 거리 (Euclidean Distance)|유클리디안 거리 (Euclidean Distance)]]를 사용하는 알고리즘을 [[2_Resource/1_Study/3_ML/Clustering/Euclidean Clustering]]이라고 함
+- 유사도 측정 방법으로 [[Study/Machine_Learning/Clustering/Distance#유클리디안 거리 (Euclidean Distance)|유클리디안 거리 (Euclidean Distance)]]를 사용하는 알고리즘을 [[Study/Machine_Learning/Clustering/Euclidean Clustering]]이라고 함
 ### 장점
 - 구현이 간단하고 이해하기 쉬움
 - 덴드로그램과 같은 그래프로 군집이 형성되는 과정 파악 가능

@@ -85,7 +85,7 @@ $$CE(p_t)=-\alpha_t\log(p_t)$$
 - [[2_Resource/0_Paper Review/Focal Loss/Methodology/Focal Loss - Method of Focal Loss#Balanced Cross Entropy Loss|Balanced Cross-Entropy Loss]]
 ---
 ## Focal Loss
-![[3_Archive/4_Zotero/Literature Notes/@LinEtAl2018/image-1-x47-y380.png|+grid]]![[3_Archive/1_Attachments/Pasted image 20240307200310.png|+grid]]
+![[3_Archive/4_Zotero/Literature Notes/@LinEtAl2018/image-1-x47-y380.png|+grid]]![[Attachments/Pasted image 20240307200310.png|+grid]]
 $$FL(p_t)=-(1-p_t)^{\gamma}\log(p_t)$$
 
 - Focal loss 는 Easy sample 에 대한 가중치를 줄이고 Hard negative sample 의 학습에 초점을 맞추도록 CE loss 수정

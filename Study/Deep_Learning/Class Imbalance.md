@@ -26,7 +26,7 @@ url:
 ## For 2-Stage Detector
 - Two-stage cascade
 	- Region proposals 를 추려내는 방법을 적용하여 대부분의 Background sample 을 걸러주는 방법
-	- eg., [[2_Resource/1_Study/2_DL/Selective Search]], Edge boxes, Deep mask, Region Proposal Network (RPN)
+	- eg., [[Study/Deep_Learning/Selective Search]], Edge boxes, Deep mask, Region Proposal Network (RPN)
 - Sampling heuristic
 	- Positive / Negative sample 의 수를 적절하게 유지하는 방법
 	- eg., Hard negative sample, OHEM

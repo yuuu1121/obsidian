@@ -13,7 +13,7 @@ url:
 - 대다수의 Object detection algorithm은 object가 존재하는 위치 주변에 여러개의 score가 높은 Bounding box를 만든다는 문제점이 있음
 - 이 중 가장 정확한 BBox를 선택하기 위해 Non-Max Suppression (NMS) 기법 사용
 
-![[3_Archive/1_Attachments/Pasted image 20240225225108.png]]
+![[Attachments/Pasted image 20240225225108.png]]
 
 ---
 ## NMS의 과정
@@ -29,16 +29,16 @@ url:
 ## NMS의 문제점과 Anchor box
 - 객체들끼리 겹칠 때 다른 객체에 대한 BBox까지 제거될 수 있음
 	- 현실에서는 객체끼리 겹치는 경우가 많기 때문에 자동차에 대해서 detection을 하면 트럭 같은 경우는 detection을 못하고 박스가 제거될 수 있음
-	- 이 문제를 해결하기 위해 [[2_Resource/1_Study/2_DL/Anchor Box]]가 등장함
+	- 이 문제를 해결하기 위해 [[Study/Deep_Learning/Anchor Box]]가 등장함
 
-![[3_Archive/1_Attachments/888ac9c19706d0b542f9a42c93699d62_MD5.png|300]]
+![[Attachments/888ac9c19706d0b542f9a42c93699d62_MD5.png|300]]
 
 - Context information 을 고려하지 않음
 - Object occlusion 으로 인해 Confidence score 와 IoU score 가 저하될 수 있는 문제 고려
 ---
 ## Modified NMS Methods
 
-![[3_Archive/1_Attachments/Pasted image 20240229161300.png]]
+![[Attachments/Pasted image 20240229161300.png]]
 <center style="font-size: 14; opacity: 0.7;">Soft NMS (좌), DIoU NMS (우)</center>
 
 - Soft NMS

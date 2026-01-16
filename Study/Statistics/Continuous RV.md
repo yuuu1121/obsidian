@@ -22,7 +22,7 @@ url:
 # 연속 확률 변수 (Continuous Random Variable)
 
 - 연속적인 변수에서 한 점의 확률은 항상 0이기 때문에 범위를 설정하고 확률을 계산해야 함
-- **확률변수** ([[2_Resource/1_Study/4_Statistics/Random Variables|Random Variables]]) 의 **누적분포함수** ([[Cumulative Distribution Function, CDF|Cumulative Distribution Function]], CDF) 가 ==실수 공간의 모든 $x$ 에 대해 연속인 경우==
+- **확률변수** ([[Study/Statistics/Random Variables|Random Variables]]) 의 **누적분포함수** ([[Cumulative Distribution Function, CDF|Cumulative Distribution Function]], CDF) 가 ==실수 공간의 모든 $x$ 에 대해 연속인 경우==
 
 <br><br>
 
@@ -45,7 +45,7 @@ url:
 	>  $$f(x) = \lim_{\Delta x \to 0} \frac{P(x \leq X \leq x + \Delta x)}{\Delta x}$$
 
 
-- ==$x$ 가 [[2_Resource/1_Study/4_Statistics/Continuous RV|연속확률]]분포를 따를 때, 누적분포함수는 **연속 함수**이며, $P(X=x)=F_X(x)-F_X(x^-)=0$==
+- ==$x$ 가 [[Study/Statistics/Continuous RV|연속확률]]분포를 따를 때, 누적분포함수는 **연속 함수**이며, $P(X=x)=F_X(x)-F_X(x^-)=0$==
 	- 즉, ==$P(X=x)$ 는 항상 0 이며, 이를 **질량점이 없다**고 표현==함 ([[Discrete RV]])
 	>[!example]
 	>0 에서 1 사이 실수중 **정확히** 0.5에 대응하는 값을 뽑을 확률

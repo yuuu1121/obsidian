@@ -12,12 +12,12 @@ author:
 url:
   - https://velog.io/@qtly_u/Object-Detection-Architecture-1-or-2-stage-detector-%EC%B0%A8%EC%9D%B4
 ---
-![[3_Archive/1_Attachments/Pasted image 20240225162412.png]]
+![[Attachments/Pasted image 20240225162412.png]]
 
 - Localization 과 Classification 이 2-Stage 로 분리되어 있는 Object detector
 	- First stage: 
 		- Region proposal 을 사용하여 이미지 안에 객체가 있을 법한 영역 (Region of Interest, ROI) 를 대략적으로 생성
-		- 대표적인 Region proposal 기법: [[2_Resource/1_Study/2_DL/Selective Search]], [[2_Resource/1_Study/2_DL/Sliding Window]]
+		- 대표적인 Region proposal 기법: [[Study/Deep_Learning/Selective Search]], [[Study/Deep_Learning/Sliding Window]]
 	- Second stage:
 		- 해당 Proposal 에 대해 CNN 을 이용하여 Classification 수행
 ---
@@ -32,14 +32,14 @@ url:
 ---
 ## Representative Models
 ### Anchor-Based
-![[3_Archive/1_Attachments/Pasted image 20240304092603.png|+grid]]![[3_Archive/1_Attachments/Pasted image 20240304092610.png|+grid]]
+![[Attachments/Pasted image 20240304092603.png|+grid]]![[Attachments/Pasted image 20240304092610.png|+grid]]
 <center style='font-size: 14; opacity: 0.7;'>Fast R-CNN (좌), Faster R-CNN (우)</center>
 
-![[3_Archive/1_Attachments/Pasted image 20240304092659.png|+grid]]![[3_Archive/1_Attachments/Pasted image 20240304092710.png|+grid]]
+![[Attachments/Pasted image 20240304092659.png|+grid]]![[Attachments/Pasted image 20240304092710.png|+grid]]
 
 <center style='font-size: 14; opacity: 0.7;'>R-FCN (좌), Libra R-CNN (우)</center>
 
-![[3_Archive/1_Attachments/Pasted image 20240304092741.png]]
+![[Attachments/Pasted image 20240304092741.png]]
 
 <center style='font-size: 14; opacity: 0.7;'>Mask R-CNN</center>
 
@@ -56,7 +56,7 @@ url:
 ---
 ### Anchor-Free
 
-![[3_Archive/1_Attachments/Pasted image 20240304092925.png|500]]
+![[Attachments/Pasted image 20240304092925.png|500]]
 
 <center style='font-size: 14; opacity: 0.7;'>RePoints</center>
 

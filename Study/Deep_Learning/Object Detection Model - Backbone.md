@@ -26,11 +26,11 @@ url:
 		- 크게 Dense prediction (1-stage) 과 Sparse prediction (2-stage) 으로 나뉨
 ---
 # Methods
-![[3_Archive/1_Attachments/Pasted image 20240313144205.png]]
+![[Attachments/Pasted image 20240313144205.png]]
 
 <center style='font-size:14;opacity:0.7;'>VGG-16(좌) ResNet-34(중간), SpineNet-49 architecture(우)</center>
 
-![[3_Archive/1_Attachments/Pasted image 20240313144245.png]]
+![[Attachments/Pasted image 20240313144245.png]]
 
 <center style='font-size:14;opacity:0.7;'>EfficientNet의 Compound scaling(좌) CSPDarknet53의 Cross Stage Hierarchy 방법(우)</center>
 

@@ -9,7 +9,7 @@ aliases:
 keywords: 
 related notes: 
 reference:
-  - "[[2_Resource/1_Study/4_Statistics/Random Variables|RV]]"
+  - "[[Study/Statistics/Random Variables|RV]]"
 author: 
 url:
 ---

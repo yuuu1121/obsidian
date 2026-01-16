@@ -87,7 +87,7 @@ dg-publish: false
 - **장점**: 명확한 정답이 없는 복잡한 문제에서 적합
 - **단점**: 학습 시간이 오래 걸리고, 시행착오가 많을 수 있음
 
-![[3_Archive/1_Attachments/Pasted image 20240910114302.png]]
+![[Attachments/Pasted image 20240910114302.png]]
 
 <br>
 

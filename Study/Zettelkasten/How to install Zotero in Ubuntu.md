@@ -7,7 +7,7 @@ aliases:
 keywords:
   - zotero
 related notes:
-  - "[[2_Resource/1_Study/ETCs/Zettelkasten/Research Workflow - Zotero, Pandoc]]"
+  - "[[Study/Zettelkasten/Research Workflow - Zotero, Pandoc]]"
 reference: 
 author: 
 url: 

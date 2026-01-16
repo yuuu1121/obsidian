@@ -14,7 +14,7 @@ url:
 ---
 # 조합 (Combination)
 - <mark class="hltr-red">$n$ 개의 요소 중 $r$ 개를 선택하여 순서 상관 없이 나열하는 모든 경우의 수</mark>
-  순서가 부여된 $n$ 개의 요소 중 $r$ 개를 선택하여 나열하는 모든 경우의 수 ($_nP_r$, [[2_Resource/1_Study/4_Statistics/Permutation]])에서 <mark class="hltr-green">순서 상관 없이 나열하므로, $r$ 개를 나열하는 $_rP_r=r!$ 를 하나의 경우로 고려</mark><br>
+  순서가 부여된 $n$ 개의 요소 중 $r$ 개를 선택하여 나열하는 모든 경우의 수 ($_nP_r$, [[Study/Statistics/Permutation]])에서 <mark class="hltr-green">순서 상관 없이 나열하므로, $r$ 개를 나열하는 $_rP_r=r!$ 를 하나의 경우로 고려</mark><br>
   
 >   $$_nC_r={_nP_r\over r!}={n!\over(n-r)!\cdot r!}={n \choose r}$$
 

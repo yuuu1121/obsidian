@@ -9,12 +9,12 @@ author:
 url:
 ---
 # Transformer
-![[3_Archive/1_Attachments/Pasted image 20240311160213.png|350]]
+![[Attachments/Pasted image 20240311160213.png|350]]
 
 - Attention 만으로 이루어진 Encoder-Decoder 구조의 Sequence to sequence 모델
 ---
 ## Self Attention
-![[3_Archive/1_Attachments/Pasted image 20240311160320.png]]
+![[Attachments/Pasted image 20240311160320.png]]
 
 - 말 그대로 Attention 을 자기 자신한테 취하는 방법
 	- Attention 은 Input sequence 전체와 Target seq 단어 1개를 연결하는 반면, Self attention 은 Input seq 의 전체 단어들 사이를 연결
@@ -22,7 +22,7 @@ url:
 ---
 ### Self Attention 과정
 #### Query, Key, Value
-![[3_Archive/1_Attachments/Pasted image 20240311160513.png|+grid]]![[3_Archive/1_Attachments/Pasted image 20240312091338.png|+grid]]
+![[Attachments/Pasted image 20240311160513.png|+grid]]![[Attachments/Pasted image 20240312091338.png|+grid]]
 
 <center style='font-size:14;opacity:0.7;'>Query, Key and Value</center>
 
@@ -39,9 +39,9 @@ url:
 - Value: 데이터의 값
 
 ---
-![[3_Archive/1_Attachments/Pasted image 20240311161401.png|500]]
-![[3_Archive/1_Attachments/Pasted image 20240311161409.png|500]]
-![[3_Archive/1_Attachments/Pasted image 20240312091722.png|300]]
+![[Attachments/Pasted image 20240311161401.png|500]]
+![[Attachments/Pasted image 20240311161409.png|500]]
+![[Attachments/Pasted image 20240312091722.png|300]]
 
 ---
 #### Scaled Dot-product Attention
@@ -52,7 +52,7 @@ $$QK^T$$
 - Query 와 Key 를 내적하여 둘 사이의 연관성을 나타내는 Relation matrix 계산
 	- 이 Relation matrix 를 Attention score 라고 함
 
-![[3_Archive/1_Attachments/Pasted image 20240311174500.png|500]]
+![[Attachments/Pasted image 20240311174500.png|500]]
 
 ---
 ##### Scale
@@ -69,7 +69,7 @@ $$softmax({score\over \sqrt{d_k}})V$$
 	- 집중하려는 단어의 값은 그대로 유지하고, 관련 없는 단어를 제외
 ---
 ## Multi-Head Attention
-![[3_Archive/1_Attachments/Pasted image 20240312093638.png]]
+![[Attachments/Pasted image 20240312093638.png]]
 
 ---
 ## 정리

@@ -197,7 +197,7 @@ ___
 ```
 
 - 결과
-	![[3_Archive/1_Attachments/58a89a5e3696dee4406bd962fe1e4f00_MD5.png|500]]
+	![[Attachments/58a89a5e3696dee4406bd962fe1e4f00_MD5.png|500]]
 
 ### 여러 줄의 각주 작성
 각주가 여러 줄에 걸쳐 작성되어야 하는 경우 각 새 줄 앞에 2개의 공백을 추가합니다.
@@ -209,7 +209,7 @@ ___
 ```
 
 - 결과
-	![[3_Archive/1_Attachments/dac9a2b90b974498b4bfc94f4cc275c1_MD5.png|500]]
+	![[Attachments/dac9a2b90b974498b4bfc94f4cc275c1_MD5.png|500]]
 
 ### 이름이 지정된 각주
 각주에 이름을 지정하여 각주를 더 쉽게 식별하고 참조를 연결할 수 있습니다. 이름이 지정된 각주도 번호로 표시됩니다.
@@ -220,7 +220,7 @@ ___
 ```
 
 - 결과
-	![[3_Archive/1_Attachments/41cf37cb267389e82227fe005c3ee977_MD5.png|500]]
+	![[Attachments/41cf37cb267389e82227fe005c3ee977_MD5.png|500]]
 
 ### 문장 안 각주 넣기
 각주를 문장 안에 인라인으로 추가할 수도 있습니다. 이 경우, `^`기호가 대괄호 바깥쪽에 위치합니다.
@@ -229,7 +229,7 @@ ___
 ```
 
 - 결과
-	![[3_Archive/1_Attachments/db5b1c1f453dc49920775ff7fb0b1f08_MD5.png|500]]
+	![[Attachments/db5b1c1f453dc49920775ff7fb0b1f08_MD5.png|500]]
 
 ## Table
 본문에 표를 넣을 수 있습니다.  
@@ -299,7 +299,7 @@ ___
 ```
 
 - 결과
-	![[3_Archive/1_Attachments/bf5e62e37e8dae902f31965ba581c3c6_MD5.png|150]]
+	![[Attachments/bf5e62e37e8dae902f31965ba581c3c6_MD5.png|150]]
 
 ## Embedding Link
 내부 링크와는 다르게 노트 내용 자체를 다른 노트에 박아놓을 때 사용하는 마크다운 문법입니다. 알고 있는면 상당히 유용합니다. 
@@ -309,18 +309,18 @@ ___
 ```
 
 - 결과
-	![[3_Archive/1_Attachments/c9c79ca93e1aa1d7f3b8c21e6823c060_MD5.png|500]]
+	![[Attachments/c9c79ca93e1aa1d7f3b8c21e6823c060_MD5.png|500]]
 
 ## Block Reference
 블록 참조는 다른 블록 내용을 현재 블록에 포함시키는 기능입니다. `![[블록 링크#^id]]` 형식으로 사용합니다.
 ID를 부여한 문단 만 임베딩 되며, 사용자가 ID를 직접 부여하기 위해선 문단 끝에 `^myobsi` 형식으로 사용합니다.
-![[3_Archive/1_Attachments/94a907200b4fad9504e5223ed1ffa931_MD5.png|500]]
+![[Attachments/94a907200b4fad9504e5223ed1ffa931_MD5.png|500]]
 ```text
 ![[옵시디언 사용법#^myobsi]]
 ```
 
 - 결과
-	![[3_Archive/1_Attachments/4985d563e85f2ecd8601698b393af502_MD5.png|500]]
+	![[Attachments/4985d563e85f2ecd8601698b393af502_MD5.png|500]]
 
 ## Callout
 내용을 쓰다가 강조하는 부분이 있다거나, 정리를 할 때 유용한 문법입니다.

@@ -31,7 +31,7 @@ Dockerfile:68
 ERROR: failed to solve: process "/bin/sh -c pip3 install numpy==1.23.0 llvmlite numba tensorboardX easydict pyyaml scikit-image tqdm SharedArray open3d mayavi av2 kornia pyquaternion" did not complete successfully: exit code: 1
 ```
 # 원인 분석
-- [[2_Resource/1_Study/1_Coding/ErrorFix/Could not build wheels for _ which use PEP 517 and cannot be installed directly|PEP 517]]의 발생 원인과 비슷한 듯하지만 정확한 이유는 모르겠음. (**double check**)
+- [[Study/Coding/ErrorFix/Could not build wheels for _ which use PEP 517 and cannot be installed directly|PEP 517]]의 발생 원인과 비슷한 듯하지만 정확한 이유는 모르겠음. (**double check**)
 # 해결 방법
 - Dockerfile에서 `RUN pip3 install`에 있는 `mayavi`를 지우고 해당 코드 추가
 ```ruby

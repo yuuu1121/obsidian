@@ -7,7 +7,7 @@ aliases:
 keywords:
   - 이항 정리
 related notes:
-  - "[[2_Resource/1_Study/4_Statistics/Combination]]"
+  - "[[Study/Statistics/Combination]]"
 reference: 
 author: 
 url: 

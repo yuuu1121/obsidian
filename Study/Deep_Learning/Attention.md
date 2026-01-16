@@ -9,13 +9,13 @@ author:
 url:
 ---
 # Attention
-![[3_Archive/1_Attachments/Pasted image 20240311153327.png]]
+![[Attachments/Pasted image 20240311153327.png]]
 
 - Attention 이란 문맥에 따라 집중할 단어를 결정하는 방식을 의미
 ---
 ## Attention 모델의 구조
 ### Encoder 와 Decoder
-![[3_Archive/1_Attachments/Pasted image 20240311153826.png]]
+![[Attachments/Pasted image 20240311153826.png]]
 
 - Encoder: Input data 를 입력 받아 Context vector 로 압축하여 출력하는 역할
 - Decoder: 압축된 Context vector 를 입력받아 Output data 를 출력
@@ -27,8 +27,8 @@ url:
 
 >정보 손실 문제를 해결하기 위해 Attention 이라는 개념이 도입
 
-![[3_Archive/1_Attachments/Pasted image 20240311154132.png]]
-![[3_Archive/1_Attachments/Pasted image 20240311154137.png|350]]
+![[Attachments/Pasted image 20240311154132.png]]
+![[Attachments/Pasted image 20240311154137.png|350]]
 <center style='font-size:14;opacity:0.7;'>RNN</center>
 
 - RNN 은 Output 으로 Hidden state 가 출력되기 때문에 Encoder 와 Decoder 구조에서 각각의 Output 이 hidden state 형태로 출력됨
@@ -38,13 +38,13 @@ url:
 - Decoder hidden state: Target sequence 의 Context vector
 ---
 ## Attention Score
-![[3_Archive/1_Attachments/Pasted image 20240311154705.png]]
+![[Attachments/Pasted image 20240311154705.png]]
 
 - Encoder hidden state 와 Decoder hidden state 를 Dot product 하여 Attention score 계산
 	- RNN 셀 개수만큼 Score 나옴
 ---
 ## Attention Value
-![[3_Archive/1_Attachments/Pasted image 20240311154855.png]]
+![[Attachments/Pasted image 20240311154855.png]]
 
 - 앞서 구한 Attention score 들을 Softmax 활성 함수에 대입하여 Attention distribution 을 생성
 	- 각 Score 들의 중요도를 상대적으로 보기 쉽게 하기 위해
@@ -52,12 +52,12 @@ url:
 
 >즉, 각 문맥들 (Hidden state) 의 중요도 (Attention score) 를 반영하여 최종 문맥 (Attention value) 를 계산
 
-![[3_Archive/1_Attachments/Pasted image 20240311155427.png]]
+![[Attachments/Pasted image 20240311155427.png]]
 
 - 마지막으로 Decoder 의 문맥을 추가하기 위해 Decoder hidden state 를 Attention value 와 Concatenation
 - 추가적으로 성능을 향상하기 위해 tanh, softmax 활성화 함수를 이용해 학습을 시키면 최종적인 출력이 나옴
 
-![[3_Archive/1_Attachments/Pasted image 20240311155530.png]]
+![[Attachments/Pasted image 20240311155530.png]]
 
 ---
 ## 정리

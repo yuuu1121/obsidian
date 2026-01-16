@@ -12,11 +12,11 @@ related notes:
   - "[[Downsampling]]"
 ---
 # Voxel 이란?
-![[3_Archive/1_Attachments/Pasted image 20240221150527.png|300]]
+![[Attachments/Pasted image 20240221150527.png|300]]
 - 2D 이미지를 구성하는 최소 단위인 pixel을 3D로 확장한 것
 	- 이미지 1x1 에서 깊이 정보를 포함한 1x1x1 로 표현하고, 이때의 최소 단위를 Voxel (Volume + Pixel)으로 정의
 ## 복셀화 방법 (Voxelization)
-![[3_Archive/1_Attachments/Pasted image 20240221150700.png|500]]
+![[Attachments/Pasted image 20240221150700.png|500]]
 - 포인트 클라우드를 복셀로 변환하는 작업
 	- PCL에서는 **Voxel Grid filter**를 이용하여 복셀화 수행
 ### 진행 방법
