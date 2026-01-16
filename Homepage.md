@@ -10,17 +10,14 @@ banner_x: 0.5
 - **AGENDA**
 	- [Daily](obsidian://advanced-uri?vault=YJU_Obsidian&daily=true)
 	- [[00. Templates|Templates]]
+-  **TODO**
 - **STUDY**
 	- [[00. Deep Learning|Deep Learning]]
 	- [[00. Machine Learning|Machine Learning]]
 	- [[00. Reinforcement Learning|RL]]
-	- [[00. Statistics|Statistics]]
+	- [[00. OpenCV|OpenCV]]
 - **PAPER**
 	- [[00. Reviews|Reviews]]
-- **TOOLS**
-	- [[00. OpenCV|OpenCV]]
-	- [[00. Coding|Coding]]
-	- [[Obsidian Guide|Guide]]
 
 <br>
 
