@@ -1,107 +1,40 @@
 ---
-cssclasses:
-  - homepage
+cssclass: cards
 ---
 
 ```dataviewjs
-const hour = new Date().getHours();
-let greeting, emoji;
-if (hour >= 5 && hour < 12) {
-    greeting = "Good Morning"; emoji = "🌅";
-} else if (hour >= 12 && hour < 17) {
-    greeting = "Good Afternoon"; emoji = "☀️";
-} else if (hour >= 17 && hour < 21) {
-    greeting = "Good Evening"; emoji = "🌆";
+const currentHour = moment().format('HH');
+let greeting;
+if (currentHour >= 18 || currentHour < 5) {
+    greeting = '🌙 Good Evening';
+} else if (currentHour >= 5 && currentHour < 12) {
+    greeting = '🌅 Good Morning';
 } else {
-    greeting = "Good Night"; emoji = "🌙";
+    greeting = '☀️ Good Afternoon';
 }
-dv.span(`<div class="greeting-container"><h1 class="greeting">${emoji} ${greeting}!</h1><p class="date">${moment().format("YYYY년 MM월 DD일 dddd")}</p></div>`)
+dv.header(1, greeting);
 ```
 
----
+> [!cards|3]
+>  **Study**
+> ![](https://raw.githubusercontent.com/D3Ext/aesthetic-wallpapers/main/images/small-memory.png)
+>  **[[Study/Deep_Learning/|Deep Learning]]**  <br> **[[Study/Machine_Learning/|Machine Learning]]**   <br> **[[Study/Reinforcement_Learning/|Reinforcement Learning]]**   <br>  **[[Study/Statistics/|Statistics]]**
+>
+>  **Paper**
+> ![](https://raw.githubusercontent.com/D3Ext/aesthetic-wallpapers/main/images/lofi.png)
+>**[[Paper/Reviews/|Reviews]]**  <br> **[[Paper/Zotero/|Zotero Notes]]**  <br> **[[Paper/논문 작성 유의사항|Writing Guide]]**
+>
+>  **Tools**
+> ![](https://raw.githubusercontent.com/D3Ext/aesthetic-wallpapers/main/images/music.jpg)
+>**[[Obsidian Guide|📖 Guide]]**  <br> **[[Templates/|📝 Templates]]**  <br> **[[Daily Notes/|📅 Daily Notes]]**
 
-> [!multi-column]
->
->> [!blank]
->> ### 📊 Vault Stats
->> ```dataviewjs
->> const all = dv.pages().length;
->> const study = dv.pages('"Study"').length;
->> const paper = dv.pages('"Paper"').length;
->> const daily = dv.pages('"Daily Notes"').length;
->> dv.paragraph(`📁 Total: **${all}** | 📚 Study: **${study}** | 📄 Paper: **${paper}** | 📅 Daily: **${daily}**`)
->> ```
->
->> [!blank]
->> ### ⏰ Life Progress
->> ![[Life Progress]]
 
----
-
-> [!multi-column]
+>[!multi-column|right|2]
 >
->> [!blank]
->> ## 🎓 Study
->> - [[Study/Deep_Learning/|🧠 Deep Learning]]
->> - [[Study/Machine_Learning/|🤖 Machine Learning]]
->> - [[Study/Reinforcement_Learning/|🎮 Reinforcement Learning]]
->> - [[Study/Statistics/|📈 Statistics]]
->> - [[Study/OpenCV/|👁 OpenCV]]
->> - [[Study/Coding/|💻 Coding]]
+>> [!important]+ 📊 Project Progress
+>> ![[Project Progress]]
 >
->> [!blank]
->> ## 📄 Paper
->> - [[Paper/Reviews/|📝 Reviews]]
->> - [[Paper/Zotero/|📚 Zotero Notes]]
->> - [[Paper/논문 작성 유의사항|✍️ Writing Guide]]
->
->> [!blank]
->> ## 🛠 Quick Access
->> ```dataviewjs
->> dv.span(`- [[${moment().format("YYYY-MM-DD")}|📅 Today's Daily Note]]`)
->> ```
->> - [[Obsidian Guide|📖 Obsidian Guide]]
->> - [[Templates/|📝 Templates]]
+>> [!danger]+ ⏳ Deadline
+>> ![[Deadline]]
 
 ---
-
-> [!multi-column]
->
->> [!blank]
->> ## 📝 Recently Modified
->> ```dataview
->> TABLE WITHOUT ID
->>   link(file.link, file.name) AS "Note",
->>   dateformat(file.mtime, "MM-dd HH:mm") AS "Modified"
->> FROM ""
->> WHERE file.name != "Homepage"
->>   AND file.name != "Life Progress"
->>   AND file.name != "Countdown"
->>   AND !contains(file.path, "Templates")
->> SORT file.mtime DESC
->> LIMIT 8
->> ```
->
->> [!blank]
->> ## ⏳ Countdown
->> ![[Countdown]]
-
----
-
-> [!blank]
-> ## ✅ Open Tasks
-> ```dataview
-> TASK
-> FROM "Daily Notes"
-> WHERE !completed
-> SORT file.mtime DESC
-> LIMIT 5
-> ```
-
----
-
-<center>
-
-🏠 **Homepage** | `Cmd + Shift + H`
-
-</center>
