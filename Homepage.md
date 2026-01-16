@@ -7,31 +7,29 @@ banner_x: 0.5
 ---
 
 # Dashboard
-- **AGENDA**
-	- [Daily](obsidian://advanced-uri?vault=YJU_Obsidian&daily=true)
-	- [[00. Templates|Templates]]
 -  **TODO**
-	- 📝 논문 작성
-		- [ ] 서론 작성 #논문
-		- [ ] 관련 연구 정리 #논문
-		- [ ] 실험 결과 정리 #논문
-		- [ ] 결론 작성 #논문
-	- 🔬 실험
-		- [ ] 데이터셋 준비 #실험
-		- [ ] 모델 학습 #실험
-		- [ ] 결과 분석 #실험
-	- 📊 데이터 분석
-		- [ ] 데이터 전처리 #데이터
-		- [ ] 시각화 #데이터
-	- 🎓 학위 과정
-		- [ ] 중간 발표 준비 #학위
-		- [ ] 논문 심사 준비 #학위
+	- [Daily](obsidian://advanced-uri?vault=YJU_Obsidian&daily=true)
+	- IROS
+		- [ ] 논문 초안 작성 #논문
+		- [ ] 시뮬레이터 구현 #논문
+		- [ ] Active Marker 제작 #논문
+		- [ ] RTK-GPS 주문 #논문
+		- [ ] Active Marker 아크릴 가공 주문 #논문
+		- [ ] Active Marker 전선 주문 #논문
+	- PKRC
+		- [ ] 수중로봇 Wall Following 실제 구현 #PKRC
+		- [ ] Laser + Camera Altitude Estimation #PKRC 
+		- [ ] 전장 V3 #PKRC 
+	-  Cyclops
+		- [ ] USBL 동작 테스트 #데이터
+		- [ ] 내부 실린더 전장 마운트 설계 #데이터
+	- AUV
+		- [ ] idea 회의 #AUV
 - **STUDY**
 	- [[00. Deep Learning|Deep Learning]]
 	- [[00. Machine Learning|Machine Learning]]
 	- [[00. Reinforcement Learning|RL]]
 	- [[00. OpenCV|OpenCV]]
-- **PAPER**
 	- [[00. Reviews|Reviews]]
 
 <br>
