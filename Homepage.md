@@ -11,20 +11,20 @@ banner_x: 0.5
 	- [**Daily**](obsidian://advanced-uri?vault=YJU_Obsidian&daily=true)
 	- **IROS**
 		- [ ] 논문 초안 작성 📅2026-03-01 #논문
-		- [ ] 시뮬레이터 구현 #논문
+		- [x] 시뮬레이터 구현 #논문
 		- [ ] Active Marker 제작 #논문
 		- [ ] RTK-GPS 주문 #논문
 		- [ ] Active Marker 아크릴 가공 주문 #논문
 		- [ ] Active Marker 전선 주문 #논문
 	- **PKRC**
-		- [ ] 수중로봇 Wall Following 실제 구현 📅2026-02-15 #PKRC
-		- [x] 수중로봇 IMU PID 제어 #PKRC
-		- [x] 수중로봇 Depth 제어 #PKRC
+		- [ ] 수중로봇 Wall Following 실제 구현 📅2026-01-18 #PKRC
+		- [x] 수중로봇 IMU PID 제어 📅2026-01-16 #PKRC
+		- [x] 수중로봇 Depth 제어 📅2026-01-16 #PKRC
 		- [ ] Laser + Camera Altitude Estimation #PKRC
 		- [ ] 전장 V3 #PKRC 
 	-  **Cyclops**
-		- [ ] USBL 동작 테스트 #데이터
-		- [ ] 내부 실린더 전장 마운트 설계 #데이터
+		- [ ] USBL 동작 테스트 #Cyclops
+		- [ ] 내부 실린더 전장 마운트 설계 #Cyclops 
 	- **AUV**
 		- [ ] idea 회의 #AUV
 - ### **STUDY**
