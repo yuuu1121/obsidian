@@ -1,16 +1,14 @@
 ---
 cssclasses:
   - myhome
-banner: "Pictures/forest.jpg"
-banner_y: 0.4
-banner_icon: 🎓
+banner: "Pictures/fuji.jpg"
+banner_y: 0.7
 banner_x: 0.5
 ---
 
 # Dashboard
 - **AGENDA**
 	- [Daily](obsidian://advanced-uri?vault=YJU_Obsidian&daily=true)
-	- [[Daily Notes/|Daily Notes]]
 	- [[Templates/|Templates]]
 - **STUDY**
 	- [[Study/Deep_Learning/|Deep Learning]]
@@ -19,8 +17,6 @@ banner_x: 0.5
 	- [[Study/Statistics/|Statistics]]
 - **PAPER**
 	- [[Paper/Reviews/|Reviews]]
-	- [[Paper/Zotero/|Zotero]]
-	- [[Paper/논문 작성 유의사항|Writing Guide]]
 - **TOOLS**
 	- [[Study/OpenCV/|OpenCV]]
 	- [[Study/Coding/|Coding]]
