@@ -11,6 +11,21 @@ banner_x: 0.5
 	- [Daily](obsidian://advanced-uri?vault=YJU_Obsidian&daily=true)
 	- [[00. Templates|Templates]]
 -  **TODO**
+	- 📝 논문 작성
+		- [ ] 서론 작성 #논문
+		- [ ] 관련 연구 정리 #논문
+		- [ ] 실험 결과 정리 #논문
+		- [ ] 결론 작성 #논문
+	- 🔬 실험
+		- [ ] 데이터셋 준비 #실험
+		- [ ] 모델 학습 #실험
+		- [ ] 결과 분석 #실험
+	- 📊 데이터 분석
+		- [ ] 데이터 전처리 #데이터
+		- [ ] 시각화 #데이터
+	- 🎓 학위 과정
+		- [ ] 중간 발표 준비 #학위
+		- [ ] 논문 심사 준비 #학위
 - **STUDY**
 	- [[00. Deep Learning|Deep Learning]]
 	- [[00. Machine Learning|Machine Learning]]
@@ -31,20 +46,37 @@ target:: 10000
 %%
 
 ```dataviewjs
-// 프로젝트 진행률 표시
+// 프로젝트별 태그와 이름 매핑
 const projects = [
-    { name: "📝 논문 작성", progress: 40, status: "진행중" },
-    { name: "🔬 실험", progress: 65, status: "진행중" },
-    { name: "📊 데이터 분석", progress: 30, status: "대기" },
-    { name: "🎓 학위 과정", progress: 50, status: "진행중" },
+    { name: "📝 논문 작성", tag: "#논문" },
+    { name: "🔬 실험", tag: "#실험" },
+    { name: "📊 데이터 분석", tag: "#데이터" },
+    { name: "🎓 학위 과정", tag: "#학위" },
 ];
+
+// 현재 파일에서 태스크 가져오기
+const currentFile = dv.page("Homepage");
+const allTasks = currentFile?.file?.tasks || [];
 
 let table = `| Project | Progress | Status |
 | --- | --- | --- |
 `;
 
 projects.forEach(p => {
-    table += `| **${p.name}** | <progress value="${p.progress}" max="100"></progress> ${p.progress}% | ${p.status} |
+    // 해당 태그가 있는 태스크 필터링
+    const projectTasks = allTasks.filter(t => t.text.includes(p.tag));
+    const total = projectTasks.length;
+    const completed = projectTasks.filter(t => t.completed).length;
+
+    // 진행률 계산
+    const progress = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+    // 상태 결정
+    let status = "대기";
+    if (progress === 100) status = "✅ 완료";
+    else if (progress > 0) status = "진행중";
+
+    table += `| **${p.name}** | <progress value="${progress}" max="100"></progress> ${progress}% (${completed}/${total}) | ${status} |
 `;
 });
 
