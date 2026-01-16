@@ -1,5 +1,7 @@
 ---
 cssclass: cards
+banner: "![[faroukhomepage2.png]]"
+banner_y: 0.35
 ---
 
 ```dataviewjs
@@ -17,15 +19,15 @@ dv.header(1, greeting);
 
 > [!cards|3]
 >  **Study**
-> ![](https://raw.githubusercontent.com/D3Ext/aesthetic-wallpapers/main/images/small-memory.png)
->  **[[Study/Deep_Learning/|Deep Learning]]**  <br> **[[Study/Machine_Learning/|Machine Learning]]**   <br> **[[Study/Reinforcement_Learning/|Reinforcement Learning]]**   <br>  **[[Study/Statistics/|Statistics]]**
+> ![[Pasted image 20230103220831.png|center|440]]
+>  **[[Study/Deep_Learning/|Deep Learning]]**  <br> **[[Study/Machine_Learning/|Machine Learning]]**   <br> **[[Study/Reinforcement_Learning/|RL]]**   <br>  **[[Study/Statistics/|Statistics]]**
 >
 >  **Paper**
-> ![](https://raw.githubusercontent.com/D3Ext/aesthetic-wallpapers/main/images/lofi.png)
+> ![[Pasted image 20230103220838.png|center|440]]
 >**[[Paper/Reviews/|Reviews]]**  <br> **[[Paper/Zotero/|Zotero Notes]]**  <br> **[[Paper/논문 작성 유의사항|Writing Guide]]**
 >
 >  **Tools**
-> ![](https://raw.githubusercontent.com/D3Ext/aesthetic-wallpapers/main/images/music.jpg)
+> ![[Pasted image 20230103220845.png|center|440]]
 >**[[Obsidian Guide|📖 Guide]]**  <br> **[[Templates/|📝 Templates]]**  <br> **[[Daily Notes/|📅 Daily Notes]]**
 
 
