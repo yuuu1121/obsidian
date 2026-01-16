@@ -9,17 +9,17 @@ banner_x: 0.5
 # Dashboard
 - **AGENDA**
 	- [Daily](obsidian://advanced-uri?vault=YJU_Obsidian&daily=true)
-	- [[Templates/|Templates]]
+	- [[00. Templates|Templates]]
 - **STUDY**
-	- [[Study/Deep_Learning/|Deep Learning]]
-	- [[Study/Machine_Learning/|Machine Learning]]
-	- [[Study/Reinforcement_Learning/|RL]]
-	- [[Study/Statistics/|Statistics]]
+	- [[00. Deep Learning|Deep Learning]]
+	- [[00. Machine Learning|Machine Learning]]
+	- [[00. Reinforcement Learning|RL]]
+	- [[00. Statistics|Statistics]]
 - **PAPER**
-	- [[Paper/Reviews/|Reviews]]
+	- [[00. Reviews|Reviews]]
 - **TOOLS**
-	- [[Study/OpenCV/|OpenCV]]
-	- [[Study/Coding/|Coding]]
+	- [[00. OpenCV|OpenCV]]
+	- [[00. Coding|Coding]]
 	- [[Obsidian Guide|Guide]]
 
 <br>
