@@ -17,7 +17,7 @@ dg-publish: false
 	- 다층 신경망(Multi-Layer [[Neural Network]])을 기반으로 한 기계 학습 방법론
 	- 미분 가능한 함수들의 조합으로 구성되어 함수를 근사함
 	$$F(x) \approx f_{W_L}(f_{W_{L-1}}(...f_{W_1}(x)...))$$
-	- ReLU와 같은 [[Activation function]]을 사용하여 **Vanishing Gradient 문제**를 완화하고, 비선형성을 높여 더 깊은 층을 쌓을 수 있게 된 모델
+	- ReLU와 같은 [[Activation Function]]을 사용하여 **Vanishing Gradient 문제**를 완화하고, 비선형성을 높여 더 깊은 층을 쌓을 수 있게 된 모델
 
 <br>
 

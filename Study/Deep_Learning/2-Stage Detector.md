@@ -22,7 +22,7 @@ url:
 		- 해당 Proposal 에 대해 CNN 을 이용하여 Classification 수행
 ---
 ## Advantages of 2-Stage Detector
-- 객체가 존재할 확률이 높은 Proposal 을 생성하기 때문에 [[Clas Imbalance]] 문제에 덜 민감
+- 객체가 존재할 확률이 높은 Proposal 을 생성하기 때문에 [[Class Imbalance]] 문제에 덜 민감
 	- Two-stage cascade, 즉 Region proposal 를 추려내는 방법을 적용하기 때문에 대부분의 Background sample 을 거를 수 있음
 	- Positive / Negative sample 의 수를 적절하게 유지하는 Sampling heuristic 방법 적용
 		- eg., Hard negative mining, OHEM ^s7ox99
