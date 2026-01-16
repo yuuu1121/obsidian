@@ -21,7 +21,7 @@ related notes: []
 - **Approaches**
 	- Nonparametric Approach
 		- 데이터 분포 가정 없이 단순히 데이터의 거리를 이용하는 방식
-		- e.g., [[K-means clustering]], [[K-means Clustering#Soft K-means Clustering|soft K-means clustering]]
+		- e.g., [[K-means Clustering]], [[K-means Clustering#Soft K-means Clustering|soft K-means clustering]]
 	- Parametric Approach
 		- 데이터가 가우시안 분포를 따른다고 가정하며, 해당 분포의 매개변수(평균과 분산)를 학습하는 방식
 		- e.g., [[Expectation Maximization]] (EM), [[Gaussian Mixture Model]] (GMM)

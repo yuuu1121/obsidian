@@ -16,7 +16,7 @@ dg-publish: false
 - **Definition**
 	- 입력 데이터 $x$가 $K$개의 클래스 중 하나에 속할 확률을 예측하는 모델로, **다항 분포 모델**을 사용하여 각 클래스에 대한 확률을 계산.
 - **Key Concepts**
-	- Discriminant Function - [[logistic function|Softmax Function]]
+	- Discriminant Function - [[Logistic Function|Softmax Function]]
 		- 각 클래스에 대한 점수를 확률로 변환하여 예측
 			$$p(y = k|x) = \frac{\exp(w_k^\top \phi(x))}{\sum_{j=1}^{K} \exp(w_j^\top \phi(x))}$$
 		- 여기서,

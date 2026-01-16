@@ -66,7 +66,7 @@ title: Recap) [[Support Vector Machine#Soft Margin SVM|Binary Soft Margin SVM]]
 		```
 		
 		```ad-example
-		title: [[Gradient Descent]] with [[Lease Square Method]]
+		title: [[Gradient Descent]] with [[Least Square Method]]
 		collapse: true
 		- 최소 제곱법을 위한 경사 하강법
 		  $$\theta \leftarrow \theta + \eta \sum_{n=1}^{N} (y_n - \theta^\top \phi(x_n))\phi(x_n)$$

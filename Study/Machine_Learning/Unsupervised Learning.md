@@ -23,7 +23,7 @@ dg-publish: false
 	- [[Clustering]]
 		- 데이터를 유사한 그룹으로 나누는 방법
 		- e.g., 
-			- Nonparametric approach: [[K-means clustering]], [[K-means Clustering#Soft K-means Clustering|soft K-means clustering]]
+			- Nonparametric approach: [[K-means Clustering]], [[K-means Clustering#Soft K-means Clustering|soft K-means clustering]]
 			- Parameteric approach: [[Gaussian Mixture Model]] (GMM)
 	- [[Dimensionality Reduction]]
 		- 고차원 데이터를 저차원으로 변환하여 핵심 정보를 보존하는 방법
