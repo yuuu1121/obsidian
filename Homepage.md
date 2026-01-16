@@ -1,42 +1,129 @@
 ---
-cssclass: cards
-banner: "![[faroukhomepage2.png]]"
-banner_y: 0.35
+cssclasses:
+  - myhome
+banner: "Attachments/IMG_5584.jpg"
+banner_y: 0.4
+banner_icon: 🎓
 ---
+
+# Dashboard
+- **AGENDA**
+	- [Daily](obsidian://advanced-uri?vault=YJU_Obsidian&daily=true)
+	- [[Daily Notes/|Daily Notes]]
+	- [[Templates/|Templates]]
+- **STUDY**
+	- [[Study/Deep_Learning/|Deep Learning]]
+	- [[Study/Machine_Learning/|Machine Learning]]
+	- [[Study/Reinforcement_Learning/|RL]]
+	- [[Study/Statistics/|Statistics]]
+- **PAPER**
+	- [[Paper/Reviews/|Reviews]]
+	- [[Paper/Zotero/|Zotero]]
+	- [[Paper/논문 작성 유의사항|Writing Guide]]
+- **TOOLS**
+	- [[Study/OpenCV/|OpenCV]]
+	- [[Study/Coding/|Coding]]
+	- [[Obsidian Guide|Guide]]
+
+<br>
+
+**PROJECT TRACKING**
+
+%%
+sourceTag:: #project
+excludeTag:: #exclude
+toCount:: words
+target:: 10000
+%%
 
 ```dataviewjs
-const currentHour = moment().format('HH');
-let greeting;
-if (currentHour >= 18 || currentHour < 5) {
-    greeting = '🌙 Good Evening';
-} else if (currentHour >= 5 && currentHour < 12) {
-    greeting = '🌅 Good Morning';
-} else {
-    greeting = '☀️ Good Afternoon';
-}
-dv.header(1, greeting);
+// 프로젝트 진행률 표시
+const projects = [
+    { name: "📝 논문 작성", progress: 40, status: "진행중" },
+    { name: "🔬 실험", progress: 65, status: "진행중" },
+    { name: "📊 데이터 분석", progress: 30, status: "대기" },
+    { name: "🎓 학위 과정", progress: 50, status: "진행중" },
+];
+
+let table = `| Project | Progress | Status |
+| --- | --- | --- |
+`;
+
+projects.forEach(p => {
+    table += `| **${p.name}** | <progress value="${p.progress}" max="100"></progress> ${p.progress}% | ${p.status} |
+`;
+});
+
+dv.span(table);
 ```
 
-> [!cards|3]
->  **Study**
-> ![[Pasted image 20230103220831.png|center|440]]
->  **[[Study/Deep_Learning/|Deep Learning]]**  <br> **[[Study/Machine_Learning/|Machine Learning]]**   <br> **[[Study/Reinforcement_Learning/|RL]]**   <br>  **[[Study/Statistics/|Statistics]]**
->
->  **Paper**
-> ![[Pasted image 20230103220838.png|center|440]]
->**[[Paper/Reviews/|Reviews]]**  <br> **[[Paper/Zotero/|Zotero Notes]]**  <br> **[[Paper/논문 작성 유의사항|Writing Guide]]**
->
->  **Tools**
-> ![[Pasted image 20230103220845.png|center|440]]
->**[[Obsidian Guide|📖 Guide]]**  <br> **[[Templates/|📝 Templates]]**  <br> **[[Daily Notes/|📅 Daily Notes]]**
+<br>
 
+**DEADLINE**
 
->[!multi-column|right|2]
->
->> [!important]+ 📊 Project Progress
->> ![[Project Progress]]
->
->> [!danger]+ ⏳ Deadline
->> ![[Deadline]]
+```dataviewjs
+const deadlines = [
+    { name: "📝 논문 제출", date: "2026-03-15" },
+    { name: "🎤 학회 발표", date: "2026-05-20" },
+    { name: "📊 중간 보고", date: "2026-02-28" },
+    { name: "🎓 졸업 심사", date: "2026-06-30" },
+];
 
----
+const today = moment().startOf('day');
+let table = `| Event | D-Day |
+| --- | --- |
+`;
+
+deadlines
+    .map(d => ({ ...d, days: moment(d.date).diff(today, 'days') }))
+    .filter(d => d.days >= 0)
+    .sort((a, b) => a.days - b.days)
+    .forEach(d => {
+        let daysText = d.days === 0 ? '**오늘!**' : `D-${d.days}`;
+        table += `| ${d.name} | ${daysText} |
+`;
+    });
+
+dv.span(table);
+```
+
+<br>
+
+**DAILY SUMMARY**
+
+```dataviewjs
+function isWithinWeek(page) {
+	let filemoment = moment(page.file.name, 'YYYY-MM-DD')
+	let today = moment().startOf('day');
+	let tomorrow = today.clone().add(1, 'days').startOf('day');
+	let weekago = today.clone().subtract(7, 'days').startOf('day');
+	if (filemoment.isAfter(weekago) && filemoment.isBefore(tomorrow)) {
+		return true;
+	}
+	return false;
+}
+
+dv.table(["Date","Note"], dv.pages('"Daily Notes"')
+	.filter(isWithinWeek)
+	.sort(b => b.file.name,'desc')
+	.limit(7)
+	.map(b => [dv.fileLink(b.file.name, false, moment(b.file.name,'YYYY-MM-DD').format("MM-DD ddd")), b.file.name])
+)
+```
+
+<br>
+
+**OBSIDIAN ACTIVITY**
+
+```dataviewjs
+let allFile = dv.pages('!"Templates"').file
+let total = allFile.length
+let studyNotes = dv.pages('"Study"').length
+let paperNotes = dv.pages('"Paper"').length
+let dailyNotes = dv.pages('"Daily Notes"').length
+let totalTask = allFile.tasks.length
+
+dv.paragraph(
+	`📁 **${total}** files | 📚 Study: **${studyNotes}** | 📄 Paper: **${paperNotes}** | 📅 Daily: **${dailyNotes}** | ✅ Tasks: **${totalTask}**`
+)
+```
