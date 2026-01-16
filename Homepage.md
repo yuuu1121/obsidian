@@ -1,9 +1,10 @@
 ---
 cssclasses:
   - myhome
-banner: "Attachments/IMG_5584.jpg"
+banner: "Pictures/forest.jpg"
 banner_y: 0.4
 banner_icon: 🎓
+banner_x: 0.5
 ---
 
 # Dashboard
