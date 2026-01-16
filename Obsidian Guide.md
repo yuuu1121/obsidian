@@ -173,8 +173,12 @@ $$
   - Study, Paper, Tools 빠른 접근 카드
   - 최근 수정된 노트 목록
   - 미완료 태스크 목록
-  - Vault 통계
-- **커스터마이징:** `Homepage.md` 파일 직접 편집
+  - Life Progress (인생 진행률)
+  - Countdown (D-Day 카운트다운)
+- **커스터마이징:**
+  - `Homepage.md` - 메인 레이아웃
+  - `Life Progress.md` - 생년월일 수정
+  - `Countdown.md` - 이벤트 추가/수정
 
 ### 10. Graph View (그래프 뷰)
 - **열기:** `Cmd + G`
@@ -233,6 +237,8 @@ YJU_Obsidian/
 │   └── Paper Review Templates/
 ├── Annotations/              # 개념 정의
 ├── Homepage.md               # 대시보드 홈페이지
+├── Life Progress.md          # 인생 진행률
+├── Countdown.md              # D-Day 카운트다운
 └── Obsidian Guide.md         # 이 가이드
 ```
 
