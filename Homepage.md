@@ -10,17 +10,17 @@ banner_x: 0.5
 -  **TODO**
 	- [Daily](obsidian://advanced-uri?vault=YJU_Obsidian&daily=true)
 	- IROS
-		- [ ] 논문 초안 작성 #논문
+		- [ ] 논문 초안 작성 📅2026-03-01 #논문
 		- [ ] 시뮬레이터 구현 #논문
 		- [ ] Active Marker 제작 #논문
 		- [ ] RTK-GPS 주문 #논문
 		- [ ] Active Marker 아크릴 가공 주문 #논문
 		- [ ] Active Marker 전선 주문 #논문
 	- PKRC
-		- [ ] 수중로봇 Wall Following 실제 구현 #PKRC
-		- [x] 수중로봇 IMU PID 제어 
-		- [x] 수중로봇 Depth 제어
-		- [ ] Laser + Camera Altitude Estimation #PKRC 
+		- [ ] 수중로봇 Wall Following 실제 구현 📅2026-02-15 #PKRC
+		- [x] 수중로봇 IMU PID 제어 #PKRC
+		- [x] 수중로봇 Depth 제어 #PKRC
+		- [ ] Laser + Camera Altitude Estimation #PKRC
 		- [ ] 전장 V3 #PKRC 
 	-  Cyclops
 		- [ ] USBL 동작 테스트 #데이터
@@ -94,12 +94,23 @@ dv.span(table);
 **DEADLINE**
 
 ```dataviewjs
-const deadlines = [
-    { name: "📝 논문 제출", date: "2026-03-15" },
-    { name: "🎤 학회 발표", date: "2026-05-20" },
-    { name: "📊 중간 보고", date: "2026-02-28" },
-    { name: "🎓 졸업 심사", date: "2026-06-30" },
-];
+// 현재 파일에서 태스크 가져오기
+const currentFile = dv.page("Homepage");
+const allTasks = currentFile?.file?.tasks || [];
+
+// 📅YYYY-MM-DD 또는 📅 YYYY-MM-DD 형식의 날짜가 있는 태스크 찾기
+const deadlines = [];
+allTasks.forEach(t => {
+    const dateMatch = t.text.match(/📅\s*(\d{4}-\d{2}-\d{2})/);
+    if (dateMatch && !t.completed) {
+        // 태스크 텍스트에서 날짜와 태그 제거하여 이름 추출
+        let name = t.text
+            .replace(/📅\s*\d{4}-\d{2}-\d{2}/, '')
+            .replace(/#[\w가-힣]+/g, '')
+            .trim();
+        deadlines.push({ name: name, date: dateMatch[1] });
+    }
+});
 
 const today = moment().startOf('day');
 let table = `| Event | D-Day |
@@ -108,13 +119,18 @@ let table = `| Event | D-Day |
 
 deadlines
     .map(d => ({ ...d, days: moment(d.date).diff(today, 'days') }))
-    .filter(d => d.days >= 0)
+    .filter(d => d.days >= -1)
     .sort((a, b) => a.days - b.days)
     .forEach(d => {
-        let daysText = d.days === 0 ? '**오늘!**' : `D-${d.days}`;
+        let daysText = d.days === 0 ? '**오늘!**' : d.days < 0 ? '**지남**' : `D-${d.days}`;
         table += `| ${d.name} | ${daysText} |
 `;
     });
+
+if (deadlines.length === 0) {
+    table += `| 📅 날짜 추가: 태스크에 📅2026-01-20 형식 | - |
+`;
+}
 
 dv.span(table);
 ```
