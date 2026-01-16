@@ -56,7 +56,6 @@
 | `Cmd + Shift + D` | Excalidraw 드로잉 생성 |
 | `Cmd + Shift + K` | 새 Kanban 보드 생성 |
 | `Cmd + Shift + B` | 블록 링크 복사 |
-| `Cmd + Alt + L` | Zotero Literature Note 생성 |
 
 ### 네비게이션
 
@@ -69,7 +68,7 @@
 
 ## 활성화된 플러그인
 
-### 핵심 플러그인 (31개)
+### 핵심 플러그인 (28개)
 
 | 카테고리 | 플러그인 | 설명 |
 |----------|----------|------|
@@ -78,9 +77,7 @@
 | | Homepage | Obsidian 시작 시 Daily Note 자동 열기 |
 | **템플릿** | Templater | 고급 템플릿 기능 (변수, 함수 등) |
 | **데이터** | Dataview | SQL처럼 노트 쿼리 및 테이블 생성 |
-| **논문/연구** | Zotero Connector | Zotero 연동 |
-| | Citations | 인용 관리 |
-| | Pandoc | 다양한 형식으로 내보내기 (PDF, Word 등) |
+| **내보내기** | Pandoc | 다양한 형식으로 내보내기 (PDF, Word 등) |
 | **시각화** | Excalidraw | 손그림 다이어그램/스케치 |
 | | Kanban | Trello 스타일 보드 |
 | **편집** | Advanced Tables | 테이블 편집 도구 |
@@ -94,7 +91,6 @@
 | **유틸리티** | Auto Link Title | URL 붙여넣기 시 제목 자동 가져오기 |
 | | Copy Block Link | 블록 링크 쉽게 복사 |
 | | Emoji Shortcodes | `:smile:` → 😄 |
-| | Image Toolkit | 이미지 확대/축소 |
 | | Local Images Plus | 이미지 로컬 저장 |
 | | Link Embed | 링크 미리보기 |
 | **백업** | Obsidian Git | GitHub 자동 백업 |
@@ -163,18 +159,13 @@ $$
 > 유용한 정보
 ```
 
-### 8. Zotero Integration
-1. Zotero에서 논문 추가
-2. Obsidian에서 `Cmd + Alt + L`
-3. 논문 선택 → Literature Note 자동 생성
-
-### 9. Git 자동 백업
+### 8. Git 자동 백업
 - **설정:** 이미 구성됨
 - **자동 커밋:** 2분마다
 - **자동 푸시:** 5분마다
 - **리포지토리:** `github.com/yuuu1121/obsidian`
 
-### 10. Graph View (그래프 뷰)
+### 9. Graph View (그래프 뷰)
 - **열기:** `Cmd + G`
 - **Local Graph:** 오른쪽 사이드바 하단
 - **사용법:** 노트 간 연결 시각화, 클릭하여 노트 이동
@@ -271,7 +262,7 @@ YJU_Obsidian/
 
 ---
 
-> 마지막 업데이트: 2026-01-16
+> 마지막 업데이트: 2026-01-17
 >
 > **Sources:**
 > - [The Must-Have Obsidian plugins for 2025](https://www.dsebastien.net/2022-10-19-the-must-have-obsidian-plugins/)
