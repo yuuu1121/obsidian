@@ -56,6 +56,7 @@
 | `Cmd + Shift + D` | Excalidraw 드로잉 생성 |
 | `Cmd + Shift + K` | 새 Kanban 보드 생성 |
 | `Cmd + Shift + B` | 블록 링크 복사 |
+| `Cmd + Shift + H` | Homepage 열기 |
 
 ### 네비게이션
 
@@ -165,7 +166,17 @@ $$
 - **자동 푸시:** 5분마다
 - **리포지토리:** `github.com/yuuu1121/obsidian`
 
-### 9. Graph View (그래프 뷰)
+### 9. Homepage (홈페이지 대시보드)
+- **열기:** `Cmd + Shift + H`
+- **기능:**
+  - 시간대별 인사말 (Good morning/afternoon/evening/night)
+  - Study, Paper, Tools 빠른 접근 카드
+  - 최근 수정된 노트 목록
+  - 미완료 태스크 목록
+  - Vault 통계
+- **커스터마이징:** `Homepage.md` 파일 직접 편집
+
+### 10. Graph View (그래프 뷰)
 - **열기:** `Cmd + G`
 - **Local Graph:** 오른쪽 사이드바 하단
 - **사용법:** 노트 간 연결 시각화, 클릭하여 노트 이동
@@ -221,6 +232,7 @@ YJU_Obsidian/
 │   ├── Literature Note.md
 │   └── Paper Review Templates/
 ├── Annotations/              # 개념 정의
+├── Homepage.md               # 대시보드 홈페이지
 └── Obsidian Guide.md         # 이 가이드
 ```
 
