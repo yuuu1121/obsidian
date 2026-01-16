@@ -7,7 +7,7 @@ banner_x: 0.5
 ---
 
 # Dashboard
--  **TODO**
+-  ### **TODO**
 	- [Daily](obsidian://advanced-uri?vault=YJU_Obsidian&daily=true)
 	- IROS
 		- [ ] 논문 초안 작성 📅2026-03-01 #논문
@@ -27,7 +27,7 @@ banner_x: 0.5
 		- [ ] 내부 실린더 전장 마운트 설계 #데이터
 	- AUV
 		- [ ] idea 회의 #AUV
-- **STUDY**
+- ### **STUDY**
 	- [[00. Deep Learning|Deep Learning]]
 	- [[00. Machine Learning|Machine Learning]]
 	- [[00. Reinforcement Learning|RL]]
