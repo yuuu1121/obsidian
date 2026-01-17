@@ -30,9 +30,9 @@ banner_x: 0.5
 - ### **STUDY**
 	- [[00. Deep Learning|Deep Learning]]
 	- [[00. Machine Learning|Machine Learning]]
-	- [[00. Reinforcement Learning|RL]]
+	- [[00. Reinforcement Learning|Reinforcement Learning]]
 	- [[00. OpenCV|OpenCV]]
-	- [[00. Reviews|Reviews]]
+	- [[00. Reviews|Paper Review]]
 
 <br>
 
