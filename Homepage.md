@@ -22,6 +22,7 @@ banner_x: 0.5
 		- [x] 수중로봇 Depth 제어 📅2026-01-16 #PKRC
 		- [ ] Laser + Camera Altitude Estimation #PKRC
 		- [ ] 전장 V3 #PKRC 
+		- [ ] 안테나 주문 #PKRC 
 	-  **Cyclops**
 		- [ ] USBL 동작 테스트 #Cyclops
 		- [ ] 내부 실린더 전장 마운트 설계 #Cyclops 
