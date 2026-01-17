@@ -1,8 +1,8 @@
 ---
 cssclasses:
   - myhome
-banner: "Pictures/fuji.jpg"
-banner_y: 0.7
+banner: "Pictures/pixel.jpg"
+banner_y: 0.6
 banner_x: 0.5
 ---
 
