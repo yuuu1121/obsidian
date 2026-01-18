@@ -17,7 +17,7 @@ banner_x: 0.5
 		- [ ] Active Marker 아크릴 가공 주문 #논문
 		- [ ] Active Marker 전선 주문 #논문
 	- **PKRC**
-		- [ ] 수중로봇 Wall Following 실제 구현 📅2026-01-18 #PKRC
+		- [x] 수중로봇 Wall Following 실제 구현 📅2026-01-18 #PKRC
 		- [x] 수중로봇 IMU PID 제어 📅2026-01-16 #PKRC
 		- [x] 수중로봇 Depth 제어 📅2026-01-16 #PKRC
 		- [ ] Laser + Camera Altitude Estimation #PKRC
