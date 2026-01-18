@@ -23,7 +23,7 @@ banner_x: 0.5
 		- [ ] Laser + Camera Altitude Estimation #PKRC
 		- [ ] 전장 V3 #PKRC 
 		- [ ] 안테나 주문 #PKRC 
-		- [ ]
+		- [ ] 이더넷 스위치 주문 #PKRC 
 	-  **Cyclops**
 		- [ ] USBL 동작 테스트 #Cyclops
 		- [ ] 내부 실린더 전장 마운트 설계 #Cyclops 
