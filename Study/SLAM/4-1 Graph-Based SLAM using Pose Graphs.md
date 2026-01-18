@@ -9,7 +9,7 @@
 - **Front End** : 각 time step마다 pose 추정, pose 간의 관계를 edge로 표현해 그래프 구성
 - **Back End** : 그래프 상에 존재하는 pose들을 업데이트 **(오늘 다룰 부분)**
 
-![Untitled](4-1%20Graph-Based%20SLAM%20using%20Pose%20Graphs/Untitled.png)
+![[Attachments/SLAM/Untitled.png]]
 
 Graph-based SLAM은 문제를 확률 그래프 모델로 모델링한다. Graph는 node와 edge로 구성된다.
 
@@ -31,13 +31,13 @@ Graph-base SLAM은 Graph를 만들고, constraint로 구한 에러를 최소화�
 
 ---
 
-![Untitled](4-1%20Graph-Based%20SLAM%20using%20Pose%20Graphs/Untitled%201.png)
+![[Attachments/SLAM/Untitled 1.png]]
 
 그림처럼 모바일 로봇이 environment를 움직인다고 했을 때, 기준이 되는 특정 시간마다 **로봇의 Pose**를 표현 할 수 있고, pose와 pose 사이를 **Constraints**(두 pose 사이의 관계로, 변하지 않는 로봇의 회전바퀴 수 등으로 설명)을 활용해서 표현할 수 있다.
 
 2D로 가정을 할 때, XY 좌표값과 로봇의 heading point가 robot pose에 대한 정보가 된다. robot pose는 변수로 취급 하지만, constraints는 변하지 않는 상수로 취급한다. 하지만 constraints인 wheel odometry에 불확실성이 있다는 것도 고려해야 한다.
 
-![Untitled](4-1%20Graph-Based%20SLAM%20using%20Pose%20Graphs/Untitled%202.png)
+![[Attachments/SLAM/Untitled 2.png]]
 
 로봇이 environment를 돌아다니다가 위와 같이 이전에 방문했던 곳을 재방문하면 **Loop Closing** 과정이 발생한다. 이러한 상황은 SLAM system에서 굉장히 중요한 요소인데, 이전에 지났던 장소를 다시 지나게 되면서 **새로운 pose와 constraints 간의 관계를 만들 수 있다.** 즉, 가상의 constraints를 만들 수 있다.
 
@@ -54,7 +54,7 @@ Graph-base SLAM은 Graph를 만들고, constraint로 구한 에러를 최소화�
 
 Edge는 2가지 방법으로 만들 수 있다. 아래 그림에서 **X는 transformation matrix를 뜻한다.**
 
-![Untitled](4-1%20Graph-Based%20SLAM%20using%20Pose%20Graphs/Untitled%203.png)
+![[Attachments/SLAM/Untitled 3.png]]
 
 1. **Odometry-Based edge**
     
@@ -66,9 +66,9 @@ Observation-Based edge는 Lidar나 카메라와 같은 센서를 활용해서 �
     $x_i$, $x_j$에서 Laser scan을 활용해 검정색 scan과 파란색 scan 값을 얻은 후, 두 scan값을 겹쳐 $x_i$, $x_j$의 관계를 계산한 값으로 edge를 만든다
     
 
-![Untitled](4-1%20Graph-Based%20SLAM%20using%20Pose%20Graphs/Untitled%204.png)
+![[Attachments/SLAM/Untitled 4.png]]
 
-![Untitled](4-1%20Graph-Based%20SLAM%20using%20Pose%20Graphs/Untitled%205.png)
+![[Attachments/SLAM/Untitled 5.png]]
 
 Transformation을 표현할 때는 Homogenous Coordinates를 이용한다. Homogenous coordinate를 활용하면 edge를 하나의 행렬로 비교적 간단히 표현할 수 있다는 장점이 있다. 예를 들어 3차원 공간에서 로봇의 pose를 4x4로 표현하고 pose들의 관계는 역행렬을 활용해서 계산할 수 있다.
 
@@ -100,13 +100,13 @@ R^{3D} & 0 \\
 
 ---
 
-![Untitled](4-1%20Graph-Based%20SLAM%20using%20Pose%20Graphs/Untitled%206.png)
+![[Attachments/SLAM/Untitled 6.png]]
 
 현재 graph에서 $x_i$와 $x_j$는 각각 node들을 의미한다. 두 node들을 잇는 edge를 계산하기 위해 ICP와 같은 알고리즘을 사용해서 observation 값을 구한다.
 edge에 들어가있는  $<z_{ij}, \Omega_{ij}>$에 대해서 설명해보자.  $z_{ij}$는 observation 값을 통해  $x_i$에서 바라본  $x_j$의 값이다. 이때 불확실성이 있기 때문에 Information matrix  $\Omega_{ij}$를 활용해서 불확실성 정도를 표현한다. cavariance 는 uncertainty의 척도이므로 그 inverse인 $\Omega_{ij}$는 신뢰도를 뜻한다. 즉, z를 형성하는 과정에서 사용한 센서의 신뢰도를 의미한다. 
 우리가 Observation을 통해 구한 값이 기존에 node  $x_j$와 차이가 발생하기 때문에, 이에 대한 Error를  $e_{ij}(x_i, x_j)$로 표현하고 이를 최소화 해야 한다. 우리가 최소화 해야할 error function을 수학적으로 쓰면 아래와 같다.
 
-![Untitled](4-1%20Graph-Based%20SLAM%20using%20Pose%20Graphs/Untitled%207.png)
+![[Attachments/SLAM/Untitled 7.png]]
 
 이때 Least squares 방법을 활용하여 최적화를 진행한다. $e_{ij}$를 구성하는데 단지 2개의 node들을 활용하면 되기 때문에 변수가 적고, SLAM system에서 각각 node들과 edge들이 독립적이기 때문에 효율적으로 최적화를 진행할 수 있다.
 
@@ -116,7 +116,7 @@ edge에 들어가있는  $<z_{ij}, \Omega_{ij}>$에 대해서 설명해보자.  
 
 Error function을 조금 더 뜯어보면 다음과 같다.
 
-![Untitled](4-1%20Graph-Based%20SLAM%20using%20Pose%20Graphs/Untitled%208.png)
+![[Attachments/SLAM/Untitled 8.png]]
 
 $Z_{ij}$는 측정값으로, 센서를 통해 $x_i$에서 바라본 $x_j$의 값을 의미하고, $(X_i^{-1}X_j)$는 node에 저장된 값을 활용해서 $x_i$에서 바라본 $x_j$의 값을 의미한다. $Z_{ij}=(X_i^{-1}X_j)$ 일 때 error=0이다. 다시 한 번 언급하면 $Z, X$는 transformation matrix이다.  $x_i^T=[t_x\,\,t_y\,\,\theta]$ 정보를 이용해 tf mtx $X_i=\begin{bmatrix}
 R & T \\
@@ -153,27 +153,27 @@ Graph Optimization은 **Uncertainty(constraint들의 합)를 최소화할 수 �
 
 하나의 error function은 두 개의 node와 하나의 edge만을 활용해 만들어지기 때문에 우리가 계산한 Jacobian은 sparse하게 값을 가지게 되고 $x_i, x_j$에 대한 값을 제외하면 0의 성분을 가지고 있게 된다.
 
-![Untitled](4-1%20Graph-Based%20SLAM%20using%20Pose%20Graphs/Untitled%209.png)
+![[Attachments/SLAM/Untitled 9.png]]
 
 시각화를 위해 0인 성분을 파란색으로, 0이 아닌 성분을 빨간색으로 표현하면 아래와 같다.
 
-![Untitled](4-1%20Graph-Based%20SLAM%20using%20Pose%20Graphs/Untitled%2010.png)
+![[Attachments/SLAM/Untitled 10.png]]
 
 **Sparse한 Jacobian은 Sparse한 $H,b$를 만들어낸다.** $H, b$는 우리가 선형화할 때 이용하는 값을 의미한다. 그림으로 표현하면 아래와 같다.
 
-![Untitled](4-1%20Graph-Based%20SLAM%20using%20Pose%20Graphs/Untitled%2011.png)
+![[Attachments/SLAM/Untitled 11.png]]
 
 - $b_{ij}^T$ : $x_i, x_j$에 대응하는 인덱스에 대해서만 0이 아니다.
 
-![Untitled](4-1%20Graph-Based%20SLAM%20using%20Pose%20Graphs/Untitled%2012.png)
+![[Attachments/SLAM/Untitled 12.png]]
 
 - $H_{ij}$(edge의 coefficient mtx) : $i,j$와 관련된 block들만 0이 아니다.
 
-![Untitled](4-1%20Graph-Based%20SLAM%20using%20Pose%20Graphs/Untitled%2013.png)
+![[Attachments/SLAM/Untitled 13.png]]
 
 지금까지 하나의 원소에 대해서만 이야기를 했고, 모든 원소를 더하면 아래와 같이 나타낼 수 있다.
 
-![Untitled](4-1%20Graph-Based%20SLAM%20using%20Pose%20Graphs/Untitled%2014.png)
+![[Attachments/SLAM/Untitled 14.png]]
 
 - $b$ : 모든 node가 constraints 가지고 있으므로 fully dense vector
 - $H$ : on-diagonal element는 constraint, off-diagonal element는 loop-closure constraint
@@ -190,27 +190,27 @@ Graph-Based SLAM이 어떻게 pose를 업데이트 하는지(구하는지) 살�
 
 - noise가 없고, Linear한 observation만 있다고 가정한다.
 
-![Untitled](4-1%20Graph-Based%20SLAM%20using%20Pose%20Graphs/Untitled%2015.png)
+![[Attachments/SLAM/Untitled 15.png]]
 
 - step1
 
-![Untitled](4-1%20Graph-Based%20SLAM%20using%20Pose%20Graphs/Untitled%2016.png)
+![[Attachments/SLAM/Untitled 16.png]]
 
 - step2
 
-![Untitled](4-1%20Graph-Based%20SLAM%20using%20Pose%20Graphs/Untitled%2017.png)
+![[Attachments/SLAM/Untitled 17.png]]
 
 - step3
 
-![Untitled](4-1%20Graph-Based%20SLAM%20using%20Pose%20Graphs/Untitled%2018.png)
+![[Attachments/SLAM/Untitled 18.png]]
 
 - step4
 
-![Untitled](4-1%20Graph-Based%20SLAM%20using%20Pose%20Graphs/Untitled%2019.png)
+![[Attachments/SLAM/Untitled 19.png]]
 
 즉, **Graph ↔ Matrix,Vector로 매핑** 한다. Back end에서는 여러 방정식의 해를 구한다.
 
-![Untitled](4-1%20Graph-Based%20SLAM%20using%20Pose%20Graphs/Untitled%2020.png)
+![[Attachments/SLAM/Untitled 20.png]]
 
 ## 3-2. 2nd 1D example
 
@@ -218,7 +218,7 @@ Graph-Based SLAM이 어떻게 pose를 업데이트 하는지(구하는지) 살�
 
 지금까지 설명한 Graph-based SLAM의 전체적인 방법을 간단한 예로 이해해보자.
 
-![Untitled](4-1%20Graph-Based%20SLAM%20using%20Pose%20Graphs/Untitled%2021.png)
+![[Attachments/SLAM/Untitled 21.png]]
 
 위 그림과 같이 node $x_1$에서 node $x_2$까지 로봇이 1m 움직였다고 가정해보자. 따라서  $z_{12}=1$이다.
 
@@ -243,18 +243,18 @@ $$
 
 첫번째 node  $x_1$를 fix하기 위해 constraints를 더해준다. 즉, information을 더함으로써 첫번째 node의 uncertainty를 낮춘다.
 
-![Untitled](4-1%20Graph-Based%20SLAM%20using%20Pose%20Graphs/Untitled%2022.png)
+![[Attachments/SLAM/Untitled 22.png]]
 
 실제 첫번째 노드를 fix 하는 예제를 보자. fix 시키지 않으면 $|\Delta x_1| \neq 0$ 이 되어 업데이트 하면 아래의 파란색과 같이 첫번째 노드가 움직일 수 있다. 그러나 $H_{11}+1$을 해주면 아래의 빨간색과 같이 $x_i$이 고정된다.
 
-![Untitled](4-1%20Graph-Based%20SLAM%20using%20Pose%20Graphs/Untitled%2023.png)
+![[Attachments/SLAM/Untitled 23.png]]
 
 정리하면 **Global coordinates을 정해주는 것이 중요하고, Global coordinates를 바로 정하지 못할 경우 하나의 node에 대해 uncertainty를 낮춰주어야 한다.**
 
 <aside>
 💡 **<Proof>**
 
-![Untitled](4-1%20Graph-Based%20SLAM%20using%20Pose%20Graphs/Untitled%2024.png)
+![[Attachments/SLAM/Untitled 24.png]]
 
 </aside>
 
@@ -283,9 +283,9 @@ $$
 
 ---
 
-![Untitled](4-1%20Graph-Based%20SLAM%20using%20Pose%20Graphs/Untitled%2025.png)
+![[Attachments/SLAM/Untitled 25.png]]
 
-![Untitled](4-1%20Graph-Based%20SLAM%20using%20Pose%20Graphs/Untitled%2026.png)
+![[Attachments/SLAM/Untitled 26.png]]
 
 # 참고 자료
 

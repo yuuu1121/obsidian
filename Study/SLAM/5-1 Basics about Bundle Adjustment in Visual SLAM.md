@@ -6,25 +6,25 @@
 
 **2D pixel location을 기반으로, 3D point location과 camera frame 간의 3D relative motion을 동시에 최적화하는 Least Squares 기법**
 
-![Untitled](5-1%20Basics%20about%20Bundle%20Adjustment%20in%20Visual%20SLAM/Untitled.png)
+![[Attachments/SLAM/Untitled.png]]
 
 bundle of ray를 보정(adjust)한다는 의미로 Bundle Adjustment라고 한다. 보통  SIFT와 같은 feature extraction 알고리즘을 수행한 후 triangulation과 같은 과정을 거쳐 3차원 공간에 point들이 어디 위치하고 있는지 추정한다.
 
-![Untitled](5-1%20Basics%20about%20Bundle%20Adjustment%20in%20Visual%20SLAM/Untitled%201.png)
+![[Attachments/SLAM/Untitled 1.png]]
 
 위와 같은 드론으로 아래쪽에 위치한 카메라를 활용하여 3D Reconstruction을 수행하면 결과는 아래와 같다.
 
-![Untitled](5-1%20Basics%20about%20Bundle%20Adjustment%20in%20Visual%20SLAM/Untitled%202.png)
+![[Attachments/SLAM/Untitled 2.png]]
 
 위 그림에서 파란색 사각형 처럼 보이는 것이 이미지이고 아래쪽에 point cloud 형식으로 시각화된 것이 3차원 output이다. Bundle Adjustment의 결과를 활용하여 위와 같은 예제의 output을 만들 수 있다.
 
 그렇다면 두 장의 이미지가 아닌 더 많은 이미지 set이 필요한 이유는 무엇일까?(Multi-view Reconstruction) 물체를 3차원으로 표현할 때 2장의 이미지로는 물체의 복잡한 표면을 모두 담아낼 수 없기 때문이다. 여러 이미지들을 활용하면 추정한 결과(camera pose or 3D location points)를 더 정교하게 최적화할 수 있다. 최적화 과정(Bundle Adjustment)을 수행하면 아래와 같이 대규모의 Map을 만드는 것도 가능하다.
 
-![Untitled](5-1%20Basics%20about%20Bundle%20Adjustment%20in%20Visual%20SLAM/Untitled%203.png)
+![[Attachments/SLAM/Untitled 3.png]]
 
 Bundle Adjustment는 Bundle Block Adjustment라고도 부르는데, Bundle Adjustment 과정을 Block 단위로 수행하여 많은 이미지 쌍을 동시에 고려해 최적화를 수행하기 때문이다. Bundle Adjustment라는 개념은 1950년대 photogrammetry분야의 Aerial Triangulation라는 분야에서 처음 나왔다. Aerial Triangulation은 areial 이미지들을 사용해 point의 3D 위치를 추정하는 것이다.
 
-![Untitled](5-1%20Basics%20about%20Bundle%20Adjustment%20in%20Visual%20SLAM/Untitled%204.png)
+![[Attachments/SLAM/Untitled 4.png]]
 
 **Control point란 위치를 아는 3D point**이다. 초창기에는 몇몇 control point를 이용해 camera pose를 추정하였다. 이제 Bundle Adjustment가 어떻게 동작하는지 알아보자.
 
@@ -49,11 +49,11 @@ Bundle Adjustment 방법을 정리하면 아래와 같다.
 
 BA 수식을 보기 전에 Image projection 수식은 다음과 같다.
 
-![Untitled](5-1%20Basics%20about%20Bundle%20Adjustment%20in%20Visual%20SLAM/Untitled%205.png)
+![[Attachments/SLAM/Untitled 5.png]]
 
 이제 BA의 수식을 보자.
 
-![Untitled](5-1%20Basics%20about%20Bundle%20Adjustment%20in%20Visual%20SLAM/Untitled%206.png)
+![[Attachments/SLAM/Untitled 6.png]]
 
 - $\hat{X}_{i}$ : point의 3D location (homogeneous coordinate)
 - $\hat{x}_{ij}'$ : 2D 이미지에서 추출한 feature point
@@ -76,7 +76,7 @@ Uncertainty in the image coordinates란 각 사진의 픽셀에 대해 feature p
 
 **위 수식에서의 unknown parameters는 아래와 같다.**
 
-![Untitled](5-1%20Basics%20about%20Bundle%20Adjustment%20in%20Visual%20SLAM/Untitled%207.png)
+![[Attachments/SLAM/Untitled 7.png]]
 
 - $\hat{X}_i$ : 새로운 point의 3D location (x,y,z)
 - $\hat{\lambda}_{ij}$ : 1D scale factor
@@ -97,17 +97,17 @@ Uncertainty in the image coordinates란 각 사진의 픽셀에 대해 feature p
 
 우선, **3D point는 2D로 어떻게 전환될까?**
 
-![Untitled](5-1%20Basics%20about%20Bundle%20Adjustment%20in%20Visual%20SLAM/Untitled%208.png)
+![[Attachments/SLAM/Untitled 8.png]]
 
 즉, frame1, frame2 만을 가지고 카메라의 모션의 R, t를 추정할 수 있는지에 대한 문제로 재정의할 수 있다.
 
 (2)에서 Gz로 나누는 이유는 아래와 같다. O에서 (a, b)와 (x, y)를 봤을 때 y=1에 맺히는 위치는 기울기인데 이는 3차원에서 z에 대해 나눈 것이다. (3)에서 fx, fy는 픽셀 단위이다. ux=Gx/Gz일 뿐이므로 fx를 이용해 픽셀 위치를 구한다. 
 
-![Untitled](5-1%20Basics%20about%20Bundle%20Adjustment%20in%20Visual%20SLAM/Untitled%209.png)
+![[Attachments/SLAM/Untitled 9.png]]
 
 카메라의 이동, point의 이동은 아래와 같이 나타낸다. 우리가 알고 있는 **3D point에 외부 파라미터와 내부 파라미터를 곱해 pixel plane으로 전환**한다. 로드리게스 회전은 축을 중심으로 어느 정도 회전이 일어나는지 알려준다.
 
-![Untitled](5-1%20Basics%20about%20Bundle%20Adjustment%20in%20Visual%20SLAM/Untitled%2010.png)
+![[Attachments/SLAM/Untitled 10.png]]
 
 카메라 내부 파라미터에는 focal length($f_x, f_y$) 이외에 카메라와 렌즈 특성 때문에 생기는 추가적인 왜곡이 있다.
 
@@ -115,18 +115,18 @@ Uncertainty in the image coordinates란 각 사진의 픽셀에 대해 feature p
 - $f_x, f_y$ 가 다른 경우 : 센서의 가로 세로 크기가 다른 경우
 - $C_x, C_y$ : 상이 센서 중앙에 맺히지 않는 경우
     
-    ![Untitled](5-1%20Basics%20about%20Bundle%20Adjustment%20in%20Visual%20SLAM/Untitled%2011.png)
+    ![[Attachments/SLAM/Untitled 11.png]]
     
 - Radiation Error
     
     원래는 네모나게 나타나는 이미지가 둥글거나 오목하게 나타나는 현상을 수학적으로 나타낸 것으로, camera calibration은 이러한 파라미터를 알아내는 것이다.
     
-    ![Untitled](5-1%20Basics%20about%20Bundle%20Adjustment%20in%20Visual%20SLAM/Untitled%2012.png)
+    ![[Attachments/SLAM/Untitled 12.png]]
     
 
 이제, 그림 두 장으로 카메라의 움직임을 계산해보자.
 
-![Untitled](5-1%20Basics%20about%20Bundle%20Adjustment%20in%20Visual%20SLAM/Untitled%2013.png)
+![[Attachments/SLAM/Untitled 13.png]]
 
 (2)는 feature extraction 과정, (3)은 correspondende 찾는 과정, (5)는 최초의 initial guess이다. (6)에서는 control point를 포함할 수도 있다. (1)~(6)의 과정에서 에러가 발생하면 앞의 에러가 BA까지 전파된다.
 
@@ -136,7 +136,7 @@ Uncertainty in the image coordinates란 각 사진의 픽셀에 대해 feature p
 
 ---
 
-![Untitled](5-1%20Basics%20about%20Bundle%20Adjustment%20in%20Visual%20SLAM/Untitled%2014.png)
+![[Attachments/SLAM/Untitled 14.png]]
 
 10000장의 이미지가 있고, 한 이미지당 1000개의 feature point을 추출한다고 가정하자. 3D point 하나는 평균적으로 10장의 이미지에서 관찰이 된다.
 
@@ -146,11 +146,11 @@ Uncertainty in the image coordinates란 각 사진의 픽셀에 대해 feature p
 
 우리가 구해야 하는 parameter의 수를 줄이기 위해서 **scale factor를 제거하는 방법**을 사용한다. Homogenous coordinates를 사용하는 대신에 Euclidean coordinates를 사용하는 방법으로 scale factor를 제거할 수 있다. (모든 것을 homogeneous 좌표계로 표현했기 때문에 $\lambda$ 사용했지만 현실에서 $\lambda$는 필요없다. 유클리디안 공간에서 포인트의 xy 좌표, 카메라의 3D 위치 벡터, 카메라의 3D 회전 파라미터만 고려하면 된다.) 그 결과 약 13000000(= 13M)정도 parameter들을 3000000(=3M)정도로 줄일 수 있다.
 
-![Untitled](5-1%20Basics%20about%20Bundle%20Adjustment%20in%20Visual%20SLAM/Untitled%2015.png)
+![[Attachments/SLAM/Untitled 15.png]]
 
 우리가 구해야 하는 parameter를 알았으면 이제 **Least squares 방법을 사용**한다.
 
-![Untitled](5-1%20Basics%20about%20Bundle%20Adjustment%20in%20Visual%20SLAM/Untitled%2016.png)
+![[Attachments/SLAM/Untitled 16.png]]
 
 여기서 $A$는 Jacobian Matrix, $\Sigma$는 covariance matrix 로 나타내였고, 우리가 찾아야 하는 unknown parameters를 $x$, observations를 $l$로 표기하였다. 위 수식에는 많은 parameter가 존재하기 때문에, 실제로 Bundle Adjustment를 사용할 땐 조금 더 효과적인 방법을 사용하는데, 그 방법에 대해서는 5-2에서 다룬다. 여기서는 일단 parameter를 알고 있다고 가정한다.
 
@@ -158,25 +158,25 @@ Uncertainty in the image coordinates란 각 사진의 픽셀에 대해 feature p
 
 ---
 
-![Untitled](5-1%20Basics%20about%20Bundle%20Adjustment%20in%20Visual%20SLAM/Untitled%2017.png)
+![[Attachments/SLAM/Untitled 17.png]]
 
 이 경우 R 없이 t만 했는데, 실행시키면 J의 랭크가 일부 없어지며 추정이 불가하다. (t나 R만 하는 경우 자코비안의 Rank가 없어지는 경우가 있다.)
 
-![Untitled](5-1%20Basics%20about%20Bundle%20Adjustment%20in%20Visual%20SLAM/Untitled%2018.png)
+![[Attachments/SLAM/Untitled 18.png]]
 
 → **[Levenberg]** 따라서 예전에 했던 것처럼 작은숫자*I를 더해 랭크가 사라지지 않도록 하는 trick을 사용한다.
 
-![Untitled](5-1%20Basics%20about%20Bundle%20Adjustment%20in%20Visual%20SLAM/Untitled%2019.png)
+![[Attachments/SLAM/Untitled 19.png]]
 
 → **[Levenberg-Marquardt]** 또한 곡면의 기울기까지 더하여 계산하면 더 좋은 결과를 얻을 수 있다. 
 
-![Untitled](5-1%20Basics%20about%20Bundle%20Adjustment%20in%20Visual%20SLAM/Untitled%2020.png)
+![[Attachments/SLAM/Untitled 20.png]]
 
-![Untitled](5-1%20Basics%20about%20Bundle%20Adjustment%20in%20Visual%20SLAM/Untitled%2021.png)
+![[Attachments/SLAM/Untitled 21.png]]
 
 아래 그림에서 왼쪽이 Levenberg, 오른쪽이 Levenberg-Marquardt 방법의 결과이다. (15회 iteration)
 
-![Untitled](5-1%20Basics%20about%20Bundle%20Adjustment%20in%20Visual%20SLAM/Untitled%2022.png)
+![[Attachments/SLAM/Untitled 22.png]]
 
 ## 2-3. Bundle Adjustment의 장점, 속성
 
@@ -219,7 +219,7 @@ Uncertainty in the image coordinates란 각 사진의 픽셀에 대해 feature p
 
 이는 우리가 어떤 것에 관심 있는지(=Objective function에 따라)에 따라 달라진다. Bundle Adjustment를 수행하는 초반에는 Control Points를 Noise가 있다고 가정하고, Outlier를 제거한 다음에는 남아있는 Control Points들을 고정하고 Bundle Adjustment를 수행한다.
 
-![Untitled](5-1%20Basics%20about%20Bundle%20Adjustment%20in%20Visual%20SLAM/Untitled%2023.png)
+![[Attachments/SLAM/Untitled 23.png]]
 
 <aside>
 💡 **Objective function에 따라서,**
@@ -267,7 +267,7 @@ Outliers를 제거하는 또다른 방법은 **RANSAC 알고리즘**을 활용�
 
 <4-4>에서 언급했듯이 **Least Squares 방법을 조금 더 Robust하게 만드는 방법 중 하나가 Robust Kernel을 사용하는 것이다.** Bundle Adjustment 방법 역시 Least Squares 방법이기 때문에 Robust Kernel을 적용하여 outlier에 강인하게 Error minimization을 수행할 수 있다.
 
-![Untitled](5-1%20Basics%20about%20Bundle%20Adjustment%20in%20Visual%20SLAM/Untitled%2024.png)
+![[Attachments/SLAM/Untitled 24.png]]
 
 Bundle Adjustment 방법을 수행하는데 여러 가지를 고려해야 하지만, 다양한 software가 있으므로 이를 모두 직접 설계할 필요는 없다. 다만 정확한 Data association을 찾는 것이 엔지니어에게 필수적인 작업이다.
 
@@ -283,9 +283,9 @@ Cyrill 교수님께서 언급하신 Software는 다음과 같다.
 
 Bundle Adjustment의 결과를 어떻게 평가할까? Precision을 다음과 같은 수식(아래)으로 측정 할 수 있다. 이론적으로는 Least squares 방법을 정의할 때 사용한 식(위)을 사용한다. 여기에 variance factor $\hat{\sigma}_0^2$을 곱한 값으로 empirical precision(경험적 정밀도)를 정의한다.
 
-![Untitled](5-1%20Basics%20about%20Bundle%20Adjustment%20in%20Visual%20SLAM/Untitled%2025.png)
+![[Attachments/SLAM/Untitled 25.png]]
 
-![Untitled](5-1%20Basics%20about%20Bundle%20Adjustment%20in%20Visual%20SLAM/Untitled%2026.png)
+![[Attachments/SLAM/Untitled 26.png]]
 
 Notation이 조금 달라 헷갈릴 수 있지만, 결국 unknown parameter ($\hat{x}$)끼리의 불확실성을 정밀도를 측정하는데 사용하는 것이다.
 

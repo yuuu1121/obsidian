@@ -31,22 +31,22 @@ url:
 - IoU 는 **Scale invariant** 하기 때문에 L1, L2 loss 와 같이 Loss 가 Scale 에 비례하는 문제 발생하지 않음 (참고: [[2_Resource/0_Paper Review/YOLO/1_You Only Look Once/YOLO v1 - Limitations#Loss Function|YOLO v1 - Limitations - Loss Function]])
 ---
 #### Interest of Union (IoU) Loss
-![[Attachments/Pasted image 20240304165450.png]]
+![[Attachments/General/Pasted image 20240304165450.png]]
 
 - GT 와의 IoU 를 높이는 방법으로 학습
 - IoU 가 0 인 경우에 한해서 BBox 가 얼마나 떨어져있던 IoU 가 모두 0으로 나옴
 	- BBox 간의 거리가 고려되지 않음
 ---
 #### Generalized IoU (GIoU)
-![[Attachments/Pasted image 20240304170232.png]]
-![[Attachments/Pasted image 20240304170243.png]]
+![[Attachments/General/Pasted image 20240304170232.png]]
+![[Attachments/General/Pasted image 20240304170243.png]]
 
 - 예측된 BBox 와 GT BBox 를 동시에 포함할 수 있는 최소 크기의 BBox **C** 를 구하고, 이 최소 영역 BBox 를 기존 IoU loss 의 분모에 사용
 - 이를 통해, 겹치는 객체 간의 IoU 를 기반으로 Scale invariant 한 속성을 유지하면서 객체의 Shape 와 Orientation 까지 고려할 수 있음
 - 여전히 수렴 속도가 느리고 부정확하게 박스를 예측
 ---
 #### Distance IoU (DIoU)
-![[Attachments/Pasted image 20240304170457.png|+grid]]![[Attachments/Pasted image 20240304170507.png|+grid]]
+![[Attachments/General/Pasted image 20240304170457.png|+grid]]![[Attachments/General/Pasted image 20240304170507.png|+grid]]
 - GIoU loss 에 두 객체 사이의 중심점 거리에 해당하는 Penalty term 을 추가하여 수렴 속도를 향상시킨 Loss function
 - GT 와 BBox 가 겹쳐진 영역이 동일하고, BBox 의 위치만 달라졌을 때 IoU, GIoU 는 위치정보를 포함하지 않기 때문에 동일하게 나타지만, DIOU는 중심점의 좌표를 고려하기에 값이 달라짐
 

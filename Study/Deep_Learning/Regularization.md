@@ -11,7 +11,7 @@ author:
 url:
 ---
 # Introduction
-![[Attachments/Pasted image 20240313160901.png|500]]![[Attachments/Pasted image 20240313160921.png|500]]
+![[Attachments/General/Pasted image 20240313160901.png|500]]![[Attachments/General/Pasted image 20240313160921.png|500]]
 
 - Overfitting
 	- 네트워크 Optimization 중 학습 데이터에만 존재하는 특징들이 모델에 과하게 반영되어 Loss function 이 필요 이상으로 작아지게 되는 현상
@@ -20,10 +20,10 @@ url:
 	- 이를 통해 특정한 Weight 값이 과도하게 커져서 일부 특징에 의존하는 현상을 방지하고, 데이터의 일반적인 특징 (Generalization) 을 잘 반영하도록 만드는 방법
 ---
 # Methods
-![[Attachments/Pasted image 20240304102816.png|+grid]]![[Attachments/Pasted image 20240304102823.png|+grid]]
+![[Attachments/General/Pasted image 20240304102816.png|+grid]]![[Attachments/General/Pasted image 20240304102823.png|+grid]]
 <center style='font-size:14;opacity:0.7;'>DropOut (좌), DropConnect (우)</center>
 
-![[Attachments/Pasted image 20240304102911.png]]
+![[Attachments/General/Pasted image 20240304102911.png]]
 
 <center style='font-size:14;opacity:0.7;'>DropBlock</center>
 

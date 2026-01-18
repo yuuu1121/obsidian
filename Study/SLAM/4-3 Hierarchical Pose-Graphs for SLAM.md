@@ -6,7 +6,7 @@
 
 Graph-based SLAM은 크게 Front-end와 back-end로 구분할 수 있다.
 
-![Untitled](4-3%20Hierarchical%20Pose-Graphs%20for%20SLAM/Untitled.png)
+![[Attachments/SLAM/Untitled.png]]
 
 - Front-end : 센서에서 raw data를 받아 node, edge를 만들어 graph를 구성한다.
 - Back-end : Front-end쪽에서 만든 node나 edge를 최적화 한다.
@@ -20,7 +20,7 @@ Graph-based SLAM은 크게 Front-end와 back-end로 구분할 수 있다.
 
 **Hierarchical Pose-Graph의 목적은 연산량을 줄이는 데 있다.** Graph를 계층적(Hierarchical)으로 만들고 간략화함으로써 더 적은 수의 node와 edge만으로 최적화를 빠르게 수행할 수 있는 구조이다. 전체 그래프를 한 번에 최적화하는 게 아니라 계층적으로 업데이트 한다. 연산량 감소에 중점을 두어 실시간성을 위해 고안되었다. Loop Closure를 찾을 때도 해당 범위 내 모든 포즈가 아닌 가장 상위 계층 레벨의 포즈만 탐색한다.
 
-![Untitled](4-3%20Hierarchical%20Pose-Graphs%20for%20SLAM/Untitled%201.png)
+![[Attachments/SLAM/Untitled 1.png]]
 
 위 그림이 Hierarchical Pose-Graph를 시각화한 그림이다. bottom layer가 Robot이 돌아다니면서 Input data로부터 Graph를 만든 것이라고 하자. First layer는 bottom layer보다 node와 edge 수를 간략화하여 grah로 표현한다. 마찬가지로 second layer에서는 node와 edge의 수를 더 간략화하여 graph를 표현한다.
 
@@ -39,27 +39,27 @@ Hierarchical Pose-Graph의 방법을 사용할 때의 주요 가정은 **Robot�
 
 Hierarchical Pose-Graph이 어떻게 동작하는지 알아보자.
 
-![Untitled](4-3%20Hierarchical%20Pose-Graphs%20for%20SLAM/Untitled%202.png)
+![[Attachments/SLAM/Untitled 2.png]]
 
 먼저 센서 데이터로부터 dense 한 graph를 만든다.
 
-![Untitled](4-3%20Hierarchical%20Pose-Graphs%20for%20SLAM/Untitled%203.png)
+![[Attachments/SLAM/Untitled 3.png]]
 
 이제 가까운 거리의 node들끼리 local connectivity를 기준으로 그룹화를 진행한다. 예를 들어, node와 node 사이가 50m 이상 차이 날 때 다른 그룹으로 취급한다. 본 강의에서는 거리를 기반으로 그룹을 나누었다.
 
-![Untitled](4-3%20Hierarchical%20Pose-Graphs%20for%20SLAM/Untitled%204.png)
+![[Attachments/SLAM/Untitled 4.png]]
 
 각 그룹 당 대표 node를 하나 정한다. 그림에는 빨간색으로 표신된 것이 대표 node이다. 본 강의에서는 가장 먼저 관측된 pose를 대표 node로 선정할 수 있다.
 
-![Untitled](4-3%20Hierarchical%20Pose-Graphs%20for%20SLAM/Untitled%205.png)
+![[Attachments/SLAM/Untitled 5.png]]
 
 이제 대표 node만을 이용해 상위 계층의 graph를 만든다. 이때 대표 노드 사이의 edge를 만들어야 한다. 상위 계층에서의 edge는 직접적으로 관찰된 값으로 만드는 것이 아니라, 그룹화한 node들끼리 연결성을 활용하여 계산을 진행한다.
 
-![Untitled](4-3%20Hierarchical%20Pose-Graphs%20for%20SLAM/Untitled%206.png)
+![[Attachments/SLAM/Untitled 6.png]]
 
 이렇게 상위 계층의 graph에서는 조금 더 적은 node와 edge로 최적화가 가능해진다. 계층을 많이 만들고 싶으면 지금까지 했던 방법을 반복적으로 진행한다. 그 다음 상위 계층의 graph에서 최적화를 진행한 모습을 위 그림과 같이 나타낼 수 있다.
 
-![Untitled](4-3%20Hierarchical%20Pose-Graphs%20for%20SLAM/Untitled%207.png)
+![[Attachments/SLAM/Untitled 7.png]]
 
 우리가 최적화한 빨간색 node는 하위 계층을 대표하는 node였기 때문에 최적화를 진행했을 경우, 최적화 결과를 하위 계층의 node들로도 전파(propagte) 해줘야 한다. 이때, 항상 전파해주는 것이 아니고 **inconsistency가 있을 때만 전파**해준다. 즉, 변동이 큰 일부만 하위 레벨 업데이트를 해준다.
 
@@ -71,7 +71,7 @@ Hierarchical Pose-Graph이 어떻게 동작하는지 알아보자.
 
 우리는 pose graph에서 edge를 결정하는 방법 두 가지를 배웠다. 여기서는 Observation-Based edge를 활용하여 edge를 결정한다. 아래의 그림에서 virtual observation $Z$와 두 node간에 Information matrix $\Omega$를 찾는 것이 우리의 목표이다. 어떻게 local node edge 정보를 결합하여 계산하는 것일까?
 
-![Untitled](4-3%20Hierarchical%20Pose-Graphs%20for%20SLAM/Untitled%208.png)
+![[Attachments/SLAM/Untitled 8.png]]
 
 실제 업데이트를 할 때, 두 대표 노드끼리 edge가 존재하는 것이 아니므로 상위 그래프에서 대표 노드끼리의 edge를 만들어주어야 한다. node에는 기본적으로 각 pose들이 저장되어 있다. 따라서 빨간색 node에 있는 pose들을 활용하여 두 node의 상대적인 Transformation을 표현한다. 두 포즈 간의 uncertainty가 매핑된 것이 없기 때문에, 둘 중 하나를 fix하고 edge를 만든다. 우리는 edge를 만들 때 Information matrix $\Omega$를 활용해서 불확실성 정도를 표현했다. **A,B 노드 중 A가 고정이 되면 (A에서 B로의 tf uncertainty) = (B의 uncertainty) 이다.**
 
@@ -79,7 +79,7 @@ Hierarchical Pose-Graph이 어떻게 동작하는지 알아보자.
 
 Information matrix $\Omega$는 두 node의 불확실성을 표현하기 위한 행렬이고, Matrix $H$를 정의할 때 Information matrix $\Omega$가 들어간다. 그리고 Information matrix $\Omega$의 역행렬이 covariance matrix이다. 따라서 강의자료에서는 두 node $x_a,x_b$의 Information matrix $\Omega_{ab}$를 아래처럼 표현하고 있다.
 
-![Untitled](4-3%20Hierarchical%20Pose-Graphs%20for%20SLAM/Untitled%209.png)
+![[Attachments/SLAM/Untitled 9.png]]
 
 node $x_a$에서 바라본 불확실성을 Matrix $H^{-1}$의 (b,b)번째 성분을 값을 통해 알아내고 이를 다시 Information matrix 값으로 바꿔주기 위해 전체의 성분값의 Inverse값을 구한다. node a를 고정했으므로 [b, b] block만 고려한다.
 
@@ -99,11 +99,11 @@ node $x_a$에서 바라본 불확실성을 Matrix $H^{-1}$의 (b,b)번째 성분
 
 따라서 **하위 계층으로의 전파는 lower level inconsistent 됐을 때만 발생하며, 가장 낮은 level까지 내려가거나 대표 노드의 움직임이 threshold 이하로 움직일 때까지 하위 계정으로 전파된다.**
 
-![Untitled](4-3%20Hierarchical%20Pose-Graphs%20for%20SLAM/Untitled%2010.png)
+![[Attachments/SLAM/Untitled 10.png]]
 
 위 그림을 보면, 어떤 두 대표 노드 간의 측정이 왼쪽과 같이 되었을 때 하위 노드들의 inconsistence가 존재하기 때문에 해당 업데이트를 하위 레벨까지 전파한다.
 
-![Untitled](4-3%20Hierarchical%20Pose-Graphs%20for%20SLAM/Untitled%2011.png)
+![[Attachments/SLAM/Untitled 11.png]]
 
 위 그림처럼 실제 대표 노드 간의 거리가 더 짧은 것으로 관측되면 이 또한 inconsistence가 있는 것으로 보고 하위 레벨 포즈를 업데이트한다. 두 대표 노드 $x_a, x_b$가 서로 가까워지는 방향으로 이동했으므로 하위 레벨 노드들도 서로 가까워진다.
 
@@ -124,9 +124,9 @@ node $x_a$에서 바라본 불확실성을 Matrix $H^{-1}$의 (b,b)번째 성분
 
 우리가 Hierarchical(계층) 구조를 활용해서 graph를 만들 경우, 이는 전체적인 graph를 간략하게 한 것이기 때문에 가장 lowest graph와 얼마나 차이가 있는지 확인해 보아야 한다.
 
-![Untitled](4-3%20Hierarchical%20Pose-Graphs%20for%20SLAM/Untitled%2012.png)
+![[Attachments/SLAM/Untitled 12.png]]
 
-![Untitled](4-3%20Hierarchical%20Pose-Graphs%20for%20SLAM/Untitled%2013.png)
+![[Attachments/SLAM/Untitled 13.png]]
 
 위 그림에서 왼쪽은 가장 lowest graph에서의 불확실성 정도이고, 오른쪽은 higher level graph에서 불확실성 정도이다. 표에서도 알 수 있듯이 higher level의 graph에서 불확실성이 더 크다. Higher level graph는 approximation(근사)를 진행한 Graph라고 볼 수 있다.
 

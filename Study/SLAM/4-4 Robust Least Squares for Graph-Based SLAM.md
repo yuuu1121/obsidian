@@ -10,7 +10,7 @@
 
 실제로 Outlier를 핸들링하지 않으면 모델이 망가진다. 가장 왼쪽은 outlier=1개, 중간은 n개, 오른쪽은 많은 수의 outlier가 존재한다.
 
-![Untitled](4-4%20Robust%20Least%20Squares%20for%20Graph-Based%20SLAM/Untitled.png)
+![[Attachments/SLAM/Untitled.png]]
 
 1. Edge로 만드는 constraints가 **Gaussian distribution을 따른다고 가정**한다.
 
@@ -18,7 +18,7 @@
 
 예를 들어 오른쪽 분포처럼 평균이 아닌 부분에서 큰 값을 가진 분포의 경우 가우시안 분포가 성립하지 못한다. 일반적인 Least Squares 방법에서는 이러한 outlier가 없다는 가정 하에 진행되지만, 실제 환경에서는 outlier가 발생할 수 밖에 없다.
 
-![Untitled](4-4%20Robust%20Least%20Squares%20for%20Graph-Based%20SLAM/Untitled%201.png)
+![[Attachments/SLAM/Untitled 1.png]]
 
 **Data association이 모호하게 나타나는 경우**는 다음과 같은 경우에서 빈번하게 나타난다.
 
@@ -28,9 +28,9 @@
 
 3) GPS의 신호를 활용하여 Data association을 만들 때 : GPS multi path(signal reflection)
 
-![Untitled](4-4%20Robust%20Least%20Squares%20for%20Graph-Based%20SLAM/Untitled%202.png)
+![[Attachments/SLAM/Untitled 2.png]]
 
-![Untitled](4-4%20Robust%20Least%20Squares%20for%20Graph-Based%20SLAM/Untitled%203.png)
+![[Attachments/SLAM/Untitled 3.png]]
 
 위 사진은 Data association이 모호하게 나타나는 경우의 한 예이다. 로봇이 비슷한 모양 Landmark로 둘러쌓여 있을 때, 로봇의 pose에 대한 확률이 여러 곳에서 높게 나타난 것을 볼 수 있다.
 
@@ -53,35 +53,35 @@
 
 Error minimization을 진행할 때는 Log likelihood를 사용하기 때문에 위의 식은 아래와 같이 변형된다. 지수(exponential)꼴로 복잡하게 정리됐던 식을 원소들의 덧셈으로 정리할 수 있다.
 
-![Untitled](4-4%20Robust%20Least%20Squares%20for%20Graph-Based%20SLAM/Untitled%204.png)
+![[Attachments/SLAM/Untitled 4.png]]
 
-![Untitled](4-4%20Robust%20Least%20Squares%20for%20Graph-Based%20SLAM/Untitled%205.png)
+![[Attachments/SLAM/Untitled 5.png]]
 
 이제 single이 아닌 multiple mode를 나타내보자. 우리가 multiple mode로 나타낼 수 있는 **첫번째 방법은 서로 다른 Gaussian distribution을 합하는 방법이다.** 그럼 식은 아래와 같이 달라진다.
 
 서로 다른 $k$개의 Gaussian distribution에 대해서, 각 가우시안 분포에 대한 Weight term인 $w_k$를 부여하고 모두 합쳐서 식을 정의한다. 마찬가지로 Error minimization을 진행할 때는 Log likelihood를 사용하기 때문에 식은 아래와 같이 변형된다. 현재 pose x에 대해 어떤 observation z가 나와야 하는지 확률적으로 표현한다.
 
-![Untitled](4-4%20Robust%20Least%20Squares%20for%20Graph-Based%20SLAM/Untitled%206.png)
+![[Attachments/SLAM/Untitled 6.png]]
 
-![Untitled](4-4%20Robust%20Least%20Squares%20for%20Graph-Based%20SLAM/Untitled%207.png)
+![[Attachments/SLAM/Untitled 7.png]]
 
 single Gaussian의 경우 log likelihood를 계산하기 쉬웠지만, k mode의 경우 log가 $\Sigma_k$ 연산자 안으로 들어가지 못해 쉽게 계산할 수 없다. 따라서 **Max Mixture는 근사치만 계산하도록 식을 재구성한다.** 강의에서는 **가장 중요한 mode의 값만 남겨둔다**고 표현한다. $\Sigma_k$ 연산자 대신 $max_k$ 연산자를 사용해 Log likelihood 적용 시 더 깔끔한 식으로 정리할 수 있다. **$max_k$ 연산자를 이용해 single Gaussian처럼 다룬다.**
 
-![Untitled](4-4%20Robust%20Least%20Squares%20for%20Graph-Based%20SLAM/Untitled%208.png)
+![[Attachments/SLAM/Untitled 8.png]]
 
 $max$ 연산자를 사용하기 때문에 “Max mixture”라고 부른다.
 
-![Untitled](4-4%20Robust%20Least%20Squares%20for%20Graph-Based%20SLAM/Untitled%209.png)
+![[Attachments/SLAM/Untitled 9.png]]
 
 위의 왼쪽은 두 Gaussian distribution을 나타낸 것이고, 오른쪽은 $\Sigma$연산자를 사용했을 때 Gaussian distribution, 중간은 $max$ 연산자를 사용했을 때 Gaussian distribution이다. approximation error가 조금 존재하지만 식을 간단하게 할 수 있기 때문에 $max$ 연산자를 사용해서 Gaussian distribution를 만든다.
 
-![Untitled](4-4%20Robust%20Least%20Squares%20for%20Graph-Based%20SLAM/Untitled%2010.png)
+![[Attachments/SLAM/Untitled 10.png]]
 
 왼쪽 그래프를 보면 y1과 y2의 두 평균이 멀고 분산이 작아 서로 겹치는 구간이 적다. 이 경우 sum과 max 방식이 아주 적은 차이를 보인다. 오른쪽 그래프는 y1과 y2가 겹치는 부분이 많아 max과 sum의 차이가 꽤 있다. 하지만 실제 outlier가 발생하는 경우는 큰 에러(평균으로부터 멀리 떨어져 있다)가 발생하기 때문에 겹치는 부분이 많지 않아 max와 sum의 차이가 크지 않을 것이다.
 
 따라서 Max mixture 식에서 Log Likelihood를 적용한 식은 아래와 같다. log term이 $max$ 연산자 안으로 들어갈 수 있어 쉽게 계산 가능하다.
 
-![Untitled](4-4%20Robust%20Least%20Squares%20for%20Graph-Based%20SLAM/Untitled%2011.png)
+![[Attachments/SLAM/Untitled 11.png]]
 
 ### Max Mixture 적용하는 과정
 
@@ -97,21 +97,21 @@ $max$ 연산자를 사용하기 때문에 “Max mixture”라고 부른다.
 
 max mixture는 모든 가우시안 분포를 계산해야 하므로 runtime이 조금 더 길지만, 기존의 Error minimization 방법과 차이가 얼마 나지 않는다는 것을 알 수 있다. 파란색 방식이 Standard Least Squares 방식이다.
 
-![Untitled](4-4%20Robust%20Least%20Squares%20for%20Graph-Based%20SLAM/Untitled%2012.png)
+![[Attachments/SLAM/Untitled 12.png]]
 
 - **Performance**
 
-![Untitled](4-4%20Robust%20Least%20Squares%20for%20Graph-Based%20SLAM/Untitled%2013.png)
+![[Attachments/SLAM/Untitled 13.png]]
 
-![Untitled](4-4%20Robust%20Least%20Squares%20for%20Graph-Based%20SLAM/Untitled%2014.png)
+![[Attachments/SLAM/Untitled 14.png]]
 
 - **Outlier에 Robust**
 
 Outlier에 굉장히 Robust하게 작동할 수 있다. 서로 다른 모드를 적용하여 하나는 주요 constraints값으로 분포를 만들고, 다른 하나는 이상적인 Gaussian 분포(flat Gaussian)로 만들어 outlier를 제거하는 방식을 사용한다. 따라서 Data Association이 모호할 때 사용하면 굉장히 효과적이다. 아래와 같이 다양한 mode (빨간색, 파란색)에 대해서 서로 다른 분포를 만들고 Max mixture 방법을 사용한다.
 
-![Untitled](4-4%20Robust%20Least%20Squares%20for%20Graph-Based%20SLAM/Untitled%2015.png)
+![[Attachments/SLAM/Untitled 15.png]]
 
-![Untitled](4-4%20Robust%20Least%20Squares%20for%20Graph-Based%20SLAM/Untitled%2016.png)
+![[Attachments/SLAM/Untitled 16.png]]
 
 # 3. Dynamic Covariance Scaling
 
@@ -121,11 +121,11 @@ Outlier에 굉장히 Robust하게 작동할 수 있다. 서로 다른 모드를 
 
 보통의 Least squares는 아래와 같은 식을 활용한다.
 
-![Untitled](4-4%20Robust%20Least%20Squares%20for%20Graph-Based%20SLAM/Untitled%2017.png)
+![[Attachments/SLAM/Untitled 17.png]]
 
 Dynamic Covariance Scaling은 이 식에 Scale term ($s_{ij}$)을 추가해 아래와 같이 식을 만든다.
 
-![Untitled](4-4%20Robust%20Least%20Squares%20for%20Graph-Based%20SLAM/Untitled%2018.png)
+![[Attachments/SLAM/Untitled 18.png]]
 
 각각의 observation마다 scale term을 추가할 경우, outlier에 해당하는 값은 scale term을 통해 Error minimization을 하는데 적은 영향을 끼치게 할 수 있다(wieght down).
 
@@ -134,11 +134,11 @@ Dynamic Covariance Scaling은 이 식에 Scale term ($s_{ij}$)을 추가해 아�
 
 $min$ 함수를 통해 1과 계산된 값 중 더 작은 값을 $s_{ij}$로 채택하기 때문에 $s_{ij}$는 1이거나 1보다 작은 값이다. 즉, **error가 기준값** $\Phi$ **보다 작으면 weight term=1로 두어 weigt를 주지 않고, error가** $\Phi$ **보다 커지면 더 강하게 scaling down한다.**
 
-![Untitled](4-4%20Robust%20Least%20Squares%20for%20Graph-Based%20SLAM/Untitled%2019.png)
+![[Attachments/SLAM/Untitled 19.png]]
 
 Error function을 시각화하면 아래와 같다. 에러가 커질수록 weighting term이 0에 가까워져 적은 영향을 미친다.
 
-![Untitled](4-4%20Robust%20Least%20Squares%20for%20Graph-Based%20SLAM/Untitled%2020.png)
+![[Attachments/SLAM/Untitled 20.png]]
 
 검은색 line은 기존의 Error function, 파란색 line은 scale factor, 빨간색 line은 Dynamic Covariance Scaling 방법을 적용한 Error function이다. 파란색 값이 1일 경우, 기존의 검은색 line과 빨간색 line은 같은 값을 가지게 되지만, 파란색 값이 작아질 경우(중심에서 멀어진 값들), Error에 대한 값도 작아
 져 outlier에 강인하도록 식이 설계됐다.
@@ -164,7 +164,7 @@ Dynamic Covariance Scaling 방법은 Least Squares with Robust Kernel의 special
 
 확률밀도함수(PDF)를 정의하기 위해 $\rho$ function을 재정의하고 최적화를 위해 negative log likelihood를 구한다. $e$는 error function의 value이다. (not error vector)
 
-![Untitled](4-4%20Robust%20Least%20Squares%20for%20Graph-Based%20SLAM/Untitled%2021.png)
+![[Attachments/SLAM/Untitled 21.png]]
 
 Gaussian distribution일 때는 $\rho(e_i(x))$함수를 우리가 기존에 사용했던 이차식 $\rho(e)=e^2$으로 사용하고 그렇지 않을 때는 다른 함수를 사용한다. 즉, 우리가 사용하던 식을 일반화 한 것이다.
 
@@ -174,13 +174,13 @@ Gaussian distribution일 때는 $\rho(e_i(x))$함수를 우리가 기존에 사�
 - L1 norm : $\rho(e)=|e|$
 - Huber function(Huber M-estimator) : solution 주변에서는 2차식, threshold 이상 멀어지면 선형
 
-![Untitled](4-4%20Robust%20Least%20Squares%20for%20Graph-Based%20SLAM/Untitled%2022.png)
+![[Attachments/SLAM/Untitled 22.png]]
 
 - Tukey, Cauchy…
 
 다양한 함수를 시각화한 모습은 아래와 같다. 그림의 함수들 중에는 L1 function을 제외하면 mean 주변에서는 quadratic form을 형성하고 에러가 기준값을 넘어가면 flat한 모습이다. (flat하다 = 자코비안이 0에 가깝다 = 에러가 optimization에 있어 영향이 거의 없다)
 
-![Untitled](4-4%20Robust%20Least%20Squares%20for%20Graph-Based%20SLAM/Untitled%2023.png)
+![[Attachments/SLAM/Untitled 23.png]]
 
 ## 4-1. Robust Estimation as Weighted Least Squares
 
@@ -188,15 +188,15 @@ Gaussian distribution일 때는 $\rho(e_i(x))$함수를 우리가 기존에 사�
 
 Dynamic Covariance Scale(기존의 Least squares 방법에서 Weight를 추가한 방법)은 일종의 Robust Kernel 모델이다. 두 가지 방법을 비교해보자.
 
-![Untitled](4-4%20Robust%20Least%20Squares%20for%20Graph-Based%20SLAM/Untitled%2024.png)
+![[Attachments/SLAM/Untitled 24.png]]
 
 그리고 위 두 식의 편미분값을 구하고, 비교를 한번 해보자. (optimum에서 gradient=0)
 
-![Untitled](4-4%20Robust%20Least%20Squares%20for%20Graph-Based%20SLAM/Untitled%2025.png)
+![[Attachments/SLAM/Untitled 25.png]]
 
 위 식에서 빨간색 부분을 제외하곤 모든 부분이 같다는 것을 알 수 있고, $\rho$ function을 잘 설계하면 Weighted Least Squares(DCS)와 비슷하게 설계 할 수 있다는 것을 알 수 있다.
 
-![Untitled](4-4%20Robust%20Least%20Squares%20for%20Graph-Based%20SLAM/Untitled%2026.png)
+![[Attachments/SLAM/Untitled 26.png]]
 
 우리는 **Weight를 잘 설계하면 Weighted Least Squares의 방법을 사용하여 Robust estimation을 활용할 수 있다!** 즉, Robust estimation과 Weighted Least Squares을 비슷하게 생각해도 무방하다.
 
@@ -230,7 +230,7 @@ CVPR 2019에 accepted된 “A General and Adaptive Robust Loss Function” 방�
 
 이 논문에서는 function을 다음과 같이 제안한다.
 
-![Untitled](4-4%20Robust%20Least%20Squares%20for%20Graph-Based%20SLAM/Untitled%2027.png)
+![[Attachments/SLAM/Untitled 27.png]]
 
 - $e$ : 우리가 기존에 봤던 error 값
 - $c$ : 우리가 어느 지점에서 이차식에서 어떤 function으로 바꿀지 결정
@@ -238,15 +238,15 @@ CVPR 2019에 accepted된 “A General and Adaptive Robust Loss Function” 방�
 
 $\alpha$ 값을 조정해 여러 $\rho$ function을 나타낼 수 있다.
 
-![Untitled](4-4%20Robust%20Least%20Squares%20for%20Graph-Based%20SLAM/Untitled%2028.png)
+![[Attachments/SLAM/Untitled 28.png]]
 
 아래 그림은 $\rho$ function과 weight function을 시각화 한 그림이다. $\alpha$에 따라 function의 모양이 달라지는 것을 확인할 수 있다. $\alpha$ 가 작을수록 outlier의 영향을 줄이는 형태이다. $\alpha=-\infin$일 때는 error가 일정 부분보다 커지면 에러 분포에 대한 변화가 거의 없고 weighting도 0에 가까워 outlier에 대한 영향을 많이 줄일 수 있다.
 
-![Untitled](4-4%20Robust%20Least%20Squares%20for%20Graph-Based%20SLAM/Untitled%2029.png)
+![[Attachments/SLAM/Untitled 29.png]]
 
 아래 그림의 Outlier distribution을 파란색 histogram(residuals)이라고 할 때, 다양한 $\alpha$에 따라 최적의 function을 만들 수 있는 것이 이 방법의 핵심이다. 최적의 function은 노란색 line으로 표현됐다. 각 분포에 따라 적절한 $\rho$ function이 다르다.
 
-![Untitled](4-4%20Robust%20Least%20Squares%20for%20Graph-Based%20SLAM/Untitled%2030.png)
+![[Attachments/SLAM/Untitled 30.png]]
 
 Generalized Robust Kernel을 사용하면 outlier의 분포와 상관 없이 모두 다 최적화 해낼 수 있다!
 
@@ -260,19 +260,19 @@ Generalized Robust Kernel을 사용하면 outlier의 분포와 상관 없이 모
 
 이 방법론에서는 최적화할 식을 아래와 같이 다시 설계한다. 이전에는  $\alpha$ 값을 고정해두고  $\alpha$에 여러 값을 대입하며 최적화 과정을 시도했지만, 이제는 $\alpha$ 자체를 최적화시키며 최적화한다.
 
-![Untitled](4-4%20Robust%20Least%20Squares%20for%20Graph-Based%20SLAM/Untitled%2031.png)
+![[Attachments/SLAM/Untitled 31.png]]
 
 앞서 $\rho$ function에서는 $c$도 parameter 였는데, $c$는 $\alpha$에 따라 결정되는 implicit parameter이다. 위 함수를 활용해 확률 밀도 함수를 만들면 다음과 같다. $Z(\alpha)$는 Normalized 하는 의미를 가진다.
 
-![Untitled](4-4%20Robust%20Least%20Squares%20for%20Graph-Based%20SLAM/Untitled%2032.png)
+![[Attachments/SLAM/Untitled 32.png]]
 
 하지만 $Z(\alpha)$를 정의할 때 $(-\infin ,\infin)$범위에서 적분 하게 되는데 $\alpha$의 값이 양수일 때는 수렴 하지만, 음수일 때는 $e^{-\rho(e, \alpha,1)}$ term이 계속 양수를 유지하며 발산하기 때문에 문제가 된다. 따라서  $\alpha$를 양수로 제한해야 했다. 이때 적분을 할 때 범위를 유한한 값으로 정해주는 trick을 사용하면 $\alpha$가 음수여도 괜찮다. 논문에서는 $\tau=10c$ 로 잡았을 때 충분했다고 한다.
 
-![Untitled](4-4%20Robust%20Least%20Squares%20for%20Graph-Based%20SLAM/Untitled%2033.png)
+![[Attachments/SLAM/Untitled 33.png]]
 
 아래의 가장 오른쪽 그림에서 보이듯, $\alpha$ 값이 작아지면 outlier에 대한 영향도 작아지지만 inlier에도 penalty가 생긴다. 따라서 tivial한 $\alpha$ 값이 아닌 최적의 $\alpha$ 값을 구할 수 있다. $Z(\alpha)$로 인해 그래프가 전체적으로 shift 된 것을 볼 수 있다.
 
-![Untitled](4-4%20Robust%20Least%20Squares%20for%20Graph-Based%20SLAM/Untitled%2034.png)
+![[Attachments/SLAM/Untitled 34.png]]
 
 Adaptive Robust Kernel을 사용할 경우, 실제로는 다음과 같은 문제들도 생각해야 한다.
 
@@ -295,7 +295,7 @@ $\alpha$ 값을 찾는 것과 x 값을 찾는 것을 분리할 수 있어 자코
 
 강의 슬라이드로 표현하면 아래와 같다.
 
-![Untitled](4-4%20Robust%20Least%20Squares%20for%20Graph-Based%20SLAM/Untitled%2035.png)
+![[Attachments/SLAM/Untitled 35.png]]
 
 이러한 Robust kernel 방법을 SLAM problem, ICP 알고리즘이나 Bundle adjustment에 적용하면 outlier에 강인하도록 알고리즘을 설계할 수 있다. Cyrill 교수님의 말에 의하면 EM-based optimization with Adaptive Robust Kernel이 가장 outlier를 잘 제거하는 결과를 보인다.
 

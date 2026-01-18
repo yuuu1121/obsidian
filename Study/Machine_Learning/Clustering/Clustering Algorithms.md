@@ -16,9 +16,9 @@ related notes:
 ---
 
 # Clustering 종류
-![[Attachments/Pasted image 20240221114027.png]]
+![[Attachments/General/Pasted image 20240221114027.png]]
 ## 계층적 군집 (Hierarchical Clustering)
-![[Attachments/Pasted image 20240221143445.png]]
+![[Attachments/General/Pasted image 20240221143445.png]]
 - **군집의 개수가 정해지지 않았을 때** 사용
 	- 몇 개의 군집으로 나누어야 하는지 결정하기 위해 사용되기도 함
 - 계층적 트리 모형을 이용해 개체들을 **순차적** 혹은 **계층적**으로 유사한 개체 내지 그룹과 통합하여 군집화 수행

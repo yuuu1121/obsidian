@@ -49,7 +49,7 @@ $$\underset{\theta}{\arg{\min}}\text{ }KL(\tilde{p}||p_\theta)=\underset{\theta}
 # Maximum log-Likelihood Estimation
 - 로그 함수는 단조 증가(monotonically increasing) 함수이기 때문에 원래 Likelihood 함수를 최대화하는 것과 같은 결과를 도출함
 
-![[Attachments/0df58b832bdf6af03f37d26f3662174a_MD5.webp|300]]
+![[Attachments/General/0df58b832bdf6af03f37d26f3662174a_MD5.webp|300]]
 
 $$\hat{\theta}_{MLE}:=\underset{\theta}{\arg{\max}}\text{ }\mathcal{L}(\theta;D)=\underset{\theta}{\arg{\max}}\text{ }\mathcal{l}(\theta;D)$$
 

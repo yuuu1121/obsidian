@@ -24,5 +24,5 @@ dg-publish: false
 210 220 230 240 250  
 ```
 **픽셀 `(2,2)`의 값을 계산할 때, 3×3 커널을 해당 위치에 적용**
-![[Attachments/eabd8ee9776263c515bdd3c179e5e50a_MD5.jpeg|700]]
+![[Attachments/General/eabd8ee9776263c515bdd3c179e5e50a_MD5.jpeg|700]]
 즉, 픽셀 `(2,2)`의 새로운 값은 `120`이 됨

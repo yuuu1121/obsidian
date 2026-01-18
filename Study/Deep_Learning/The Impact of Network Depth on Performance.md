@@ -13,7 +13,7 @@ url:
 ---
 # Introduction
 
-![[Attachments/Pasted image 20240305124828.png]]
+![[Attachments/General/Pasted image 20240305124828.png]]
 <center style='font-size:14;opacity:0.7;'>Layer 에 따른 Feature map 의 변화 도식도</center>
 
 - Deep neural network 는 Low / mid / high level features 를 통합하고, 여러 개의 Layer 에서 end-to-end 방식으로 Class 를 분류함
@@ -21,7 +21,7 @@ url:
 ---
 ## Feature map 의 해상도와 각각 보유하고 있는 Representation 의 관계
 
-![[Attachments/Pasted image 20240311053601.png]]
+![[Attachments/General/Pasted image 20240311053601.png]]
 
 - Convolutional network 에서 더 얕은, 즉 입력층에 보다 가까울수록 Feature map 은 높은 해상도 (High resolution) 을 가지며, 가장자리, 곡선 등과 같은 저수준 특징 (Low-level feature) 을 보유
 - 반대로 더 깊은 Layer 에서 얻을 수 있는 Feature map 은 낮은 해상도 (Low resolution) 을 가지며, 질감과 물체의 일부분 등 Class 를 추론할 수 있는 고수준 특징 (High-level feature) 를 가짐
@@ -40,7 +40,7 @@ url:
 ---
 ## Degradation Problem
 
-![[Attachments/Pasted image 20240305142202.png]]
+![[Attachments/General/Pasted image 20240305142202.png]]
 <center style='font-size:14;opacity:0.7;'>Layer 깊이에 따른 train (좌) / test (우) error 비교</center>
 
 - Neural network 의 *깊이가 증가할수록, 정확도는 포화되다가 급격하게 정확도 감소*

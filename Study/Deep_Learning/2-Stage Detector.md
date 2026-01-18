@@ -12,7 +12,7 @@ author:
 url:
   - https://velog.io/@qtly_u/Object-Detection-Architecture-1-or-2-stage-detector-%EC%B0%A8%EC%9D%B4
 ---
-![[Attachments/Pasted image 20240225162412.png]]
+![[Attachments/General/Pasted image 20240225162412.png]]
 
 - Localization 과 Classification 이 2-Stage 로 분리되어 있는 Object detector
 	- First stage: 
@@ -32,14 +32,14 @@ url:
 ---
 ## Representative Models
 ### Anchor-Based
-![[Attachments/Pasted image 20240304092603.png|+grid]]![[Attachments/Pasted image 20240304092610.png|+grid]]
+![[Attachments/General/Pasted image 20240304092603.png|+grid]]![[Attachments/General/Pasted image 20240304092610.png|+grid]]
 <center style='font-size: 14; opacity: 0.7;'>Fast R-CNN (좌), Faster R-CNN (우)</center>
 
-![[Attachments/Pasted image 20240304092659.png|+grid]]![[Attachments/Pasted image 20240304092710.png|+grid]]
+![[Attachments/General/Pasted image 20240304092659.png|+grid]]![[Attachments/General/Pasted image 20240304092710.png|+grid]]
 
 <center style='font-size: 14; opacity: 0.7;'>R-FCN (좌), Libra R-CNN (우)</center>
 
-![[Attachments/Pasted image 20240304092741.png]]
+![[Attachments/General/Pasted image 20240304092741.png]]
 
 <center style='font-size: 14; opacity: 0.7;'>Mask R-CNN</center>
 
@@ -56,7 +56,7 @@ url:
 ---
 ### Anchor-Free
 
-![[Attachments/Pasted image 20240304092925.png|500]]
+![[Attachments/General/Pasted image 20240304092925.png|500]]
 
 <center style='font-size: 14; opacity: 0.7;'>RePoints</center>
 

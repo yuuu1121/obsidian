@@ -27,19 +27,19 @@ url:
 - 말그대로 직선적인 함수 $y=x$
 - Linear Function을 [[Study/Deep_Learning/Activation Function|활성화 함수]]로 사용하면 **Deep**한 네트워크의 이점이 전혀 없음
 
-![[Attachments/Pasted image 20240225205146.png]]
+![[Attachments/General/Pasted image 20240225205146.png]]
 - 위 2-Layer 모델을 보면 $X$에 곱해지는 항들은 $W$로 치환이 가능하고, 입력과 무관한 상수들은 전체를 $B$로 치환이 가능하기 때문에 $WX+B$라는 Single layer perception과 동일한 결과를 냄
 - 즉, [[Back Propagation|역전파 과정]]에서 미분을 진행할 때, 항상 같은 상수 $W$를 반환하게 되므로 학습이 진행되지 않고, 네트워크를 **Deep**하게 쌓는 의미가 없어짐
 
-![[Attachments/Pasted image 20240225205346.png|500]]
+![[Attachments/General/Pasted image 20240225205346.png|500]]
 
 ---
 ## Rectified Linear Unit (ReLU)
-![[Attachments/Pasted image 20240304192615.png|500]]
+![[Attachments/General/Pasted image 20240304192615.png|500]]
 <center style='font-size:14; opacity:0.7;'>Comparison between ReLU series</center>
 
 ---
-![[Attachments/Pasted image 20240229144832.png|+grid]]![[Attachments/Pasted image 20240229144908.png|+grid]]![[Attachments/Pasted image 20240229144929.png|+grid]]
+![[Attachments/General/Pasted image 20240229144832.png|+grid]]![[Attachments/General/Pasted image 20240229144908.png|+grid]]![[Attachments/General/Pasted image 20240229144929.png|+grid]]
 <center style="font-size: 14; opacity: 0.7">Leaky ReLU / PReLU (좌), ReLU6, SeLU</center>
 
 ### ReLU
@@ -62,11 +62,11 @@ x, & \mbox{if }x>0 \\
 - Self-normalizing 효과가 있어 Gradient exploding, Vanishing 문제를 방지하는 Activation function 
 ---
 
-![[Attachments/Pasted image 20240229154554.png|+grid]]![[Attachments/Pasted image 20240229154606.png|+grid]]![[Attachments/Pasted image 20240229154615.png|+grid]]
+![[Attachments/General/Pasted image 20240229154554.png|+grid]]![[Attachments/General/Pasted image 20240229154606.png|+grid]]![[Attachments/General/Pasted image 20240229154615.png|+grid]]
 <center style="font-size: 14; opacity: 0.7;">Swish (좌), hard Swish (중간), Mish (우)</center>
 
 ### Swish
-![[Attachments/Pasted image 20240311143657.png|500]]
+![[Attachments/General/Pasted image 20240311143657.png|500]]
 
 $$f(x)=x\cdot sigmoid(x)$$
 
@@ -79,7 +79,7 @@ $$f(x)=x\cdot sigmoid(x)$$
 - 임베디드 기기에서는 Swish 함수에서 Sigmoid 에 대한 연산량이 높기 때문에 이러한 문제를 해결하기 위해 적용한 activation function 
 ---
 ### Mish
-![[Attachments/Pasted image 20240311143902.png|500]]
+![[Attachments/General/Pasted image 20240311143902.png|500]]
 
 $$f(x)=x\tanh(softplus(x))=x\tanh(\ln(1+e^x))$$
 
@@ -91,13 +91,13 @@ $$f(x)=x\tanh(softplus(x))=x\tanh(\ln(1+e^x))$$
 - Bounded below:
 	- 음의 값이 -0.31 로 제한되어 있기 때문에 Strong regularization 효과가 있으며, Overfitting 을 감소시킬 수 있음
 ---
-![[Attachments/Pasted image 20240311145335.png|500]]
+![[Attachments/General/Pasted image 20240311145335.png|500]]
 
 - Mish 의 Loss 값이 부드럽게 형성되어 있어 더 쉬운 최적화와 더 나은 일반화를 도와줌
 - 넓은 Minima 구역을 갖고 있으며, 가장 낮은 Loss 값을 가짐
 ---
 #### Comparison between Swish and Mish
-![[Attachments/Pasted image 20240311144214.png]]
+![[Attachments/General/Pasted image 20240311144214.png]]
 
 $$\begin{align}
 f'(x)&=sech^2(softplus(x))\cdot x\cdot sigmoid(x)+{f(x)\over x} \\\\
@@ -109,9 +109,9 @@ f'(x)&=sech^2(softplus(x))\cdot x\cdot sigmoid(x)+{f(x)\over x} \\\\
 - 수학적으로 무거운 모델인 Mish 는 Swish 확성화 함수의 시간 복잡성에 비해 계산 비용이 많이 든다는 단점 있음
 ---
 ### Comparison of ReLU series
-![[Attachments/Pasted image 20240311144020.png]]
-![[Attachments/Pasted image 20240311144025.png]]
-![[Attachments/Pasted image 20240311144030.png]]
+![[Attachments/General/Pasted image 20240311144020.png]]
+![[Attachments/General/Pasted image 20240311144025.png]]
+![[Attachments/General/Pasted image 20240311144030.png]]
 
 - Swish 와 Mish 에 비해 ReLU 의 좌표의 스칼라 크기 사이의 Sharp transition 을 보여줌
 - Smoother transition 은 보다 부드러운 최적화 기능을 제공하여 손실을 줄이면서 신경망을 일반화

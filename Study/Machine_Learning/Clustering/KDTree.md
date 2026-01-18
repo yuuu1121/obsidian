@@ -18,4 +18,4 @@ related notes:
 	- K 차원 공간의 점을 구성하기 위한 공간 분할 구조
 - Range나 Nearest Neighbor 탐색에 매우 유용
 - 포인트 클라우드는 일반적으로 3차원이므로 여기서 사용되는 KDTree의 차원은 3차원이며, 다음과 같이 표현됨
-![[Attachments/Pasted image 20240221150310.png|300]]
+![[Attachments/General/Pasted image 20240221150310.png|300]]

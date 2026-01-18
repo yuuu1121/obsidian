@@ -6,15 +6,15 @@
 
 <5-1>에서 설명했던 Bundle Adjustment를 실제로 어떻게 사용하는지 설명해보자. BA는 non-linear least squares 방법이다. 이미지에서의 projection error를 최소화하며, 추정한 3D point들을 추정한 카메라 이미지들에 Project 한다. 이 projected 3D point들을 관측한 2D pixel 좌표와 비교한다. 여러 점들을 한 번에 bundle로 묶어 projection error를 줄이기 때문에 Bundle Adjustment 라고 한다.
 
-![Untitled](5-1%20Basics%20about%20Bundle%20Adjustment%20in%20Visual%20SLAM/Untitled%206.png)
+![[Attachments/SLAM/Untitled 6.png]]
 
 Unknown parameter는 다음과 같다. 이 파라미터들을 reprojection error 최소화 시키는 방향으로 refine 한다. 이 중에서 **6DoF Camera Pose와 3D point를 제외한 다른 파라미터들은 알고 있다고 가정하고 생략할수 있다.**
 
-![Untitled](5-2%20Numeric%20of%20the%20Bundle%20Adjustment%20in%20Visual%20SLA/Untitled.png)
+![[Attachments/SLAM/Untitled.png]]
 
 식을 정의했다면 Least squares approach를 사용해 최적화를 진행한다.
 
-![Untitled](5-2%20Numeric%20of%20the%20Bundle%20Adjustment%20in%20Visual%20SLA/Untitled%201.png)
+![[Attachments/SLAM/Untitled 1.png]]
 
 - A : Jacobian Matrix
 - $\Sigma$ : Covariance matrix
@@ -25,7 +25,7 @@ Unknown parameter는 다음과 같다. 이 파라미터들을 reprojection error
 
 3차원 포인트를 이미지 상에 projection한 좌표와 실제 이미지에 있는 좌표를 비교하여 projection error를 최소화한다. BA를 통해 refine 할 수록 둘 사이의 거리는 가까워진다. 한 포인트를 여러 위치에서 바라보고, 한 카메라도 여러 포인트를 보게 되는데 동시에 번들로 묶어 진행하기 때문에 bundle adjustment라고 한다.
 
-![Untitled](5-2%20Numeric%20of%20the%20Bundle%20Adjustment%20in%20Visual%20SLA/Untitled%202.png)
+![[Attachments/SLAM/Untitled 2.png]]
 
 - C : center 좌표계(translation), K : intrinsic mtx
 - X는 포인트의 3D homogenuous 좌표 / [u v w]T는 계산한 포인트의 2D homogenuous 좌표
@@ -33,7 +33,7 @@ Unknown parameter는 다음과 같다. 이 파라미터들을 reprojection error
 - error를 최소화하는 방향으로 unknown parameters를 refine 해야한다.
 - scale factor는 w(z축 값)로 나눌 때 사라지므로 고려하지 않는다.
 
-![Untitled](5-2%20Numeric%20of%20the%20Bundle%20Adjustment%20in%20Visual%20SLA/Untitled%203.png)
+![[Attachments/SLAM/Untitled 3.png]]
 
 **Gradient Descent 방법으로 최적화 한다.** Jacobian을 구할때, 우리가 구해야 하는 파라미터인 camera pose, 3D point가 Jacobian의 파라미터가 된다. 또한 observation의 constraint가 된다.
 
@@ -43,11 +43,11 @@ Normal equation은 Gauss Newton과 같다고 볼 수 있는데, $||y-X\theta||^2
 
 ---
 
-![Untitled](5-2%20Numeric%20of%20the%20Bundle%20Adjustment%20in%20Visual%20SLA/Untitled%204.png)
+![[Attachments/SLAM/Untitled 4.png]]
 
 Normal equation은 Hessian과 Jacobian의 element들이다. 이것들을 double 형태로 저장하면 무려 2.8TB의 저장공간이 필요하다.
 
-![Untitled](5-2%20Numeric%20of%20the%20Bundle%20Adjustment%20in%20Visual%20SLA/Untitled%205.png)
+![[Attachments/SLAM/Untitled 5.png]]
 
 검은색 line을 따라 UAV가 움직이고 있고, 49개의 map points가 있다고 가정하자. 그리고 꼭짓점 쪽에 삼각형으로 되어있는 points는 control points(map points의 위치를 정확히 아는 points)이다. 즉, 최적화를 하는 대상이 아니다. (최적화 해야할 map points는 전체 49개에서 4개의 control points를 뺀 45개의 map points이다.) 정사각형으로 표시된 것이 한 이미지를 나타낸 것인데, 첫번째 이미지에서는 총 6개의 map points들이 관찰되었고, 두번째부터 9개의 map points들이 관찰되었다. 본 예시에서는 촬영 영역에 control point를 설치해 boundary condition처럼 사용하였다.
 
@@ -79,23 +79,23 @@ $$
 
 라고 정의하고 $\Delta x$를 3D points에 대한 변수와 6DoF에 대한 정보로 쪼개준다.
 
-![Untitled](5-2%20Numeric%20of%20the%20Bundle%20Adjustment%20in%20Visual%20SLA/Untitled%206.png)
+![[Attachments/SLAM/Untitled 6.png]]
 
 $\Delta t$는 camera orientation parameter이다.(not tf) 변형된 식은 다음과 같다.  $\Delta x$를 나눈 것에 맞추어 $A$ 행렬도 나누어준다.
 
-![Untitled](5-2%20Numeric%20of%20the%20Bundle%20Adjustment%20in%20Visual%20SLA/Untitled%207.png)
+![[Attachments/SLAM/Untitled 7.png]]
 
 따라서 $i$번째 3D Map point, $j$번째 이미지(=카메라)에서 바라본 error equation은 아래와 같다. $U$는 unknown paraeters의 갯수이다. 그냥 변형된 식에 맞추어 쪼갰다고 생각하면 된다.
 
-![Untitled](5-2%20Numeric%20of%20the%20Bundle%20Adjustment%20in%20Visual%20SLA/Untitled%208.png)
+![[Attachments/SLAM/Untitled 8.png]]
 
-![Untitled](5-2%20Numeric%20of%20the%20Bundle%20Adjustment%20in%20Visual%20SLA/Untitled%209.png)
+![[Attachments/SLAM/Untitled 9.png]]
 
 Jacobian matrix를 쪼개는 것이 이 식 변형의 핵심이다. 우리가 고려하는 파라미터에 필요한 성분을 가지고 있는 matrix만 가지고 계산할 수 있기 때문이다. 즉, Jacobian matrix의 크기를 줄여 real-time으로 계산할 수 있다. **Jacobian matrix $A$는 sparse 하기 때문에 식의 변형을 통해 0으로 채워져 있는 성분을 제거해 계산량을 줄일 수 있다.** Jacobian matrix를 시각화하면 아래와 같다. 검은색 부분을 제외하면 모든 성분은 0이다. matrix가 커질수록 더 sparse 해진다.
 
-![Untitled](5-2%20Numeric%20of%20the%20Bundle%20Adjustment%20in%20Visual%20SLA/Untitled%2010.png)
+![[Attachments/SLAM/Untitled 10.png]]
 
-![Untitled](5-2%20Numeric%20of%20the%20Bundle%20Adjustment%20in%20Visual%20SLA/Untitled%2011.png)
+![[Attachments/SLAM/Untitled 11.png]]
 
 $B$  Matrix와 $C$ Matrix의 모양이 규칙적인 이유는 UAV의 trajectory가 일정하기 때문이다.
 
@@ -120,17 +120,17 @@ $B$ matrix와 $C$ matrix는 어떻게 계산하고 찾아낼까? 실제로는 �
 
 목표는 Least squares approach로 non-linear optimization을 하는 것이다. 따라서 우리는 아래와 같은 Matrix를 구해야 한다.
 
-![Untitled](5-2%20Numeric%20of%20the%20Bundle%20Adjustment%20in%20Visual%20SLA/Untitled%2012.png)
+![[Attachments/SLAM/Untitled 12.png]]
 
 이러한 Normal matrix를 $C, B$ matrix를 활용해서 나타내면 다음과 같다.
 
-![Untitled](5-2%20Numeric%20of%20the%20Bundle%20Adjustment%20in%20Visual%20SLA/Untitled%2013.png)
+![[Attachments/SLAM/Untitled 13.png]]
 
 N에 대해 더 자세히 설명해보자. $B_i$는 포인트가 관측된 이미지이다.
 
-![Untitled](5-2%20Numeric%20of%20the%20Bundle%20Adjustment%20in%20Visual%20SLA/Untitled%2014.png)
+![[Attachments/SLAM/Untitled 14.png]]
 
-![Untitled](5-2%20Numeric%20of%20the%20Bundle%20Adjustment%20in%20Visual%20SLA/Untitled%2015.png)
+![[Attachments/SLAM/Untitled 15.png]]
 
 ## 2-3. Orientation parameter delta_t 계산
 
@@ -138,19 +138,19 @@ N에 대해 더 자세히 설명해보자. $B_i$는 포인트가 관측된 이�
 
 최적화를 수행할 때 Orientation parameter만을 최적화 해보자.
 
-![Untitled](5-2%20Numeric%20of%20the%20Bundle%20Adjustment%20in%20Visual%20SLA/Untitled%2016.png)
+![[Attachments/SLAM/Untitled 16.png]]
 
 Orientation parameter만을 최적화 하기 위해 식 변형을 해준다.
 
-![Untitled](5-2%20Numeric%20of%20the%20Bundle%20Adjustment%20in%20Visual%20SLA/Untitled%2017.png)
+![[Attachments/SLAM/Untitled 17.png]]
 
 이렇게 Reduced normal system을 구할 수 있다(마지막 줄). point의 수에 독립적이고, 여전히 sparse 하며, 크기는 $(126 \times 126)$=(# of obs)X(# of obs) 이다. Matrix를 시각화하면 아래와 같다. 검은색 부분이 non-zero 성분이고, 하얀색이 zero 성분이다.
 
-![Untitled](5-2%20Numeric%20of%20the%20Bundle%20Adjustment%20in%20Visual%20SLA/Untitled%2018.png)
+![[Attachments/SLAM/Untitled 18.png]]
 
 이제 실제로 계산을 진행하면 아래와 같다.
 
-![Untitled](5-2%20Numeric%20of%20the%20Bundle%20Adjustment%20in%20Visual%20SLA/Untitled%2019.png)
+![[Attachments/SLAM/Untitled 19.png]]
 
 $N_{kk}$ mtx는 Diagonal mtx 이기 때문에 계산량이 많지 않다. 이 식을 풀면 Orientation parameter $\Delta t$를 알 수 있다.
 
@@ -160,31 +160,31 @@ $N_{kk}$ mtx는 Diagonal mtx 이기 때문에 계산량이 많지 않다. 이 �
 
 $\Delta t$를 구했으니 이 값을 이용해 Map points parameter $\Delta k$를 구한다.
 
-![Untitled](5-2%20Numeric%20of%20the%20Bundle%20Adjustment%20in%20Visual%20SLA/Untitled%2020.png)
+![[Attachments/SLAM/Untitled 20.png]]
 
 위 식에서 Upper block의 식을 활용하여 $\Delta k$에 대한 식을 구하면 아래와 같다.
 
-![Untitled](5-2%20Numeric%20of%20the%20Bundle%20Adjustment%20in%20Visual%20SLA/Untitled%2021.png)
+![[Attachments/SLAM/Untitled 21.png]]
 
 $\Delta k$에 대해 정리하면 아래와 같다.
 
-![Untitled](5-2%20Numeric%20of%20the%20Bundle%20Adjustment%20in%20Visual%20SLA/Untitled%2022.png)
+![[Attachments/SLAM/Untitled 22.png]]
 
 지금까지 이야기한 과정을 정리해보면 다음과 같다.
 
 우선 $N$ Matrix의 성분을 계산한다.
 
-![Untitled](5-2%20Numeric%20of%20the%20Bundle%20Adjustment%20in%20Visual%20SLA/Untitled%2023.png)
+![[Attachments/SLAM/Untitled 23.png]]
 
 그 다음 $N_{tt}, h_t$를 계산한다.
 
-![Untitled](5-2%20Numeric%20of%20the%20Bundle%20Adjustment%20in%20Visual%20SLA/Untitled%2017.png)
+![[Attachments/SLAM/Untitled 17.png]]
 
-![Untitled](5-2%20Numeric%20of%20the%20Bundle%20Adjustment%20in%20Visual%20SLA/Untitled%2024.png)
+![[Attachments/SLAM/Untitled 24.png]]
 
 위 식에서 $\Delta t$를 계산한 후, 아래 식을 이용해 $\Delta k$를 계산한다. 이때 $N^{-1}_{kk}$는 앞에서 이미 구했으므로 다시 연산할 필요가 없다. (연산량 감소)
 
-![Untitled](5-2%20Numeric%20of%20the%20Bundle%20Adjustment%20in%20Visual%20SLA/Untitled%2025.png)
+![[Attachments/SLAM/Untitled 25.png]]
 
 # 3. **BA without Control Points**
 
@@ -208,31 +208,31 @@ Contol point 관측 시 내부의 값들은 차이가 없지만, 외부의 어�
 
 <4-1>을 생각해보자. 왼쪽은 가장 아래 row를 추가해 자코비안 관점에서 pose 1에 대한 constraint를 추가해 Gauge Freedom을 없애는 효과를 가지고 있다. determinant가 0이 되지 않게 하는 효과도 있는데, gauge freedom 때문에 determinant 값이 0이 되기도 하므로 같은 말이다. 오른쪽은 가장 왼쪽 column을 제거해 카메라 1의 포즈를 고정하는 효과를 가진다.
 
-![Untitled](5-2%20Numeric%20of%20the%20Bundle%20Adjustment%20in%20Visual%20SLA/Untitled%2026.png)
+![[Attachments/SLAM/Untitled 26.png]]
 
 </aside>
 
 Constraints Matrix를 $H$로 정의하고, 최적화를 진행할 때 Matrix에 대한 정보를 활용하면 Rank deficiency를 해결할 수 있다.
 
-![Untitled](5-2%20Numeric%20of%20the%20Bundle%20Adjustment%20in%20Visual%20SLA/Untitled%2027.png)
+![[Attachments/SLAM/Untitled 27.png]]
 
 ### +) **SLAMDUNK 예시**
 
-![Untitled](5-2%20Numeric%20of%20the%20Bundle%20Adjustment%20in%20Visual%20SLA/Untitled%2028.png)
+![[Attachments/SLAM/Untitled 28.png]]
 
-![Untitled](5-2%20Numeric%20of%20the%20Bundle%20Adjustment%20in%20Visual%20SLA/Untitled%2029.png)
+![[Attachments/SLAM/Untitled 29.png]]
 
 우리는 MATLAB toolbox를 이용해 계산할 수 있다. 아래는 픽셀 좌표 x에 대한 Rotation 벡터의 편미분 값인데 오른쪽을 보면 결과값이 매우 긴 것을 확인할 수 있다.
 
-![Untitled](5-2%20Numeric%20of%20the%20Bundle%20Adjustment%20in%20Visual%20SLA/Untitled%2030.png)
+![[Attachments/SLAM/Untitled 30.png]]
 
 Jacobian matrix는 매우 sparse 하다.
 
-![Untitled](5-2%20Numeric%20of%20the%20Bundle%20Adjustment%20in%20Visual%20SLA/Untitled%2031.png)
+![[Attachments/SLAM/Untitled 31.png]]
 
 Hessian matrix도 매우 sparse하다. 가장 연산량이 큰 부분이 $(J^TJ)^{-1}$, 즉 Hessian의 inverse를 구하는 부분이다. 이때 Hessian matrix를 block으로 나눌 수 있는데, block 이기 떄문에 inverse를 구하기가 쉽다. 각 block의 inverse를 구하여 전체 mtx의 inverse를 쉽게 구할 수 있다.
 
-![Untitled](5-2%20Numeric%20of%20the%20Bundle%20Adjustment%20in%20Visual%20SLA/Untitled%2032.png)
+![[Attachments/SLAM/Untitled 32.png]]
 
 ## Outlier 제거하기
 
@@ -242,12 +242,12 @@ Hessian matrix도 매우 sparse하다. 가장 연산량이 큰 부분이 $(J^TJ)
 
 이 때 Robust kernel을 활용하여 Outlier에 강인한 Error minimization을 수행할 수 있다.
 
-![Untitled](5-2%20Numeric%20of%20the%20Bundle%20Adjustment%20in%20Visual%20SLA/Untitled%2033.png)
+![[Attachments/SLAM/Untitled 33.png]]
 
 좋은 Initial guess를 가지고 있다면 Blake-Zisserman과 같은 kernel을 사용하는 것이 효율적이지만, Initial guess를 좋게 만들 수 없다면 Huber kernel을 사용하는 것을 추천하셨다.
 계속 강조하지만 아래와 같은 Robust Kernel의 사용도 추천하셨다.
 
-![Untitled](5-2%20Numeric%20of%20the%20Bundle%20Adjustment%20in%20Visual%20SLA/Untitled%2034.png)
+![[Attachments/SLAM/Untitled 34.png]]
 
 # 4. Summary
 

@@ -12,7 +12,7 @@ url:
 header-includes:
   - \usepackage{kotex}
 ---
-![[Attachments/Pasted image 20240225165029.png]]
+![[Attachments/General/Pasted image 20240225165029.png]]
 
 # Anchor Box
 - 미리 정의된 형태를 가진 여러 개의 Bounding Box
@@ -22,6 +22,6 @@ header-includes:
 	- 아래와 같이 Anchor box가 2개라면 벡터는 다음과 같이 생성됨
 	  $[p_x, b_x, b_y, b_w, b_h, c_1, c_2, c_3, p_x, b_x, b_y, b_w, b_h, c_1, c_2, c_3]$
 	- Detection을 할 때는 예측한 객체의 BBox가 Anchor box 1에 유사한지 2에 유사한지 **IoU를 비교**하여 높은 IoU를 갖는 Anchor box 자리에 할당
-	  ![[Attachments/409b0563b1083ce91ed856c97beeba62_MD5.png|500]]
+	  ![[Attachments/General/409b0563b1083ce91ed856c97beeba62_MD5.png|500]]
 - 이후, 이미지의 Feature map에서 **Anchor box의 offset**을 최적화
 	- Offset: 예측된 bounding box의 위치 좌표 $(x, y, w, h)$의 offset

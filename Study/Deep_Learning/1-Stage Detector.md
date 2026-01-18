@@ -12,7 +12,7 @@ author:
 url:
   - https://velog.io/@qtly_u/Object-Detection-Architecture-1-or-2-stage-detector-%EC%B0%A8%EC%9D%B4
 ---
-![[Attachments/Pasted image 20240225163954.png]]
+![[Attachments/General/Pasted image 20240225163954.png]]
 
 - Localization 과 Classification 과 동시에 이루어지는 1-Stage detector
 	- Region proposal 과정을 거치지 않고, CNN 의 결과인 Feature map 에서 Localization 과 Bounding box regression 수행
@@ -31,12 +31,12 @@ url:
 ---
 ## Representative Model
 ### Anchor-Based
-![[Attachments/Pasted image 20240304091918.png|+grid]]![[Attachments/Pasted image 20240304091928.png|+grid]]<center style='font-size: 14; opacity: 0.7;'>YOLO v1 (좌), YOLO v3 (우)</center>
+![[Attachments/General/Pasted image 20240304091918.png|+grid]]![[Attachments/General/Pasted image 20240304091928.png|+grid]]<center style='font-size: 14; opacity: 0.7;'>YOLO v1 (좌), YOLO v3 (우)</center>
 
-![[Attachments/Pasted image 20240304092037.png]]
+![[Attachments/General/Pasted image 20240304092037.png]]
 <center style='font-size: 14; opacity: 0.7;'>SSD architecture</center>
 
-![[Attachments/Pasted image 20240304092106.png]]
+![[Attachments/General/Pasted image 20240304092106.png]]
 <center style='font-size: 14; opacity: 0.7;'>RetinaNet architecture</center>
 
 - **YOLO**: 
@@ -49,13 +49,13 @@ url:
 	- Darkent-53을 backbone network로 사용하며 multi-scale feature map을 사용하여 빠른 추론 속도를 보인 모델
 ---
 ### Anchor-Free
-![[Attachments/Pasted image 20240304092249.png|+grid]]![[Attachments/Pasted image 20240304092301.png|+grid]]
+![[Attachments/General/Pasted image 20240304092249.png|+grid]]![[Attachments/General/Pasted image 20240304092301.png|+grid]]
 <center style='font-size: 14; opacity: 0.7;'>CornerNet (좌), MatrixNet (우)</center>
 
-![[Attachments/Pasted image 20240304092348.png]]
+![[Attachments/General/Pasted image 20240304092348.png]]
 <center style='font-size: 14; opacity: 0.7;'>CenterNet</center>
 
-![[Attachments/Pasted image 20240304092410.png]]
+![[Attachments/General/Pasted image 20240304092410.png]]
 <center style='font-size: 14; opacity: 0.7;'>FCOS architecture</center>
 
 - **CornerNet**: 

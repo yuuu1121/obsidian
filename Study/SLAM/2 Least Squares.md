@@ -10,7 +10,7 @@ Least Squares은 우리가 배우는 SLAM system인 ‘Graph-based SLAM system�
 **Overdetermined System(구해야 할 parameter보다 더 많은 Observations이 존재)**에서, Observation들에 noise가 존재하는 경우에 실제값와 예측값의 **Error가 최소화되도록 하는 parameter 값을 구하는 방법**이다. 그 error는 보통 **관찰값과 예측값의 차이(residual)의 제곱**으로 표현한다.
 > 
 
-![Untitled](2%20Least%20Squares/Untitled.png)
+![[Attachments/SLAM/Untitled.png]]
 
 Least Squares는 선형화를 가정하여 error의 최소화를 구하는 방법이다. 만약 **Non-linear**한 모델일 경우, Gauss-Newton Method 등의 방법을 이용할 수 있다.
 
@@ -18,7 +18,7 @@ Least Squares는 선형화를 가정하여 error의 최소화를 구하는 방�
 
 ---
 
-![Untitled](2%20Least%20Squares/Untitled%201.png)
+![[Attachments/SLAM/Untitled 1.png]]
 
 이 문제는 모델 파라미터 추정 문제가 아닌, state x 추정 문제이다.
 
@@ -56,13 +56,13 @@ $\Omega_i$는 information matrix이다. $e_i(x)^Te_i(x)$ 는 스칼라이므로 
 <aside>
 💡 **<Information Matrix $\Omega$>**
 
-![Untitled](2%20Least%20Squares/Untitled%202.png)
+![[Attachments/SLAM/Untitled 2.png]]
 
 우리는 uncertainty를 $\delta^2$로 나타낸다. $v_i$는 i번째 관측의 noise이고, $v$의 covariance를 나타내면 $\delta^2$이다. $\delta^2$이 클수록 low confidence, 즉 uncertainty가 높다는 뜻이 된다. 불확실한 센서의 값일수록 관측값이 평균으로부터 넓게 분포되어 있어 불확실성이 높다. 센서 관측 확률 분포가 아래와 같다면, 센서 1이 가장 정밀도 높은 센서이다.
 
 $\delta_1 < \delta_2 < \delta_3$ 이므로 $\frac{1}{\delta_1^2} \gg \frac{1}{\delta_2^2} \gg \frac{1}{\delta_3^2}$. 즉 sensor1의 영향 가장 많이 받는다.
 
-![Untitled](2%20Least%20Squares/Untitled%203.png)
+![[Attachments/SLAM/Untitled 3.png]]
 
 $$
 E(x) = \frac{e^2_1}{\delta^2_1}+\cdots+\frac{e^2_k}{\delta^2_k}
@@ -93,11 +93,11 @@ Information mtx는 Heteroskedasticity (이분산성)이다. 즉, SLAM system에�
 
 Off-diagonal term은 센서와 센서 사이의 관계를 나타내준다. 센서끼리의 영향이 없다고 가정하면 모두 0으로 나타낼 수 있다.
 
-![Untitled](2%20Least%20Squares/Untitled%204.png)
+![[Attachments/SLAM/Untitled 4.png]]
 
 off-diagonal term 이 모두 0이면 서로 다른 센서끼리는 영향을 받지 않는 것을 볼 수 있다. $e_1, e_2, e_3$는 3개 센서의 각 error이다.
 
-![Untitled](2%20Least%20Squares/Untitled%205.png)
+![[Attachments/SLAM/Untitled 5.png]]
 
 </aside>
 
@@ -107,7 +107,7 @@ off-diagonal term 이 모두 0이면 서로 다른 센서끼리는 영향을 받
 
 Error function을 이용해 우리가 구해야 할 것은 **$x^*$(error function를 최소화 시키는 $x$ 값)**이다.
 
-![Untitled](2%20Least%20Squares/Untitled%206.png)
+![[Attachments/SLAM/Untitled 6.png]]
 
 argmin을 구할 때는 수식적인 방법으로 Iterative하게 접근을 하여 구한다.
 
@@ -138,22 +138,22 @@ Gauss-Newton Method는 Non-linear한 모델에서 최적의 Parameter를 구하�
 
 테일러 전개로 선형화를 하기 위해, $e_i(x)=e_i(x+\Delta x)$로 두고 식을 쓴다. 이때 $x$는 상수로 취급하고 변화량($\Delta x$)만 변수로 취급한다.
 
-![Untitled](2%20Least%20Squares/Untitled%207.png)
+![[Attachments/SLAM/Untitled 7.png]]
 
 <aside>
 💡 **<Taylor expansion>**
 
-![Untitled](2%20Least%20Squares/Untitled%208.png)
+![[Attachments/SLAM/Untitled 8.png]]
 
 </aside>
 
 이를 풀어쓰면
 
-![Untitled](2%20Least%20Squares/Untitled%209.png)
+![[Attachments/SLAM/Untitled 9.png]]
 
 모든 i에 대해 Error를 구하고 그 합을 통해 Global Error $F(x)=\sum_ie_i(x)$를 구한다.
 
-![Untitled](2%20Least%20Squares/Untitled%2010.png)
+![[Attachments/SLAM/Untitled 10.png]]
 
 ## 2-2.  **2차식 편미분**
 
@@ -161,16 +161,16 @@ Gauss-Newton Method는 Non-linear한 모델에서 최적의 Parameter를 구하�
 
 global error term을 $\Delta x$에 대한 quadratic form(2차식)으로 쓰면
 
-![Untitled](2%20Least%20Squares/Untitled%2011.png)
+![[Attachments/SLAM/Untitled 11.png]]
 
 $F(x+\Delta x)$ 편미분하면
 
-![Untitled](2%20Least%20Squares/Untitled%2012.png)
+![[Attachments/SLAM/Untitled 12.png]]
 
 <aside>
 💡 **<행렬의 편미분>**
 
-![Untitled](2%20Least%20Squares/Untitled%2013.png)
+![[Attachments/SLAM/Untitled 13.png]]
 
 </aside>
 
@@ -180,7 +180,7 @@ $F(x+\Delta x)$ 편미분하면
 
 미분 값이 0이 되는 x 값을 찾으면 된다.
 
-![Untitled](2%20Least%20Squares/Untitled%2014.png)
+![[Attachments/SLAM/Untitled 14.png]]
 
 ## 2-4.  **새로운  x를 이용한 Initial State Update**
 
@@ -200,7 +200,7 @@ $$
 
 2-3 과정에서 Linear system $H\Delta x = -b$을 풀 때, $H$의 역행렬을 구해서 $\Delta x^*$를 구할 수 있다. 하지만 $H$가 invertible하지 않다면 Pseudo-inverse를 이용한다.
 
-![Untitled](2%20Least%20Squares/Untitled%2015.png)
+![[Attachments/SLAM/Untitled 15.png]]
 
 하지만 계산량이 비효율적이다. Pseudo-inverse를 대신할 수 있는 역행렬을 구하는 방법은 다양하다.
 
@@ -212,7 +212,7 @@ $$
 
 계산 복잡도가 ~$O(\frac{1}{2}n^3)$ 으로 계산 복잡도가 ~$O(n^3)$ 인 LU/QR decomposition보다 낮다는 장점이 있지만, Cholesky factorization을 사용하려면 사용하는 mtx가 **positive-definite($x^THx>0, x \neq 0$)**여야 한다.
 
-![Untitled](2%20Least%20Squares/Untitled%2016.png)
+![[Attachments/SLAM/Untitled 16.png]]
 
 <aside>
 💡 **H는 positive definite이다.
@@ -231,11 +231,11 @@ $$
 
 ---
 
-![Untitled](2%20Least%20Squares/Untitled%2017.png)
+![[Attachments/SLAM/Untitled 17.png]]
 
 수식으로 표현하면 아래 단계들을 반복한다고 볼 수 있다.
 
-![Untitled](2%20Least%20Squares/Untitled%2018.png)
+![[Attachments/SLAM/Untitled 18.png]]
 
 # 3. Least Squares vs Probabilistic State Estimation
 
@@ -245,26 +245,26 @@ Least Squares를 활용하여 해를 구하는 방법과 Probabilistic State Est
 
 (Independent 가우시안 분포의 Log Likelihood 최대화) = (Squared Error 최소화)이기 때문이다.
 
-![Untitled](2%20Least%20Squares/Untitled%2019.png)
+![[Attachments/SLAM/Untitled 19.png]]
 
 조금 더 자세하게 살펴보면 다음과 같다.
 
 State Estimation을 할 때, Bayes Rule을 적용하고 Markov assumption을 따른다고 가정한다.
 Product term은 비선호되므로 여러 term으로 나누기 위해 구한 식에 log를 취한다. 이 때 확률 값은 모두 가우시안 분포를 가정한다면, Maximum likelihood를 구하는 것과 Squared Error를 Minimize 하는 방법은 결국 같다.
 
-![Untitled](2%20Least%20Squares/Untitled%2020.png)
+![[Attachments/SLAM/Untitled 20.png]]
 
 # 4. Example
 
 ---
 
-![Untitled](2%20Least%20Squares/Untitled%2021.png)
+![[Attachments/SLAM/Untitled 21.png]]
 
 # 5. Question
 
 ---
 
-![Untitled](2%20Least%20Squares/Untitled%2022.png)
+![[Attachments/SLAM/Untitled 22.png]]
 
 # 참고 자료
 

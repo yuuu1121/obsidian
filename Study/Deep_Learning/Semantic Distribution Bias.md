@@ -22,7 +22,7 @@ url:
 - [[Study/Deep_Learning/Class Imbalance]]
 ---
 ### 2-Stage Detector
-![[Attachments/Pasted image 20240304103944.png|+grid]]![[Attachments/Pasted image 20240304103951.png|+grid]]
+![[Attachments/General/Pasted image 20240304103944.png|+grid]]![[Attachments/General/Pasted image 20240304103951.png|+grid]]
 <center style='font-size:14;opacity:0.7;'>Hard negative example mining (좌), OHEM (우)</center>
 
 - Hard negative example mining: 
@@ -40,7 +40,7 @@ url:
 	- 각 Class 가 서로 배타적이며, 각 데이터 포인트가 오직 하나의 범주에만 속한다고 가정하기 때문에 서로 다른 Class 의 연관성을 표현하기 어려움
 ---
 
-![[Attachments/Pasted image 20240304104536.png|+grid]]![[Attachments/Pasted image 20240304104543.png|+grid]]
+![[Attachments/General/Pasted image 20240304104536.png|+grid]]![[Attachments/General/Pasted image 20240304104543.png|+grid]]
 <center style='font-size:14;opacity:0.7;'>label smoothing clustering 결과(좌) Label Refinement Network(우)</center>
 
 - **Label smoothing**: 

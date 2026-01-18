@@ -20,9 +20,9 @@ dg-publish: true
 
 1. **Docker for Windows** 설치
 	[Docker 설치 링크](https://www.docker.com/)
-	![[Attachments/Pasted image 20240731145240.png|+grid]]![[Attachments/Pasted image 20240731145251.png|+grid]]
+	![[Attachments/General/Pasted image 20240731145240.png|+grid]]![[Attachments/General/Pasted image 20240731145251.png|+grid]]
 2. Docker 확인하기
 	```shell
 	sudo docker run --rm --gpus all nvidia/cuda:11.0.3-base-ubuntu20.04 nvidia-smi
 	```
-	![[Attachments/Pasted image 20240731155622.png]]
+	![[Attachments/General/Pasted image 20240731155622.png]]

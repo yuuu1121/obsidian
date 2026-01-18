@@ -8,11 +8,11 @@
 
 <4-1. Graph-Based SLAM using Pose Graphs> 에서는 로봇의 pose만을 node로 생각하고 최적화를 진행했다. **Landmark-Based SLAM은 로봇의 Pose 뿐만 아니라 map에 있는 Landmark도 Graph로 표현한다.**
 
-![Untitled](4-2%20Graph-based%20SLAM%20with%20Landmarks/Untitled.png)
+![[Attachments/SLAM/Untitled.png]]
 
 위 사진은 Victoria Park dataset의 한 장면으로, 실제 환경에서 Lamdmark를 활용하여 Map을 만든 예시이다. 파란색이 로봇의 궤적이고 빨간색이 landkmark이다.자동차가 공원 주변을 돌아다니면서 차량에 부착되어 있는 laser 센서를 활용하여 나무, 바위 등 고정된 장애물들을 tracking하고 landmark로 표현하였다. Landmark까지 고려된 Graph를 간략하게 그림으로 표현하면 아래와 같다.
 
-![Untitled](4-2%20Graph-based%20SLAM%20with%20Landmarks/Untitled%201.png)
+![[Attachments/SLAM/Untitled 1.png]]
 
 파란색 화살표는 로봇 pose를 의미하는 것이고 위치정보(2D : X,Y / 3D : X,Y,Z)와 방향정보를 포함한다. 검은색 별로 표시된 Landmark의 경우 위치정보만을 포함한다. 그러므로 pose와 pose 사이를 연결하는 edge와 pose와 feature(Landmark) 사이를 연결하는 edge는 각각 서로 다른 정보를 가지고 있다.
 
@@ -47,16 +47,16 @@ Landmarks observation은 두 종류로 표현할 수 있다.
 
 $(x,y)$ sensor observation을 수식으로 쓰면 다음과 같다. ($x_i$에서 $x_j$ 관찰)
 
-![Untitled](4-2%20Graph-based%20SLAM%20with%20Landmarks/Untitled%202.png)
+![[Attachments/SLAM/Untitled 2.png]]
 
 Pose와 pose 사이를 잇는 edge와 형태는 유사하지만, 벡터의 차원이 다른 것에 주의해야한다. 2D 평면을 기준으로 Robot pose는 방향과 위치를 나타낼 때 $(3 \times 1)$벡터로 나타내고, Landmark의 경우 위치만 나타내기 때문에 $(2 \times 1)$로 나타낼 수 있다. 따라서 Robot pose에서 translation($t_i$)에 대한 값만 가져온 다음, landmark($x_j$)와의 차이를 구하고 Robot pose의 rotation matrix의 역행렬($R^T_i$)만큼
 곱해주는 방식으로 Edge를 만들게 된다.
 
 Edge가 다르게 정의됨에 따라 Error function도 다르게 정의 되는데 수식은 아래와 같다. 우리가 예측한 observation $\hat{z_{ij}}$과 실제로 관찰된 observation $z_{ij}$의 차이를 error로 한다. **(2D, (x,y))**
 
-![Untitled](4-2%20Graph-based%20SLAM%20with%20Landmarks/Untitled%203.png)
+![[Attachments/SLAM/Untitled 3.png]]
 
-![Untitled](4-2%20Graph-based%20SLAM%20with%20Landmarks/Untitled%204.png)
+![[Attachments/SLAM/Untitled 4.png]]
 
 ## 2-2. Bearing Only Observations
 
@@ -64,15 +64,15 @@ Edge가 다르게 정의됨에 따라 Error function도 다르게 정의 되는�
 
 Bearing Only Observations는 방향 정보를 가지고 있는 edge이다. Landmark를 바라볼 때 Robot이 어떤 방향으로 바라봐야 하는지 알려준다. 수식적으로 표현하면 아래와 같다.
 
-![Untitled](4-2%20Graph-based%20SLAM%20with%20Landmarks/Untitled%205.png)
+![[Attachments/SLAM/Untitled 5.png]]
 
 2D 평면을 기준으로 방향에 대한 정보 $\theta$만 필요하기 때문에, 1차원 벡터로 표현할 수 있다. 수식에서 $(x_j-t_i).y$는 landmark($x_j$)와 Robot pose에서 translation($t_i$)에 $y$성분 차이를 의미하고, $(x_j-t_i).x$는 landmark($x_j$)와 Robot pose에서 translation($t_i$)에 $x$성분 차이를 의미한다.
 
 마찬가지로 Error function도 바뀌게 되는데 수식으로는 아래와 같다. **(1D, $\theta$)**
 
-![Untitled](4-2%20Graph-based%20SLAM%20with%20Landmarks/Untitled%206.png)
+![[Attachments/SLAM/Untitled 6.png]]
 
-![Untitled](4-2%20Graph-based%20SLAM%20with%20Landmarks/Untitled%207.png)
+![[Attachments/SLAM/Untitled 7.png]]
 
 # 3. Landmark를 통한 로봇 위치 파악 (Rank)
 
@@ -117,14 +117,14 @@ Rank가 중요한 이유를 예시를 들어 설명해보자. Robot이 Landmark�
     한 번 관찰한 경우, landmark 중심으로 하나의 원 위에서 존재 가능하다. 정확한 값을 구하기 위해서는 최소 2개의 observation이 있어야 한다.
     
 
-![Untitled](4-2%20Graph-based%20SLAM%20with%20Landmarks/Untitled%208.png)
+![[Attachments/SLAM/Untitled 8.png]]
 
 - **Bearing Only observation**
     
     landmark의 관찰값이 회전 각도에 대한 값만 있으므로 한 번 관찰한 경우는 아래 그림처럼 2차원 xy 평면 어디서나 존재할 수 있다. 정확한 값을 구하기 위해서는 최소 3개의 observation이 있어야 한다.
     
 
-![Untitled](4-2%20Graph-based%20SLAM%20with%20Landmarks/Untitled%209.png)
+![[Attachments/SLAM/Untitled 9.png]]
 
 ## Under-determined System (**Levenberg Marquardt method**)
 
@@ -142,7 +142,7 @@ damping factor를 작게 하면 system이 많이 변하게 하지 않게 하면�
 
 또한 개념적으로 Gauss-newton method에 Steepest Descent Approach를 추가한 방법을 **Levenberg Marquardt method**라고 한다. Levenberg Marquardt의 pseudo code는 아래와 같다.
 
-![Untitled](4-2%20Graph-based%20SLAM%20with%20Landmarks/Untitled%2010.png)
+![[Attachments/SLAM/Untitled 10.png]]
 
 Levenberg Marquardt는 Visual SLAM에서 자주 등장하는 용어인 **Bundle Adjustment**에서도 사용하는 방법이다.
 

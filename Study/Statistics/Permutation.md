@@ -17,7 +17,7 @@ author:
 url: 
 ---
 # 순열 (Permutation)
-![[Attachments/Pasted image 20240506160344.png]]
+![[Attachments/General/Pasted image 20240506160344.png]]
 
 - <mark class="hltr-red">순서가 부여된 임의의 집합을 중복 없이 나열하는 모든 경우의 수</mark>
   서로 다른 $n$ 개에서 $r$ 개를 택하여 일렬로 나열할 때 첫 번째 자리에 올 수 있는 경우는 $n$ 가지이며, 두 번째 자리에는 첫 번째 자리에서 선택된 1개를 제외한 $(n-1)$ 가지

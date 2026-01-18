@@ -18,7 +18,7 @@ dg-publish: true
 
 # WSL2 설치
 1. Windows PowerShell 관리자 권한으로 실행
-	![[Attachments/Pasted image 20240731141439.png]]
+	![[Attachments/General/Pasted image 20240731141439.png]]
 	
 	- 문제 발생 시 해결방법
 	  [[Study/Coding/ErrorFix/이 시스템에서 스크립트를 실행 할 수 없으므로 파일을 로드 할 수 없습니다.|이 시스템에서 스크립트를 실행 할 수 없으므로 파일을 로드 할 수 없습니다.]]

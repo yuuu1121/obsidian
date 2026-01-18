@@ -1,6 +1,6 @@
 # Kinematics of Mobile Robot
 
-![image.png](Kinematics%20of%20Mobile%20Robot/image.png)
+![[image.png]]
 
 로봇 암은 base가 ground에 고정 되어 있고 링크가 하나의 체인으로 연결되어 있다. (Serial type)
 
@@ -10,7 +10,7 @@
 
 Diffential equations는 final position에서 바로 적분 불가능하다.
 
-![image.png](Kinematics%20of%20Mobile%20Robot/image%201.png)
+![[image 1.png]]
 
 ### Mobile Robots with Wheels
 
@@ -23,7 +23,7 @@ Diffential equations는 final position에서 바로 적분 불가능하다.
 
 Differential Type Mobile Robot : 하나의 축에 장착된 두 개의 바퀴를 사용하는 모바일 로봇
 
-![image.png](Kinematics%20of%20Mobile%20Robot/image%202.png)
+![[image 2.png]]
 
 $$
 \small{그림\ 2.}
@@ -31,7 +31,7 @@ $$
 
 먼저 Kinematic Constraints (rolling, sliding)을 구해본다.
 
-![image.png](Kinematics%20of%20Mobile%20Robot/image%203.png)
+![[image 3.png]]
 
 $$
 \small{그림\ 3.}
@@ -113,7 +113,7 @@ $$
 
 이제 그림 4와 같은 Differential Mobile Robot을 예시로 들어보자.
 
-![image.png](Kinematics%20of%20Mobile%20Robot/image%204.png)
+![[image 4.png]]
 
 $$
 \small{그림\ 4.}
@@ -155,7 +155,7 @@ Rotation Matrix의 역행렬은 Transpose한 것과 같기 때문에 전치 행�
 
 3x3 행렬의 역행렬 구하는 방법 : 
 
-[3x3 Inverse Matrix](Kinematics%20of%20Mobile%20Robot/3x3%20Inverse%20Matrix%20125d4ae18d3280fa8e01eb2fa2ab5fb6.md)
+[3x3 Inverse Matrix](Attachments/SLAM/3x3 Inverse Matrix 125d4ae18d3280fa8e01eb2fa2ab5fb6.md)
 
 $$
 \begin{bmatrix}\dot{x_I}\\ \dot{y_I}\\\dot{\theta}\\\end{bmatrix}={\begin{bmatrix}cos(\theta)&-sin(\theta)&0\\sin(\theta)&cos(\theta)&0\\0&0&1\end{bmatrix}}{\begin{bmatrix}1/2&1/2&0\\0&0&-l\\1/2l&-1/2l&0\end{bmatrix}}\begin{bmatrix}r\dot{\phi_1} \\r\dot{\phi_2} \\0\end{bmatrix}

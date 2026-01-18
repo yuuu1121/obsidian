@@ -38,7 +38,7 @@ image ='20150404_095727.jpg'
 print(get_image_exif(image))
 ```
 
-![[Attachments/Pasted image 20240709162213.png]]
+![[Attachments/General/Pasted image 20240709162213.png]]
 
 ### 이미지 촬영 일시만 출력
 - "DateTime, DateTimeOriginal, DateTimeDigitized" Tag 정보를 통해 촬영 일시 확인
@@ -64,5 +64,5 @@ image ='20150404_095727.jpg'
 print(get_image_exif(image))
 ```
 
-![[Attachments/Pasted image 20240709162416.png]]
+![[Attachments/General/Pasted image 20240709162416.png]]
 

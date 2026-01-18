@@ -11,7 +11,7 @@ Estimate the transformation to move one cloud so that it is aligned with the oth
 - STEP1 : Data Association
 - STEP2 : Transformation 계산
 
-![Untitled](3%20Point%20Cloud%20Registration%20&%20ICP%20algorithm/Untitled.png)
+![[Attachments/SLAM/Untitled.png]]
 
 Optimize 방법
 
@@ -27,17 +27,17 @@ Optimize 방법
 
 Point Cloud Registration이란 **두 Point Cloud를 정합 하는 공간 변환을 찾는 과정**을 말한다. 이는 Mapping을 할 때 매우 중요한 과정인데 Scan matching을 하거나 Scan registration을 진행할 때 동일한 reference frame에서 보았을 때 각각의 Map point들이 일치해야 정확한 주위 환경을 Mapping 할 수 있기 때문이다. 따라서 Point Cloud Registration을 통해 **가장 정합을 잘하는 Rotation Matrix $R$과 Translation Vector** $t$를 찾는 것이 핵심이다.
 
-![Untitled](3%20Point%20Cloud%20Registration%20&%20ICP%20algorithm/Untitled%201.png)
+![[Attachments/SLAM/Untitled 1.png]]
 
-![Untitled](3%20Point%20Cloud%20Registration%20&%20ICP%20algorithm/Untitled%202.png)
+![[Attachments/SLAM/Untitled 2.png]]
 
 $y_n,x_n,C$가 모두 주어져 있으면 Rotation Matrix $R$과 Translation Vector $t$ 를 활용해 두 Point Cloud를 정합할 수 있다. $R$과 $t$에 의해 옮겨진 Point Cloud를 $\bar{x}_n$라고 하자.
 
-![Untitled](3%20Point%20Cloud%20Registration%20&%20ICP%20algorithm/Untitled%203.png)
+![[Attachments/SLAM/Untitled 3.png]]
 
 이때 유클리디안 거리가 최소화 되도록 하는 **$R$과 $t$를 찾는 것이 Point Cloud Registration**이다.
 
-![Untitled](3%20Point%20Cloud%20Registration%20&%20ICP%20algorithm/Untitled%204.png)
+![[Attachments/SLAM/Untitled 4.png]]
 
 상황에 따라 해결법도 달라진다.
 
@@ -77,7 +77,7 @@ $$
 
 수식으로 표현해보자.
 
-![Untitled](3%20Point%20Cloud%20Registration%20&%20ICP%20algorithm/Untitled%205.png)
+![[Attachments/SLAM/Untitled 5.png]]
 
 - $x_0$ : $x_n$의 weighted mean
 - $y_0$ : $y_n$의 weighted mean
@@ -85,25 +85,25 @@ $$
 
 교차 공분산 행렬(Cross Covariance Matrix) $H$를 계산한다.
 
-![Untitled](3%20Point%20Cloud%20Registration%20&%20ICP%20algorithm/Untitled%206.png)
+![[Attachments/SLAM/Untitled 6.png]]
 
 이제 $H$에 대해 SVD를 계산한다.
 
-![Untitled](3%20Point%20Cloud%20Registration%20&%20ICP%20algorithm/Untitled%207.png)
+![[Attachments/SLAM/Untitled 7.png]]
 
 Rotation Matrix $R$은 다음과 같이 계산한다.
 
-![Untitled](3%20Point%20Cloud%20Registration%20&%20ICP%20algorithm/Untitled%208.png)
+![[Attachments/SLAM/Untitled 8.png]]
 
 Translation Vector $t$는 다음과 같이 계산한다.
 
-![Untitled](3%20Point%20Cloud%20Registration%20&%20ICP%20algorithm/Untitled%209.png)
+![[Attachments/SLAM/Untitled 9.png]]
 
 Rotation Matrix $R$과 Translation Vector $t$을 구하여 Point Cloud Registration을 풀었다.
 
 한 장으로 정리하면 아래와 같다.
 
-![Untitled](3%20Point%20Cloud%20Registration%20&%20ICP%20algorithm/Untitled%2010.png)
+![[Attachments/SLAM/Untitled 10.png]]
 
 ## Why solution used SVD is good?
 
@@ -111,15 +111,15 @@ Rotation Matrix $R$과 Translation Vector $t$을 구하여 Point Cloud Registrat
 
 우리가 구하는 식을 재정의(Rewrite) 해보자. 우리가 원래 구해야 하는 식은 다음과 같다.
 
-![Untitled](3%20Point%20Cloud%20Registration%20&%20ICP%20algorithm/Untitled%204.png)
+![[Attachments/SLAM/Untitled 4.png]]
 
 이 식을 원점(origin)이 $y_0$인 Local Coordinate System으로 다시 재정의해보자. 이전에 정의한 것과 같이 $y_0$을 아래와 같이 정의 한 후
 
-![Untitled](3%20Point%20Cloud%20Registration%20&%20ICP%20algorithm/Untitled%2011.png)
+![[Attachments/SLAM/Untitled 11.png]]
 
 우리가 구해야 하는 식을 아래와 같이 변경하자.
 
-![Untitled](3%20Point%20Cloud%20Registration%20&%20ICP%20algorithm/Untitled%2012.png)
+![[Attachments/SLAM/Untitled 12.png]]
 
 이렇게 되면 구해야하는 Translation Vector가 바뀌였다. 다시 Translation Vector를 재정의 해보자.
 
@@ -127,53 +127,53 @@ $\bar{x}_n=Rx_n + t$ 식을 원점 $y_0$을 활용해 이동시키면 $\bar{x}_n
 
 Rotation Matrix로 우변을 모두 묶으면 아래와 같은 식이 나온다. ($RR^T=I$)
 
-![Untitled](3%20Point%20Cloud%20Registration%20&%20ICP%20algorithm/Untitled%2013.png)
+![[Attachments/SLAM/Untitled 13.png]]
 
 새로운 변수 $x_0$을 활용하여 다시 식을 정의해보자. $x_0$은 아까 Weighted mean을 구할 때 쓰던 변수가 아님에 주의하자.
 
 $x_0=-R^Tt+R^Ty_0$이라고 할 때, 우리가 구해야 하는 식을 다음과 같이 쓸 수 있다.
 
-![Untitled](3%20Point%20Cloud%20Registration%20&%20ICP%20algorithm/Untitled%2014.png)
+![[Attachments/SLAM/Untitled 14.png]]
 
 그렇다면 우리가 찾아야 하는 변수는 $R,t$가 아니라 $R,x_0$로 변한다.
 
-![Untitled](3%20Point%20Cloud%20Registration%20&%20ICP%20algorithm/Untitled%2015.png)
+![[Attachments/SLAM/Untitled 15.png]]
 
 우리가 구해야 하는 식은 2차식인데 이를 행렬로 표현하여 Objective function을 정의한다. Objective function은 최적화시키려는 함수를 의미한다.
 
 Objective function $\Phi (x_0,R)$이라 정의하고 이를 최소화시키는 $x^*_0,R^*$를 구하면 원하는 해를 구할 수 있다.
 
-![Untitled](3%20Point%20Cloud%20Registration%20&%20ICP%20algorithm/Untitled%2016.png)
+![[Attachments/SLAM/Untitled 16.png]]
 
 Objective function을 풀어 쓴다.
 
-![Untitled](3%20Point%20Cloud%20Registration%20&%20ICP%20algorithm/Untitled%2017.png)
+![[Attachments/SLAM/Untitled 17.png]]
 
 미분 하여 0이 되는 값을 찾자.
 
-![Untitled](3%20Point%20Cloud%20Registration%20&%20ICP%20algorithm/Untitled%2018.png)
+![[Attachments/SLAM/Untitled 18.png]]
 
 미분한 식을 0으로 만드는 값을 찾아 정리하면 아래와 같다.
 
-![Untitled](3%20Point%20Cloud%20Registration%20&%20ICP%20algorithm/Untitled%2019.png)
+![[Attachments/SLAM/Untitled 19.png]]
 
 이를 정리하면
 
-![Untitled](3%20Point%20Cloud%20Registration%20&%20ICP%20algorithm/Untitled%2020.png)
+![[Attachments/SLAM/Untitled 20.png]]
 
 우리는 이전에 $y_0$을 아래와 같이 정의했었는데, 위의 식에 대입하면 우변이 0이 된다.
 
-![Untitled](3%20Point%20Cloud%20Registration%20&%20ICP%20algorithm/Untitled%2011.png)
+![[Attachments/SLAM/Untitled 11.png]]
 
 따라서 우리는 아래 식을 얻을 수 있다.
 
-![Untitled](3%20Point%20Cloud%20Registration%20&%20ICP%20algorithm/Untitled%2021.png)
+![[Attachments/SLAM/Untitled 21.png]]
 
 이 식을 이용해 $x_0$을 정의해보면 $x_0$은 $x_n$의 weighted mean이다.
 
-![Untitled](3%20Point%20Cloud%20Registration%20&%20ICP%20algorithm/Untitled%2022.png)
+![[Attachments/SLAM/Untitled 22.png]]
 
-![Untitled](3%20Point%20Cloud%20Registration%20&%20ICP%20algorithm/Untitled%2023.png)
+![[Attachments/SLAM/Untitled 23.png]]
 
 결국 우리가 임의로 정의했던 $x_0$이 $x_n$의 Weighted mean일 때 최적의 해를 구할 수 있다.
 
@@ -181,19 +181,19 @@ Objective function을 풀어 쓴다.
 
 Objective function을 관찰하면 $R$에 관한 식은 아래에 빨간색 부분 밖에 없으므로 아래 식만 고려하면 된다.
 
-![Untitled](3%20Point%20Cloud%20Registration%20&%20ICP%20algorithm/Untitled%2024.png)
+![[Attachments/SLAM/Untitled 24.png]]
 
 빨간색 부분의 부호가 (-)이므로 이를 최대화하면 Objective function은 최솟값을 가질 수 있다. ($RR^T=I$)
 
-![Untitled](3%20Point%20Cloud%20Registration%20&%20ICP%20algorithm/Untitled%2025.png)
+![[Attachments/SLAM/Untitled 25.png]]
 
 좀 더 식을 간편하게 보기 위해
 
-![Untitled](3%20Point%20Cloud%20Registration%20&%20ICP%20algorithm/Untitled%2026.png)
+![[Attachments/SLAM/Untitled 26.png]]
 
 이처럼 정의한다. $a_n, b_n$은 열벡터이다. $x_0, y_0$은 이전에 정의했던 Weighted mean값이다. 그럼 식은 다음과 같이 정리된다.
 
-![Untitled](3%20Point%20Cloud%20Registration%20&%20ICP%20algorithm/Untitled%2027.png)
+![[Attachments/SLAM/Untitled 27.png]]
 
 이를 trace의 정의를 이용해서 다음과 같이 나타낼 수 있다. $a,b, p$는 열벡터이므로 시그마 취한 값은 스칼라가 되기 때문에 trace 취해줄 수 있다.
 
@@ -203,21 +203,21 @@ $$
 
 위 식에서 나온 $H$는 Cross covariance matrix로 다음과 같이 정의된다.
 
-![Untitled](3%20Point%20Cloud%20Registration%20&%20ICP%20algorithm/Untitled%2028.png)
+![[Attachments/SLAM/Untitled 28.png]]
 
 이제 $R$을 최대화하는 $tr(RH)$를 찾으면 된다. 이는 SVD를 이용한다.
 
-![Untitled](3%20Point%20Cloud%20Registration%20&%20ICP%20algorithm/Untitled%2029.png)
+![[Attachments/SLAM/Untitled 29.png]]
 
-![Untitled](3%20Point%20Cloud%20Registration%20&%20ICP%20algorithm/Untitled%2030.png)
+![[Attachments/SLAM/Untitled 30.png]]
 
 $R=VU^T$라고 정의하자. 그럼 다음과 같은 식을 얻을 수 있다.
 
-![Untitled](3%20Point%20Cloud%20Registration%20&%20ICP%20algorithm/Untitled%2031.png)
+![[Attachments/SLAM/Untitled 31.png]]
 
 $D$는 대각행렬이다.
 
-![Untitled](3%20Point%20Cloud%20Registration%20&%20ICP%20algorithm/Untitled%2032.png)
+![[Attachments/SLAM/Untitled 32.png]]
 
 대각행렬의 전치행렬은 자기자신이다.
 
@@ -227,17 +227,17 @@ $$
 
 $VD^{\frac{1}{2}}=A$라고 정의하자.
 
-![Untitled](3%20Point%20Cloud%20Registration%20&%20ICP%20algorithm/Untitled%2033.png)
+![[Attachments/SLAM/Untitled 33.png]]
 
 $AA^T$는 positive definite 이므로 코시-슈바르츠 부등식에 의해 다음을 만족한다. $R'$은 임의의 어떤 Rotation Matrix이다.
 
-![Untitled](3%20Point%20Cloud%20Registration%20&%20ICP%20algorithm/Untitled%2034.png)
+![[Attachments/SLAM/Untitled 34.png]]
 
-![A1F31F3F-6C4C-414D-B5AC-7359D6208E5D.png](3%20Point%20Cloud%20Registration%20&%20ICP%20algorithm/A1F31F3F-6C4C-414D-B5AC-7359D6208E5D.png)
+![[Attachments/SLAM/A1F31F3F-6C4C-414D-B5AC-7359D6208E5D.png]]
 
 이는 아래 식을 의미한다. 여기서 $R'R$는 또 다른 Rotation Matrix를 의미한다.
 
-![Untitled](3%20Point%20Cloud%20Registration%20&%20ICP%20algorithm/Untitled%2035.png)
+![[Attachments/SLAM/Untitled 35.png]]
 
 **즉, $RH$ 왼쪽에 어떠한 임의의 $R'$를 곱해도 $tr(RH)$ 보다 더 크지 못하므로, $tr(RH)$이 maximum이다! 따라서 $R=VU^T$일 때 $tr(RH)$가 최대의 값을 가질 수 있고, 결국 Objective function을 최소화하는 $R$은 SVD의 결과로 만들어진 $V,D$를 활용하여 만든 Matrix이다.**
 
@@ -249,7 +249,7 @@ $rank(H)=3$**이면 $\Phi$를 최소화하는 rotation이 unique하다**. 즉, $
 
 위 과정을 통해 초기값이 없어도 최적의 해를 구할 수 있는 방법을 증명했다! 여기서 행렬의 순서때문에 헷갈리는 상황이 발생할 수 있는데 아래의 슬라이드를 통해 결국 다 똑같다는 것을 말한다.
 
-![Untitled](3%20Point%20Cloud%20Registration%20&%20ICP%20algorithm/Untitled%2036.png)
+![[Attachments/SLAM/Untitled 36.png]]
 
 # 4. Unk**own Data Association**
 
@@ -276,7 +276,7 @@ ICP 알고리즘에서는 Direct로 해를 찾을 수 없어 초기값(Initial g
 
 Point Cloud Set $x_n,y_n$이 있다고 할 때 ICP 알고리즘의 흐름을 대략적으로 설명하면 다음과 같다.
 
-![Untitled](3%20Point%20Cloud%20Registration%20&%20ICP%20algorithm/Untitled%2037.png)
+![[Attachments/SLAM/Untitled 37.png]]
 
 1. Point Cloud $x_n$의 대략적인 대응관계를 초기값으로 설정한다. 보통 $x_n$에서 각각의 point에 대해, 가장 가까운 거리에 있는 $y_n$의 하나의 점과 매칭을 통해 대응관계를 만든다.
 2. 대응관계에 따라, SVD를 이용해 Rotation Matrix $R$과 Translation vector $t$를 구한다.
@@ -320,7 +320,7 @@ Sampling을 하는 방법은 다음과 같다.
     - 대응관계(correspondences)를 찾는데 훨씬 간소화할 수 있고, Feature들이 잘 뽑혔다고 가정할 때 높은 효율성과 때로는 높은 정확도까지 보일 수 있다.
     - preprocessing 필요
     
-    ![Untitled](3%20Point%20Cloud%20Registration%20&%20ICP%20algorithm/Untitled%2038.png)
+    ![[Attachments/SLAM/Untitled 38.png]]
     
 5. Normal-space sampling
     - 복잡한 feature 환경에서 유리
@@ -328,13 +328,13 @@ Sampling을 하는 방법은 다음과 같다.
     - large smooth surface with only small variation 환경에 적절하다.
     - Uniform vs. Normal-Space Sampling
     
-    ![Untitled](3%20Point%20Cloud%20Registration%20&%20ICP%20algorithm/Untitled%2039.png)
+    ![[Attachments/SLAM/Untitled 39.png]]
     
     Uniform sampling은 간격이 균일하게 sampling을 하는 반면, Normal-space sampling은 굴곡진 부분에 대해서 조금 더 많은 sampling을 하는 것을 확인할 수 있다. Normal-space sampling 방법은 Smooth한 지형에서 조금씩 보이는 curvture나 조그마한 object가 붙어 있는 경우 sampling 하고 point cloud registration을 하는데 효율적인 방법이다.
     
     - Random vs. Normal-Space Sampling
     
-    ![Untitled](3%20Point%20Cloud%20Registration%20&%20ICP%20algorithm/Untitled%2040.png)
+    ![[Attachments/SLAM/Untitled 40.png]]
     
     Random sampling과 비교를 했을 때도 Normal-space sampling이 굴곡진 부분에 대해서 Alignment를 더 잘 수행했다.
     
@@ -364,7 +364,7 @@ Vanila ICP 알고리즘에서는 가장 가까운 point를 활용해서 Data Ass
     
     한 point에서 Normal vector를 구하고 그 방향과 만나는 또 다른 Point set에서의 점을 활용하여 Data association을 하는 방법이다. Smooth한 평면에서는 굉장히 유용한 Data association 방법이지만, Noise가 많거나 곡선이 많은 복잡한 환경에서는 좋지 않을 수 있다.
     
-    ![Untitled](3%20Point%20Cloud%20Registration%20&%20ICP%20algorithm/Untitled%2041.png)
+    ![[Attachments/SLAM/Untitled 41.png]]
     
     단순한 구조에서는 closet point 보다 좋지만, 복잡한 구조나 scanning noise가 심하면 closest point 보다 좋지 않다.
     
@@ -373,7 +373,7 @@ Vanila ICP 알고리즘에서는 가장 가까운 point를 활용해서 Data Ass
     Point cloud를 RGB-D camera와 같은 센서에 Projection 시켰을 때, 서로 같은 점에 projection이
     된 Point들을 대응시켜 Data association을 하는 방법이다.
     
-    ![Untitled](3%20Point%20Cloud%20Registration%20&%20ICP%20algorithm/Untitled%2042.png)
+    ![[Attachments/SLAM/Untitled 42.png]]
     
     Nearest neighbor search를 단순화한 것이다. 반복할수록 조금씩 결과가 안 좋아진다.
     
@@ -381,17 +381,17 @@ Vanila ICP 알고리즘에서는 가장 가까운 point를 활용해서 Data Ass
     
     앞서 소개한 방법은 Point와 point를 Direct하게 이어서 유클리디안 거리를 만들었다면, Point-to-plane은 source point에서 Target point를 Direct하게 잇는 것이 아니라, Target point의 점과 점 사이에 있는 가상의 평면(또는 직선)을 만들고 Normal vector를 구해 가장 가까운 점을 고르고 유클리디안 거리를 계산하여 Data association을 만드는 방법이다.
     
-    ![Untitled](3%20Point%20Cloud%20Registration%20&%20ICP%20algorithm/Untitled%2043.png)
+    ![[Attachments/SLAM/Untitled 43.png]]
     
     LiDAR의 경우 거리가 커지면 sparse해진다. **point-to-point는 이러한 uncertainty를 반영하지 못하므로 적당한 initial guess를 할 수 없다.**
     
     가장 가까운 target의 point d에서 plane을 만들고 source의 point s에서 법선에 내린다(l).
     
-    ![Untitled](3%20Point%20Cloud%20Registration%20&%20ICP%20algorithm/Untitled%2044.png)
+    ![[Attachments/SLAM/Untitled 44.png]]
     
     Point-to-plane 방법은 최소화해야하는 함수 또한 조금 달라지는데, **Normal vector를 내적시킨 값을 최소화** 시킨다고 이해할 수 있다.
     
-    ![Untitled](3%20Point%20Cloud%20Registration%20&%20ICP%20algorithm/Untitled%2045.png)
+    ![[Attachments/SLAM/Untitled 45.png]]
     
     **Point-to-plane 방법은 최근 ICP 알고리즘을 사용하는데 가장 유용하게 사용하는 Data Association 방법이다!**
     
@@ -400,7 +400,7 @@ Vanila ICP 알고리즘에서는 가장 가까운 point를 활용해서 Data Ass
 
 Point의 쌍을 만들 때, Points들의 신뢰도에 따라서 weight를 부여하는 방법이다. 신뢰도가 높은 pair에 더 높은 weight를 준다. 보통 사용하는 센서에서 나온 값이 불확실한 경우 weight를 사용하여 얼마나 noise가 있는지 알 수 있도록 한다. 이미 우리는 앞서 ICP 알고리즘 및 Point cloud registration을 설명할 때, weight의 개념을 사용하였다.
 
-![Untitled](3%20Point%20Cloud%20Registration%20&%20ICP%20algorithm/Untitled%2046.png)
+![[Attachments/SLAM/Untitled 46.png]]
 
 ## 4-4. 잠재적인 Outlier Pairs 제거
 
@@ -410,11 +410,11 @@ Outlier를 제거 후 point pairs를 맞추는 방법이다. 좋은 Data Associa
 간단히 생각해볼 수 있는 방법은 Point끼리의 유클리디안 거리가 일정 Threshold를 넘을 경우,
 Outlier pairs로 생각하고 이를 제거해주는 방법이다. 하지만 얼마나 miss-alignment 된 것인지는 모르기 때문에 threshold 찾는 것이 heuristic한 문제이다.
 
-![Untitled](3%20Point%20Cloud%20Registration%20&%20ICP%20algorithm/Untitled%2047.png)
+![[Attachments/SLAM/Untitled 47.png]]
 
 또 다른 방법은 인접한 Points에서 대응관계로 묶인 Points들의 거리가 크게 차이가 난다면 Outlier pairs로 생각하고 이를 제거해주는 방법이다. 이 방법에 따른다면 아래 그림에서 왼쪽 대응관계가 Outlier pair로 판명될 것이다.
 
-![Untitled](3%20Point%20Cloud%20Registration%20&%20ICP%20algorithm/Untitled%2048.png)
+![[Attachments/SLAM/Untitled 48.png]]
 
 이 방법을 발전시켜 가장 대응관계가 나쁜 $t$%를 제거하고 ICP 알고리즘을 수행하는 방법이 제안되었는데, 이를 **Trimmed ICP**라고 부른다. 여기서 $t$를 지정해주는 것 또한 하나의 문제인데, 주로 얼마나 Outlier가 많을 것 같은지 얼마나 많은 Points들이 Overlap 됐는지에 따라 결정된다.
 
@@ -454,7 +454,7 @@ Outlier pairs로 생각하고 이를 제거해주는 방법이다. 하지만 얼
 
 우선 사용한 수식은 아래와 같다.
 
-![Untitled](3%20Point%20Cloud%20Registration%20&%20ICP%20algorithm/Untitled%2049.png)
+![[Attachments/SLAM/Untitled 49.png]]
 
 - $t_x$ : x로의 translation
 - $t_y$ : y로의 translation
@@ -464,18 +464,18 @@ Outlier pairs로 생각하고 이를 제거해주는 방법이다. 하지만 얼
 
 Gauss Newton Method에서 했던 것과 마찬가지로 먼저 1차 미분에 대한 식을 구하기 위해 Jacobian을 알아야 한다. 여기서 Jacobian의 형태는 2x3 행렬이다. 2는 x성분 y성분을 의미하고 3은 parameter의 갯수 ($t_x, t_y, \theta$)를 의미한다. Jacobian에 대한 식은 아래와 같다.
 
-![Untitled](3%20Point%20Cloud%20Registration%20&%20ICP%20algorithm/Untitled%2050.png)
+![[Attachments/SLAM/Untitled 50.png]]
 
-![Untitled](3%20Point%20Cloud%20Registration%20&%20ICP%20algorithm/Untitled%2051.png)
+![[Attachments/SLAM/Untitled 51.png]]
 
 맨 마지막 행렬의 $x_n, y_n$은 Error function에 있는 $x_n$의 성분을 x성분과 y성분으로 나누어서 쓴 것이니 주의하자.
 
 <aside>
 💡 **Remark**
 
-![Untitled](3%20Point%20Cloud%20Registration%20&%20ICP%20algorithm/Untitled%2052.png)
+![[Attachments/SLAM/Untitled 52.png]]
 
-![Untitled](3%20Point%20Cloud%20Registration%20&%20ICP%20algorithm/Untitled%2053.png)
+![[Attachments/SLAM/Untitled 53.png]]
 
 </aside>
 
@@ -483,7 +483,7 @@ Gauss Newton Method에서 했던 것과 마찬가지로 먼저 1차 미분에 �
 
 위에서 구한 Jacobian을 이용하여 필요한 $H,b$를 구하는 식과 Gauss Newton Method를 쓴 방법은 강의자료에 아래와 같이 나와있다.
 
-![Untitled](3%20Point%20Cloud%20Registration%20&%20ICP%20algorithm/Untitled%2054.png)
+![[Attachments/SLAM/Untitled 54.png]]
 
 이 방법을 사용하여 최적화를 진행하면 어떻게 될까? **SVD based method와는 다르게 매 step(또는 iteration)마다 Correspondence가 달라질 수도 있다!**
 
@@ -493,13 +493,13 @@ Gauss Newton Method에서 했던 것과 마찬가지로 먼저 1차 미분에 �
 
 따라서 Point-to-plane을 least squares method에 사용해보자. error function은 아래와 같다.
 
-![Untitled](3%20Point%20Cloud%20Registration%20&%20ICP%20algorithm/Untitled%2055.png)
+![[Attachments/SLAM/Untitled 55.png]]
 
 Normal vector $n_n$을 구할 때는 Eigenvalue와 eigenvector가 활용되거나, 외적을 활용한다.
 
 Error function이 달라졌기 때문에 Jacobian도 당연히 달라진다. 달라지는 형태는 아래 강의자료에서 확인할 수 있다. Error fuction을 구할 때, 벡터의 내적이 활용되므로 최종적인 형태는 1x3형태의 vector임을 주의하자.
 
-![Untitled](3%20Point%20Cloud%20Registration%20&%20ICP%20algorithm/Untitled%2056.png)
+![[Attachments/SLAM/Untitled 56.png]]
 
 - $n_x$ : 법선 벡터의 x component
 - $n_y$ : 법선 벡터의 y component
@@ -510,7 +510,7 @@ Jacobian을 구하면 아까 Gauss Newton method를 진행하기 위해 구했�
 
 따라서 Noraml vector를 구할 때, $x$에 대한 Noraml vector 성분과 $y$에 대한 Noraml vector 성분을 더하는 과정을 거쳐 대칭이 안되는 문제를 해결하려 한다. 이러한 방법을 **Symmetric Point-to-plane** 방법이라고 한다. Noraml vector를 각각 구하는 과정이 있어야 하지만 성능이 확실히 좋아졌다고 한다.
 
-![Untitled](3%20Point%20Cloud%20Registration%20&%20ICP%20algorithm/Untitled%2057.png)
+![[Attachments/SLAM/Untitled 57.png]]
 
 ## Robust Least Squares
 

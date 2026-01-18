@@ -19,13 +19,13 @@ Particle Filter는 particle set을 사용해 본인의 위치를 파악한다. G
 
 ## Frequency vs. Weight
 
-![Untitled](8%20Particle%20Filter%20and%20Monte%20Carlo%20Localization/Untitled.png)
+![[Attachments/SLAM/Untitled.png]]
 
 특정 area에 sample이 몇 개 있는지 센다. particle은 확률 밀도의 approximation으로 볼 수 있다. 각 샘플은 아주 작은 probability mass로 본다. (특정 지역에 있는 샘플의 수) = (그 지역의 확률)을 나타낸다.
 
 큰 weight는 큰 probability mass를 뜻한다. 위 사진의 경우 모든 샘플이 같은 uniform weight j를 가진다. 만약 특정 샘플이 더 큰 가중치를 가진다면 아래 그림과 같이 해당 분포를 표현하기 위해 더 적은 샘플이 필요할 것이다. 즉, 우리는 높은 확률을 표현하기 위해 많은 수의 샘플을 사용하는 대신 더 큰 (가중치를 가진) 샘플을 사용할 수 있다.
 
-![Untitled](8%20Particle%20Filter%20and%20Monte%20Carlo%20Localization/Untitled%201.png)
+![[Attachments/SLAM/Untitled 1.png]]
 
 (frequency vs weight) : 위 사진은 frequency, 아래 사진은 weight를 이용해서 확률 분포를 나타낸 것이다. particle filter의 resampling 단계와 비슷하다. 우리는 주로 weighted sample을 사용하게 될 것이다. 하지만 이렇게 샘플로 표현하는 것은 approximation에 불과하다. 따라서 함수를 잘 표현하려면 많은 수의 샘플이 있어야 한다. (이론적으로는 그렇지만 실제로는 또 그렇지만도 않다.)
 
@@ -39,13 +39,13 @@ Particle Filter는 particle set을 사용해 본인의 위치를 파악한다. G
 • $x$ : 이 샘플이 어디 있는지 (1D/2D/3D Vector)
 • $w$ : weight (Real number)
 
-![Untitled](8%20Particle%20Filter%20and%20Monte%20Carlo%20Localization/Untitled%202.png)
+![[Attachments/SLAM/Untitled 2.png]]
 
 p(x)는 direct impulse들의 weighted sum을 나타낸다. 각 샘플 위치에서 direct impulse가 존재한다. (normalized, approximation X)
 
 approximation function은 어떻게 생겼을까?
 
-![Untitled](8%20Particle%20Filter%20and%20Monte%20Carlo%20Localization/Untitled%203.png)
+![[Attachments/SLAM/Untitled 3.png]]
 
 왼쪽은 가우시안 분포이고, 200~300개의 샘플이 있다. 오른쪽은 가우시안 분포가 아니다. 샘플의 분포에서 확연히 차이가 난다.
 
@@ -53,13 +53,13 @@ arbitrary function에서 closed-form sample을 쉽게 사용할 수 없다. 다�
 
 이처럼 Closed Form Sampling은 소수의 distribution에 대해서만 가능한데, Gaussian은 그 한 예시이다. 아래 방법을 이용해 우리는 샘플링을 더 쉽게 할 수 있다.
 
-![Untitled](8%20Particle%20Filter%20and%20Monte%20Carlo%20Localization/Untitled%204.png)
+![[Attachments/SLAM/Untitled 4.png]]
 
 (-standard deviation ~ standard deviation) 범위의 12개의 랜덤값을 다 더하고 2로 나눈다. 그러면 거의 가우시안 분포와 비슷하다(Approx.). 이는 가우시안 분포 형성하는 가장 쉬운 방법이다.
 
 다른 임의의 분포에 대해서는 어떻게 해야할까?  **Importance Sampling Principle**을 이용한다. 
 
-![Untitled](8%20Particle%20Filter%20and%20Monte%20Carlo%20Localization/Untitled%205.png)
+![[Attachments/SLAM/Untitled 5.png]]
 
 - $f$ : target
 - $g$ : proposal
@@ -78,15 +78,15 @@ mistake($f$와 $g$의 차이)를 보상함으로써 $f$의 샘플을 생성하�
 
 **System equation과 Measurement equation은 아래와 같다.** $w_k$는 system noise, $v_k$는 measurement noise이다.
 
-![Untitled](8%20Particle%20Filter%20and%20Monte%20Carlo%20Localization/Untitled%206.png)
+![[Attachments/SLAM/Untitled 6.png]]
 
 **Particle Filter의 알고리즘**은 아래와 같다.
 
-![Untitled](8%20Particle%20Filter%20and%20Monte%20Carlo%20Localization/Untitled%207.png)
+![[Attachments/SLAM/Untitled 7.png]]
 
 **Resampling 과정**은 아래와 같다. 이는 아래에서 다룰 Roulette Wheel에 대한 설명이다.
 
-![Untitled](8%20Particle%20Filter%20and%20Monte%20Carlo%20Localization/Untitled%208.png)
+![[Attachments/SLAM/Untitled 8.png]]
 
 예를 들어 w1=0.1, w2=0.1, w3=0.7 이고 첫번째 랜덤 넘버가 0.7이면 w1+w2+w3=0.9 가 되어야 rabdom number 를 넘으므로 첫번째 particle은 이전의 세번째 particle로 업데이트 된다. 두번째 랜덤 넘버가 0.1이면 두번째 particle은 이전의 두 번째 particle로 업데이트 된다. 세번째 랜덤 넘버가 0.5이면 세번째 particle은 이전의 세 번째 particle로 업데이트 된다. 이런 식으로 업데이트 해주면 **확률적으로 큰 weight를 가진 particle이 업데이트 된다.** 여기에 노이즈를 추가하여 조금 다른 particle이 될 수도 있다. 다만 이 방식은 뒤에 있는 particle들이 업데이트 되지 않는다는 단점이 있고, 이를 해결하기 위해 다른 샘플링 방식들을 사용할 수 있다.
 
@@ -102,20 +102,20 @@ Dynamic State Estimation Problems에서 Particle Filter를 어떻게 사용하�
 
 Particle Filter의 알고리즘을 살펴보자.
 
-![Untitled](8%20Particle%20Filter%20and%20Monte%20Carlo%20Localization/Untitled%205.png)
+![[Attachments/SLAM/Untitled 5.png]]
 
 (1) **Proposal Step = Prediction Step** : proposal distribution 이용해 particle을 샘플링한다. (user-defined choice)
 
 - proposal로부터 sample을 그린다.(blue line)
 - red line의 proposal은 flatform의 motion의 bayesian 예측값과 관련 있다.
 
-![Untitled](8%20Particle%20Filter%20and%20Monte%20Carlo%20Localization/Untitled%209.png)
+![[Attachments/SLAM/Untitled 9.png]]
 
 (2) **Correction Step** : importance weights를 계산한다.
 
 - observation model을 통해 weight을 얻고 miss match 된 값을 보상한다.
 
-![Untitled](8%20Particle%20Filter%20and%20Monte%20Carlo%20Localization/Untitled%2010.png)
+![[Attachments/SLAM/Untitled 10.png]]
 
 (3) **Resampling** : sample $i$의 확률을 $w^{[j]}_t$로 둔다. $J$번 반복한다. 샘플이 유한하므로 가중치가 너무 작아 0에 가까운 것은 없앤다. 샘플이 무한하게 있다면 무시해도 되는 단계이다.
 
@@ -123,7 +123,7 @@ Particle Filter의 알고리즘을 살펴보자.
 
 ## Particle Filter Psudo Code
 
-![Untitled](8%20Particle%20Filter%20and%20Monte%20Carlo%20Localization/Untitled%2011.png)
+![[Attachments/SLAM/Untitled 11.png]]
 
 LINE 3 : Prediction belief from my sample proposal
 
@@ -139,11 +139,11 @@ LINE 7~10 : Resampling : frequency weight를 가진 uniform weight sample을 얻
 
 particle filter 이용해 “Where Am I?” 문제를 풀어 플랫폼의 위치와 방향을 추정한다.
 
-![Untitled](8%20Particle%20Filter%20and%20Monte%20Carlo%20Localization/Untitled%2012.png)
+![[Attachments/SLAM/Untitled 12.png]]
 
 실제 로봇이 있는 곳이 가장 큰 확률이지만, 그럼에도 다른 곳에도 샘플이 있다. 우리는 particle 얼마나 믿을 수 있는가?
 
-![Untitled](8%20Particle%20Filter%20and%20Monte%20Carlo%20Localization/Untitled%2013.png)
+![[Attachments/SLAM/Untitled 13.png]]
 
 particle filter는 한 샘플을 골라 pose hypothesis로 둔다. 모든 hypothesis는 자기가 실제 로봇이 존재하는 곳이라고 가정하고 가중치를 준다. 이때 모든 가설이 자신이 맞고 다른 가설이 틀렸다고 생각한다. 수많은 가설이 모이면 더 정확한 값 찾을 수 있다.
 
@@ -166,26 +166,26 @@ $$
 
 ## Particle Filter for Localization Psudo Code
 
-![Untitled](8%20Particle%20Filter%20and%20Monte%20Carlo%20Localization/Untitled%2014.png)
+![[Attachments/SLAM/Untitled 14.png]]
 
 ## 1D Example
 
-![Untitled](8%20Particle%20Filter%20and%20Monte%20Carlo%20Localization/Untitled%2015.png)
+![[Attachments/SLAM/Untitled 15.png]]
 
 ## Resampling
 
 sample $i$의 확률을 $w^{[i]}_t$로 둔다. $J$번 반복한다. unlikely sample을 more likely sample로 대체한다. $J=n$=(샘플의 개수) 이다.
 
-![Untitled](8%20Particle%20Filter%20and%20Monte%20Carlo%20Localization/Untitled%2016.png)
+![[Attachments/SLAM/Untitled 16.png]]
 
-![Untitled](8%20Particle%20Filter%20and%20Monte%20Carlo%20Localization/Untitled%2017.png)
+![[Attachments/SLAM/Untitled 17.png]]
 
 weight를 0~1 사이로 normalize 시키고 룰렛처럼 원으로 나타낸다.
 
 - Roulette wheel은 화살표 한 개가 돌아가다가 멈췄을 때 그 점을 선택한다. 이해하기 쉬우나, 현실에서는 suboptimal 하다.
     - 0~1사이의 값을 가진 random number가 해당하는 위치를 찾기 위해 Binary serach
         
-        ![Untitled](8%20Particle%20Filter%20and%20Monte%20Carlo%20Localization/Untitled%2018.png)
+        ![[Attachments/SLAM/Untitled 18.png]]
         
 - Stochastic universal sampling은 arrow를 n개 사용한다. 각 arrow 사이의 거리는 1/J이다. n개의 화살표를 돌려 끝나는 것들을 선택한다. **Low variance sampling**이기 때문에 계산 복잡도가 낮아 빠르다.
     - 1~1/J 사이의 값을 가진 random number 구한다.
@@ -195,13 +195,13 @@ weight를 0~1 사이로 normalize 시키고 룰렛처럼 원으로 나타낸다.
 
 Sampling 구현 방법은 아래와 같다.
 
-![Untitled](8%20Particle%20Filter%20and%20Monte%20Carlo%20Localization/Untitled%2019.png)
+![[Attachments/SLAM/Untitled 19.png]]
 
-![Untitled](8%20Particle%20Filter%20and%20Monte%20Carlo%20Localization/Untitled%2020.png)
+![[Attachments/SLAM/Untitled 20.png]]
 
 ## MCL 적용 로봇
 
-![Untitled](8%20Particle%20Filter%20and%20Monte%20Carlo%20Localization/Untitled%2021.png)
+![[Attachments/SLAM/Untitled 21.png]]
 
 ## MCL 특징
 
