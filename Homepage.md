@@ -35,6 +35,7 @@ banner_x: 0.5
 	- [[00. Reinforcement Learning|Reinforcement Learning]]
 	- [[00. OpenCV|OpenCV]]
 	- [[00. Reviews|Paper Review]]
+	- [[00. SLAM|SLAM]]
 
 <br>
 
