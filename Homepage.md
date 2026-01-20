@@ -50,8 +50,14 @@ target:: 10000
 
 ```dataviewjs
 // Homepage + Daily Notes에서 태스크 가져오기
-const homepageTasks = dv.page("Homepage")?.file?.tasks || [];
-const dailyTasks = dv.pages('"Daily Notes"').file.tasks.values.flat();
+const homepageTasks = dv.page("Homepage")?.file?.tasks?.values || [];
+const dailyPages = dv.pages('"Daily Notes"');
+let dailyTasks = [];
+for (let page of dailyPages) {
+    if (page.file.tasks) {
+        dailyTasks = dailyTasks.concat(page.file.tasks.values || []);
+    }
+}
 const allTasks = [...homepageTasks, ...dailyTasks];
 
 // 모든 태스크에서 태그 자동 추출
@@ -106,8 +112,14 @@ dv.span(table);
 
 ```dataviewjs
 // Homepage + Daily Notes에서 태스크 가져오기
-const homepageTasks = dv.page("Homepage")?.file?.tasks || [];
-const dailyTasks = dv.pages('"Daily Notes"').file.tasks.values.flat();
+const homepageTasks = dv.page("Homepage")?.file?.tasks?.values || [];
+const dailyPages = dv.pages('"Daily Notes"');
+let dailyTasks = [];
+for (let page of dailyPages) {
+    if (page.file.tasks) {
+        dailyTasks = dailyTasks.concat(page.file.tasks.values || []);
+    }
+}
 const allTasks = [...homepageTasks, ...dailyTasks];
 
 // 📅YYYY-MM-DD 또는 📅 YYYY-MM-DD 형식의 날짜가 있는 태스크 찾기 (중복 제거)
