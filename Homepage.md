@@ -16,19 +16,35 @@ banner_x: 0.5
 		- [ ] RTK-GPS 주문 #논문
 		- [ ] Active Marker 아크릴 가공 주문 #논문
 		- [ ] Active Marker 전선 주문 #논문
+		```dataviewjs
+		const tasks = dv.pages('"Daily Notes"').file.tasks.where(t => t.text.includes("#논문") && !t.completed)
+		if (tasks.length > 0) dv.taskList(tasks, false)
+		```
 	- **PKRC**
 		- [x] 수중로봇 Wall Following 실제 구현 📅2026-01-18 #PKRC
 		- [x] 수중로봇 IMU PID 제어 📅2026-01-16 #PKRC
 		- [x] 수중로봇 Depth 제어 📅2026-01-16 #PKRC
 		- [ ] Laser + Camera Altitude Estimation #PKRC
-		- [ ] 전장 V3 #PKRC 
-		- [ ] 안테나 주문 #PKRC 
-		- [ ] 이더넷 스위치 주문 #PKRC 
+		- [ ] 전장 V3 #PKRC
+		- [ ] 안테나 주문 #PKRC
+		- [ ] 이더넷 스위치 주문 #PKRC
+		```dataviewjs
+		const tasks = dv.pages('"Daily Notes"').file.tasks.where(t => t.text.includes("#PKRC") && !t.completed)
+		if (tasks.length > 0) dv.taskList(tasks, false)
+		```
 	-  **Cyclops**
 		- [ ] USBL 동작 테스트 #Cyclops
-		- [ ] 내부 실린더 전장 마운트 설계 #Cyclops 
+		- [ ] 내부 실린더 전장 마운트 설계 #Cyclops
+		```dataviewjs
+		const tasks = dv.pages('"Daily Notes"').file.tasks.where(t => t.text.includes("#Cyclops") && !t.completed)
+		if (tasks.length > 0) dv.taskList(tasks, false)
+		```
 	- **AUV**
 		- [ ] idea 회의 #AUV
+		```dataviewjs
+		const tasks = dv.pages('"Daily Notes"').file.tasks.where(t => t.text.includes("#AUV") && !t.completed)
+		if (tasks.length > 0) dv.taskList(tasks, false)
+		```
 - ### **STUDY**
 	- [[00. Deep Learning|Deep Learning]]
 	- [[00. Machine Learning|Machine Learning]]
