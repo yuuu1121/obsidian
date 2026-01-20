@@ -49,9 +49,10 @@ target:: 10000
 %%
 
 ```dataviewjs
-// 현재 파일에서 태스크 가져오기
-const currentFile = dv.page("Homepage");
-const allTasks = currentFile?.file?.tasks || [];
+// Homepage + Daily Notes에서 태스크 가져오기
+const homepageTasks = dv.page("Homepage")?.file?.tasks || [];
+const dailyTasks = dv.pages('"Daily Notes"').file.tasks.values.flat();
+const allTasks = [...homepageTasks, ...dailyTasks];
 
 // 모든 태스크에서 태그 자동 추출
 const tagSet = new Set();
@@ -70,8 +71,15 @@ let table = `| Project | Progress | Status |
 `;
 
 tags.forEach(tag => {
-    // 해당 태그가 있는 태스크 필터링
-    const projectTasks = allTasks.filter(t => t.text.includes(tag));
+    // 해당 태그가 있는 태스크 필터링 (중복 제거: 텍스트 기준)
+    const seen = new Set();
+    const projectTasks = allTasks.filter(t => {
+        if (t.text.includes(tag) && !seen.has(t.text)) {
+            seen.add(t.text);
+            return true;
+        }
+        return false;
+    });
     const total = projectTasks.length;
     const completed = projectTasks.filter(t => t.completed).length;
 
@@ -97,12 +105,14 @@ dv.span(table);
 # DEADLINE
 
 ```dataviewjs
-// 현재 파일에서 태스크 가져오기
-const currentFile = dv.page("Homepage");
-const allTasks = currentFile?.file?.tasks || [];
+// Homepage + Daily Notes에서 태스크 가져오기
+const homepageTasks = dv.page("Homepage")?.file?.tasks || [];
+const dailyTasks = dv.pages('"Daily Notes"').file.tasks.values.flat();
+const allTasks = [...homepageTasks, ...dailyTasks];
 
-// 📅YYYY-MM-DD 또는 📅 YYYY-MM-DD 형식의 날짜가 있는 태스크 찾기
+// 📅YYYY-MM-DD 또는 📅 YYYY-MM-DD 형식의 날짜가 있는 태스크 찾기 (중복 제거)
 const deadlines = [];
+const seen = new Set();
 allTasks.forEach(t => {
     const dateMatch = t.text.match(/📅\s*(\d{4}-\d{2}-\d{2})/);
     if (dateMatch && !t.completed) {
@@ -111,7 +121,11 @@ allTasks.forEach(t => {
             .replace(/📅\s*\d{4}-\d{2}-\d{2}/, '')
             .replace(/#[\w가-힣]+/g, '')
             .trim();
-        deadlines.push({ name: name, date: dateMatch[1] });
+        const key = name + dateMatch[1];
+        if (!seen.has(key)) {
+            seen.add(key);
+            deadlines.push({ name: name, date: dateMatch[1] });
+        }
     }
 });
 
