@@ -16,6 +16,7 @@ banner_x: 0.5
 		- [x] RTK-GPS 주문 #논문
 		- [ ] Active Marker 아크릴 가공 주문 #논문
 		- [x] Active Marker 전선 주문 #논문
+		- [ ] Active Marker PCB JLCPCB Assembly 주문 #논문 
 		```dataviewjs
 		const tasks = dv.pages('"Daily Notes"').file.tasks.where(t => t.text.includes("#논문") && !t.completed)
 		if (tasks.length > 0) dv.taskList(tasks, false)
