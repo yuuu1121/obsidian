@@ -13,9 +13,9 @@ banner_x: 0.5
 		- [ ] 논문 초안 작성 📅2026-03-01 #논문
 		- [x] 시뮬레이터 구현 #논문
 		- [ ] Active Marker 제작 #논문
-		- [ ] RTK-GPS 주문 #논문
+		- [x] RTK-GPS 주문 #논문
 		- [ ] Active Marker 아크릴 가공 주문 #논문
-		- [ ] Active Marker 전선 주문 #논문
+		- [x] Active Marker 전선 주문 #논문
 		```dataviewjs
 		const tasks = dv.pages('"Daily Notes"').file.tasks.where(t => t.text.includes("#논문") && !t.completed)
 		if (tasks.length > 0) dv.taskList(tasks, false)
@@ -26,8 +26,8 @@ banner_x: 0.5
 		- [x] 수중로봇 Depth 제어 📅2026-01-16 #PKRC
 		- [ ] Laser + Camera Altitude Estimation #PKRC
 		- [ ] 전장 V3 #PKRC
-		- [ ] 안테나 주문 #PKRC
-		- [ ] 이더넷 스위치 주문 #PKRC
+		- [x] 안테나 주문 #PKRC
+		- [x] 이더넷 스위치 주문 #PKRC
 		```dataviewjs
 		const tasks = dv.pages('"Daily Notes"').file.tasks.where(t => t.text.includes("#PKRC") && !t.completed)
 		if (tasks.length > 0) dv.taskList(tasks, false)
