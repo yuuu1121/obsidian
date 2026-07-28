@@ -9,7 +9,13 @@ Koopman 튜토리얼 공용 모듈 — 차동구동 로봇(differential-drive ro
 """
 
 import numpy as np
-from scipy.linalg import pinv
+import matplotlib.pyplot as plt
+from scipy.linalg import pinv, eig, solve_discrete_are
+from scipy import linalg
+import time
+
+# Set random seed for reproducibility
+np.random.seed(0)
 
 # 데이터 수집에 쓰는 샘플링 주기 [s]
 # 주의: 학습과 제어에서 동일한 dt를 써야 합니다 (03_mpc_control.py 상단 주석 참고)
