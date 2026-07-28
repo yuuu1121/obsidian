@@ -49,9 +49,10 @@ setup_korean_font()      # 그래프 한글 깨짐 방지 (폰트 없으면 자�
 # =============================================================================
 d = np.load("data_diffdrive.npz")
 X, Y, U, dt = d["X"], d["Y"], d["U"], float(d["dt"])
+dt = 0.05        # 실습: 학습 dt(0.05)와 다르게 설정
 
 # 이 시스템의 비선형성이 cos/sin(theta)이므로 삼각함수를 포함시킵니다
-lifting = Lifting(poly_order=1, use_trig=False, cross_terms=False)
+lifting = Lifting(poly_order=1, use_trig=True, cross_terms=False)
 n_psi = lifting.dim()
 
 # PhiX, PhiY : (n_psi, M)  -- 상태/다음상태를 딕셔너리로 리프팅한 것
