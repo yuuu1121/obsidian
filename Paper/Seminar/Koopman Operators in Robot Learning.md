@@ -26,7 +26,8 @@ dg-publish: false
 > - **DOI**: [10.1109/TRO.2026.3654384](https://doi.org/10.1109/TRO.2026.3654384)
 > - **투고**: 2025-05-20 / **수정**: 2025-11-24 / **게재**: 2026-01-15
 > - **유형**: **Survey / Review** (튜토리얼 코드 포함)
-> - **코드**: https://github.com/sunnyshi0310/KoopmanRobo
+> - **코드**: https://github.com/sunnyshi0310/KoopmanRobo ([Colab로 바로 실행](https://colab.research.google.com/github/sunnyshi0310/KoopmanRobo/blob/main/demo.ipynb))
+> - **▶ 실행 예제**: [[Koopman 예제 코드|🧪 단계별 실행 스크립트]] — 이 저장소를 개념 노트 단계에 맞춰 재구성하고 실행 검증한 것
 
 ---
 
@@ -405,9 +406,9 @@ $$
 
 **계보**: [104] 최초 도입 → [105] Koopman MPC → [79] Koopman NMPC → [43][97] Bilinear
 
-### ③-b 능동학습 (§III-C2)
+### ③-b 능동학습(Active Learning) (§III-C2)
 
-닫힌 형태 해 (6),(7)이 **능동학습 제어기**로 직결된다 [100].
+선형 최소제곱 모델 적합 문제인 closed-form solution (6),(7)이 **능동학습 제어기**로 직결된다 [100].
 
 $$
 \mathcal{I} = \mathbb{E}\Big[\tfrac{\partial\log p(z_{t+1}|K,z_k)}{\partial K}\ \tfrac{\partial\log p(z_{t+1}|K,z_k)}{\partial K}^\top\Big] \tag{14}
@@ -623,7 +624,7 @@ $$
 1. **이론과 실무를 실제로 잇는다.** §II(실용 근사)와 §V(엄밀 이론)를 **의도적으로 분리**한 구성이 탁월하다. 실무자는 §II·§III만 읽고 바로 구현할 수 있고, 이론가는 §V에서 그 실용적 선택들이 어디서 정당화되는지(input-state separable form이 선형/쌍선형/스위칭을 모두 포섭) 확인할 수 있다.
 2. **반례로 가르친다.** $x^+=0.5x$ 딕셔너리 반례, Fig. 3의 $\alpha$-족, Fig. 4의 진자 비교 — "차원을 키우면 좋다", "residual이 작으면 좋다"는 **가장 흔한 오해를 정면으로 깬다.** 서베이가 이렇게 구체적 반례를 드는 경우는 드물다.
 3. **자기비판이 정직하다.** §III-B에서 자기가 소개한 실용 방법들에 "수렴 보장 없음"을 명시하고 §V-C로 넘긴다. §V-C 끝에서는 그 이론적 방법마저 "오프라인 전용"이라 §I의 runtime 주장과 긴장 관계임을 인정한다.
-4. **재현 가능성**: 실행 가능한 튜토리얼 코드 + 단계별 런타임 측정 제공.
+4. **재현 가능성**: 실행 가능한 튜토리얼 코드 + 단계별 런타임 측정 제공. 실제로 돌려본 결과는 [[Koopman 예제 코드|🧪 실행 예제]]에 정리했습니다 — EDMD 학습이 **0.09초**에 끝나는 것을 직접 확인할 수 있습니다.
 
 ### 👎 한계 / 아쉬운 점
 

@@ -1,31 +1,39 @@
 """
-[3단계] Koopman MPC로 궤적 추종
-        개념 노트 [[Koopman MPC]] 1~3번에 대응
+[3단계] Koopman MPC로 궤적 추종 — 그리고 볼록성 vs 정확도의 실제 대가
+        개념 노트 [[Koopman MPC]] 1~3번, [[Koopman with Control Input]]
 
 실행:  python 03_mpc_control.py   (01, 02를 먼저 실행해야 합니다)
 필요:  pip install cvxpy
 
-무엇을 보는가
--------------
-학습된 선형 모델 z+ = K_psi z + K_u u 를 MPC에 넣으면, 원래 비선형이라
-비볼록이었을 최적제어 문제가 **볼록 QP** 가 됩니다.
+이 스크립트는 두 모델로 각각 MPC를 돌려 비교합니다
+---------------------------------------------------
+(A) input-affine  z+ = A z + B u
+      -> MPC가 **볼록 QP**. 전역 최적해, 초기화 불필요, 빠름.
+      -> 그러나 이 시스템에서는 모델 자체가 부정확합니다 (아래 설명).
 
-    min  sum ( (z-z_ref)' Q (z-z_ref) + u' R u )
-    s.t. z_{t+1} = K_psi z_t + K_u u_t        <- 선형 제약
-         u_min <= u <= u_max                  <- 선형 제약
-         z_0 = psi(x_t)
+(B) bilinear      z+ = A z + B u + sum_j u_j B_j z
+      -> 모델이 거의 정확합니다 (04번에서 확인: 1-step 오차 ~1e-15).
+      -> 그러나 u 에 대해 비선형이라 MPC가 **비볼록**이 됩니다.
+         여기서는 각 스텝에서 이전 해를 기준으로 선형화해 푸는
+         반복(SQP류) 방식을 씁니다 — 국소 최적해만 보장됩니다.
 
-볼록이므로 전역 최적해가 유일하고, 초기 추측이 필요 없습니다.
-이것이 리프팅으로 차원이 커졌는데도 실시간 계산이 되는 이유입니다.
+왜 이런 비교가 필요한가
+-----------------------
+차동구동 로봇의 비선형항은 v*cos(theta), v*sin(theta) 입니다. 이것은
+**입력과 상태함수의 곱**이라, input-affine 구조로는 원리적으로 표현할
+수 없습니다. cos(theta)를 딕셔너리에 넣어도 소용없습니다 — 그것에 v를
+곱해줄 자리가 모델에 없기 때문입니다. (04_dictionary_study.py 참고)
 
-중요: 로봇의 물리 모델은 제어기 어디에도 쓰이지 않습니다.
-      f_discrete는 '실제 로봇' 역할로 시뮬레이션에만 등장합니다.
+즉 이 예제는 논문 [[Koopman MPC]] 3번이 말하는
+"때때로 비선형 실현이 더 정확한 예측을 주고, 그러면 그 트레이드오프가
+정당화된다"는 상황의 구체적 사례입니다.
 """
 
 import time
 
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy.linalg import pinv
 
 try:
     import cvxpy as cp
@@ -34,26 +42,45 @@ except ImportError:
 
 from koopman_lib import Lifting, f_discrete
 
-# --- 모델 로드 ---------------------------------------------------------------
-m = np.load("model_diffdrive.npz")
-A_l, B_l, C = m["K_psi"], m["K_u"], m["C"]
-dt = float(m["dt"])
+# =============================================================================
+# 모델 준비 — affine 과 bilinear 를 같은 데이터/딕셔너리로 학습
+# =============================================================================
+d = np.load("data_diffdrive.npz")
+X, Y, U, dt = d["X"], d["Y"], d["U"], float(d["dt"])
 
-lifting = Lifting(poly_order=int(m["poly_order"]),
-                  use_trig=bool(m["use_trig"]),
-                  cross_terms=bool(m["cross_terms"]))
+# 이 시스템의 비선형성이 cos/sin(theta)이므로 삼각함수를 포함시킵니다
+lifting = Lifting(poly_order=1, use_trig=True, cross_terms=False)
+n_psi = lifting.dim()
 
-print(f"모델 로드: N_psi={A_l.shape[0]}, dt={dt}")
+PhiX = lifting.lift_matrix(X)
+PhiY = lifting.lift_matrix(Y)
+C = X.dot(pinv(PhiX))
 
-# ⚠️ 원본 demo.ipynb 주의사항 --------------------------------------------------
-# 원본 노트북은 데이터를 dt=0.05로 수집한 뒤, MPC 셀에서 dt=0.1로 덮어씁니다.
-# 그러면 학습된 모델의 시간 스케일과 시뮬레이션 시간 스케일이 2배 어긋납니다.
-# 여기서는 학습에 쓴 dt를 그대로 사용합니다. 원본 동작을 재현하려면
-# 아래 줄의 주석을 해제하세요 (추종 성능이 나빠지는 것을 볼 수 있습니다).
-# dt = 0.1
+# (A) input-affine
+K_aff = PhiY.dot(pinv(np.vstack([PhiX, U])))
+A_aff, B_aff = K_aff[:, :n_psi], K_aff[:, n_psi:]
 
-# --- 기준 궤적 (sinusoidal weave) --------------------------------------------
-T_track = 400
+# (B) bilinear
+blocks = [PhiX, U] + [U[j:j + 1, :] * PhiX for j in range(2)]
+K_bil = PhiY.dot(pinv(np.vstack(blocks)))
+A_bil = K_bil[:, :n_psi]
+B_bil = K_bil[:, n_psi:n_psi + 2]
+Bj = [K_bil[:, n_psi + 2 + j * n_psi: n_psi + 2 + (j + 1) * n_psi] for j in range(2)]
+
+# 모델 정확도 비교 (1-step)
+err_aff = np.linalg.norm(Y - C.dot(K_aff.dot(np.vstack([PhiX, U])))) / np.sqrt(X.shape[1])
+err_bil = np.linalg.norm(Y - C.dot(K_bil.dot(np.vstack(blocks)))) / np.sqrt(X.shape[1])
+
+print(f"딕셔너리 차원 N_psi = {n_psi},  dt = {dt}")
+print(f"모델 1-step RMS 오차")
+print(f"   (A) input-affine : {err_aff:.3e}")
+print(f"   (B) bilinear     : {err_bil:.3e}   <- 기계 정밀도 = 정확한 모델")
+print()
+
+# =============================================================================
+# 기준 궤적
+# =============================================================================
+T_track = 250
 nx = 3
 A_amp, L = 5.0, 20.0
 
@@ -62,112 +89,206 @@ y_ref = L * (t / (T_track * dt))
 x_ref_pos = A_amp * np.sin(2 * np.pi * y_ref / L)
 theta_ref = np.unwrap(np.arctan2(np.gradient(y_ref), np.gradient(x_ref_pos)))
 x_ref = np.vstack((x_ref_pos, y_ref, theta_ref))
-
 Phi_ref = lifting.lift_matrix(x_ref)
 
-# --- MPC 파라미터 ------------------------------------------------------------
-N_mpc = 15                                    # 예측 구간
-Q = np.eye(A_l.shape[0]) * 0.1
-Q[:nx, :nx] = np.diag([10.0, 10.0, 0.1])      # x, y 를 무겁게, yaw 는 가볍게
-R = np.eye(B_l.shape[1]) * 0.1
+# MPC 파라미터
+N_mpc = 15
+Q = np.eye(n_psi) * 0.1
+Q[:nx, :nx] = np.diag([10.0, 10.0, 0.1])
+R = np.eye(2) * 0.1
 u_min = np.array([-1.5, -5.0])
 u_max = np.array([1.5, 5.0])
 
-print(f"MPC: horizon={N_mpc}, 입력 제약 v∈[{u_min[0]},{u_max[0]}], "
-      f"omega∈[{u_min[1]},{u_max[1]}]")
 
-# --- Receding-horizon 루프 ---------------------------------------------------
-x_mpc = np.zeros((nx, T_track))
-x_mpc[:, 0] = x_ref[:, 0]
-u_hist = np.zeros((2, T_track - 1))
-solve_times = []
+# =============================================================================
+# (A) 볼록 QP — input-affine
+# =============================================================================
+def run_mpc_affine():
+    x = np.zeros((nx, T_track)); x[:, 0] = x_ref[:, 0]
+    u_hist = np.zeros((2, T_track - 1))
+    times = []
 
-t_start = time.time()
-for k in range(T_track - 1):
-    H = min(N_mpc, T_track - 1 - k)
+    for k in range(T_track - 1):
+        H = min(N_mpc, T_track - 1 - k)
+        Uv = cp.Variable((2, H))
+        Zv = cp.Variable((n_psi, H + 1))
 
-    Uvar = cp.Variable((B_l.shape[1], H))
-    Zvar = cp.Variable((A_l.shape[0], H + 1))
+        cost = 0
+        cons = [Zv[:, 0] == lifting.phi(x[:, k])]
+        for i in range(H):
+            cons += [Zv[:, i + 1] == A_aff @ Zv[:, i] + B_aff @ Uv[:, i]]
+            cons += [Uv[:, i] <= u_max, Uv[:, i] >= u_min]
+            cost += cp.quad_form(Zv[:, i] - Phi_ref[:, k + i], Q)
+            cost += cp.quad_form(Uv[:, i], R)
+        cost += cp.quad_form(Zv[:, H] - Phi_ref[:, k + H], Q)
 
-    cost = 0
-    cons = [Zvar[:, 0] == lifting.phi(x_mpc[:, k])]     # 현재 상태를 리프팅해 초기조건으로
-
-    for i in range(H):
-        cons += [Zvar[:, i + 1] == A_l @ Zvar[:, i] + B_l @ Uvar[:, i]]   # 선형 동역학
-        cons += [Uvar[:, i] <= u_max, Uvar[:, i] >= u_min]                # 입력 제약
-        cost += cp.quad_form(Zvar[:, i] - Phi_ref[:, k + i], Q)
-        cost += cp.quad_form(Uvar[:, i], R)
-    cost += cp.quad_form(Zvar[:, H] - Phi_ref[:, k + H], Q)               # 종단 비용
-
-    prob = cp.Problem(cp.Minimize(cost), cons)
-    ts = time.time()
-    try:
+        prob = cp.Problem(cp.Minimize(cost), cons)
+        ts = time.time()
         prob.solve(warm_start=True)
-    except Exception:
-        prob.solve(solver=cp.OSQP, warm_start=True)
-    solve_times.append(time.time() - ts)
+        times.append(time.time() - ts)
 
-    if Uvar.value is None:
-        print(f"  [경고] step {k}: solver 실패 ({prob.status}) — 입력 0 적용")
-        u_cmd = np.zeros(B_l.shape[1])
-    else:
-        u_cmd = np.clip(Uvar.value[:, 0], u_min, u_max)
+        u = np.zeros(2) if Uv.value is None else np.clip(Uv.value[:, 0], u_min, u_max)
+        u_hist[:, k] = u
+        x[:, k + 1] = f_discrete(x[:, k], u, dt=dt)
 
-    u_hist[:, k] = u_cmd
-    x_mpc[:, k + 1] = f_discrete(x_mpc[:, k], u_cmd, dt=dt)   # '실제 로봇' 시뮬레이션
+    return x, u_hist, np.mean(times)
 
-elapsed = time.time() - t_start
-err = np.linalg.norm(x_ref - x_mpc, axis=0)
 
-print(f"\n완료 — 전체 {elapsed:.1f}초, QP 1회 평균 {np.mean(solve_times)*1000:.1f} ms")
-print(f"추종 오차: 평균 {err.mean():.4f} m, 최대 {err.max():.4f} m")
-print(f"  (QP 1회가 {np.mean(solve_times)*1000:.1f} ms 이므로 "
-      f"{1/np.mean(solve_times):.0f} Hz 제어 루프가 가능합니다)")
+# =============================================================================
+# (B) 비볼록 — bilinear, 이전 해 주변에서 선형화해 반복 (SQP류)
+# =============================================================================
+def run_mpc_bilinear(n_iter=3):
+    """bilinear 항 u_j * B_j z 를 이전 iterate 기준으로 선형화합니다.
 
-# --- 시각화 -----------------------------------------------------------------
+        u_j (B_j z) ~= u_j (B_j z_prev) + u_prev_j B_j (z - z_prev)
+
+    이렇게 하면 각 반복은 QP가 되지만, 전체는 **비볼록 문제의 국소 해**를
+    찾는 것입니다. 초기 추측(u_prev)에 의존한다는 점이 볼록 QP와의
+    결정적 차이입니다 — [[Koopman MPC]] 3번.
+    """
+    x = np.zeros((nx, T_track)); x[:, 0] = x_ref[:, 0]
+    u_hist = np.zeros((2, T_track - 1))
+    times = []
+    u_warm = np.zeros((2, N_mpc))       # 이전 스텝 해를 초기 추측으로 재사용
+
+    for k in range(T_track - 1):
+        H = min(N_mpc, T_track - 1 - k)
+        u_prev = u_warm[:, :H].copy()
+        ts = time.time()
+
+        for _ in range(n_iter):
+            # 현재 u_prev로 명목 궤적 z_prev 계산
+            z_prev = np.zeros((n_psi, H + 1))
+            z_prev[:, 0] = lifting.phi(x[:, k])
+            for i in range(H):
+                up = u_prev[:, i]
+                z_prev[:, i + 1] = (A_bil @ z_prev[:, i] + B_bil @ up
+                                    + sum(up[j] * (Bj[j] @ z_prev[:, i]) for j in range(2)))
+
+            Uv = cp.Variable((2, H))
+            Zv = cp.Variable((n_psi, H + 1))
+            cost = 0
+            cons = [Zv[:, 0] == lifting.phi(x[:, k])]
+            for i in range(H):
+                # 선형화된 동역학
+                lin = A_bil @ Zv[:, i] + B_bil @ Uv[:, i]
+                for j in range(2):
+                    lin = lin + Uv[j, i] * (Bj[j] @ z_prev[:, i]) \
+                              + u_prev[j, i] * (Bj[j] @ (Zv[:, i] - z_prev[:, i]))
+                cons += [Zv[:, i + 1] == lin]
+                cons += [Uv[:, i] <= u_max, Uv[:, i] >= u_min]
+                cost += cp.quad_form(Zv[:, i] - Phi_ref[:, k + i], Q)
+                cost += cp.quad_form(Uv[:, i], R)
+            cost += cp.quad_form(Zv[:, H] - Phi_ref[:, k + H], Q)
+
+            prob = cp.Problem(cp.Minimize(cost), cons)
+            try:
+                prob.solve(warm_start=True)
+            except Exception:
+                break
+            if Uv.value is None:
+                break
+            u_prev = np.clip(Uv.value, u_min[:, None], u_max[:, None])
+
+        times.append(time.time() - ts)
+        u = u_prev[:, 0]
+        u_hist[:, k] = u
+        x[:, k + 1] = f_discrete(x[:, k], u, dt=dt)
+
+        u_warm = np.zeros((2, N_mpc))                    # 다음 스텝 warm start
+        u_warm[:, :max(H - 1, 0)] = u_prev[:, 1:H]
+
+    return x, u_hist, np.mean(times)
+
+
+# =============================================================================
+# 실행 및 비교
+# =============================================================================
+print("(A) input-affine + 볼록 QP 실행 중...")
+x_aff, u_aff, t_aff = run_mpc_affine()
+e_aff = np.linalg.norm(x_ref - x_aff, axis=0)
+print(f"    QP 1회 {t_aff*1000:.1f} ms,  추종오차 평균 {e_aff.mean():.3f} m")
+
+print("(B) bilinear + 비볼록(SQP) 실행 중...")
+x_bil, u_bil, t_bil = run_mpc_bilinear()
+e_bil = np.linalg.norm(x_ref - x_bil, axis=0)
+print(f"    1스텝 {t_bil*1000:.1f} ms,  추종오차 평균 {e_bil.mean():.3f} m")
+
+print(f"""
+{'='*70}
+결과 해석
+{'='*70}
+                        모델 1-step오차      추종오차       계산시간
+  (A) input-affine      {err_aff:.2e}       {e_aff.mean():7.3f} m    {t_aff*1000:6.1f} ms
+  (B) bilinear          {err_bil:.2e}       {e_bil.mean():7.3f} m    {t_bil*1000:6.1f} ms
+
+(A)는 볼록이라 빠르고 전역 최적해를 보장하지만, **모델이 이 시스템의
+비선형성(v*cos theta)을 구조적으로 표현하지 못해** 추종에 실패합니다.
+
+(B)는 모델이 정확해 추종이 잘 되지만, u에 대해 비선형이라 비볼록이고
+계산이 더 무거우며 국소 최적해만 얻습니다.
+
+=> "볼록성은 공짜가 아니다". 모델 구조를 선형으로 제한한 대가가
+   여기서는 제어 실패로 나타납니다. 논문이 bilinear 실현을 절충안으로
+   탐구하는 이유가 이것입니다 ([[Koopman MPC]] 3번, 논문 [43][97]).
+
+주의 1: (B)도 완벽한 추종은 아닙니다. 모델이 1-step으로는 정확해도
+        MPC 성능은 예측구간 길이, 가중치 Q/R, 입력 제약, SQP 반복
+        횟수에 함께 좌우됩니다. 여기서는 모델 구조의 영향을 드러내는
+        것이 목적이라 나머지는 튜닝하지 않았습니다. 아래 '직접 해보기'
+        1~2번으로 개선해보세요.
+
+주의 2: 모든 시스템에서 affine이 실패하는 것은 아닙니다. 비선형성이
+        입력과 얽히지 않은 시스템에서는 affine으로 충분하며, 그때는
+        볼록성이라는 큰 이점을 공짜로 얻습니다.
+{'='*70}""")
+
+# =============================================================================
+# 시각화
+# =============================================================================
 fig = plt.figure(figsize=(13, 8))
 
 ax = fig.add_subplot(2, 2, 1)
-ax.plot(x_ref[0], x_ref[1], "--", lw=2, label="reference")
-ax.plot(x_mpc[0], x_mpc[1], "-", lw=1.5, label="MPC closed-loop")
-ax.scatter(*x_mpc[:2, 0], c="r", zorder=5, label="start")
-ax.axis("equal"); ax.legend(); ax.grid(alpha=.3)
-ax.set_xlabel("x [m]"); ax.set_ylabel("y [m]")
-ax.set_title("추종 결과 (xy 평면)")
+ax.plot(x_ref[0], x_ref[1], "k--", lw=2, label="reference")
+ax.plot(x_aff[0], x_aff[1], "-", lw=1.5, color="tab:red", label="(A) affine / convex QP")
+ax.plot(x_bil[0], x_bil[1], "-", lw=1.5, color="tab:green", label="(B) bilinear / SQP")
+ax.scatter(*x_ref[:2, 0], c="k", zorder=5, s=40)
+ax.axis("equal"); ax.legend(fontsize=8); ax.grid(alpha=.3)
+ax.set_xlabel("x [m]"); ax.set_ylabel("y [m]"); ax.set_title("Tracking in xy plane")
 
 ax = fig.add_subplot(2, 2, 2)
-ax.plot(err); ax.grid(alpha=.3)
-ax.set_xlabel("step"); ax.set_ylabel("||x - x_ref|| [m]")
-ax.set_title(f"추종 오차 (평균 {err.mean():.3f} m)")
+ax.plot(e_aff, color="tab:red", label=f"(A) affine  mean {e_aff.mean():.2f} m")
+ax.plot(e_bil, color="tab:green", label=f"(B) bilinear mean {e_bil.mean():.2f} m")
+ax.set_yscale("log"); ax.legend(fontsize=8); ax.grid(alpha=.3)
+ax.set_xlabel("step"); ax.set_ylabel("||x - x_ref|| [m]"); ax.set_title("Tracking error")
 
 ax = fig.add_subplot(2, 2, 3)
-ax.plot(u_hist[0], label="v [m/s]")
-ax.axhline(u_max[0], ls=":", c="r"); ax.axhline(u_min[0], ls=":", c="r")
-ax.legend(); ax.grid(alpha=.3); ax.set_title("선속도 (점선 = 제약)")
+ax.plot(u_aff[0], color="tab:red", label="(A) v")
+ax.plot(u_bil[0], color="tab:green", label="(B) v")
+ax.axhline(u_max[0], ls=":", c="k"); ax.axhline(u_min[0], ls=":", c="k")
+ax.legend(fontsize=8); ax.grid(alpha=.3); ax.set_title("linear speed v [m/s]")
 
 ax = fig.add_subplot(2, 2, 4)
-ax.plot(u_hist[1], label="omega [rad/s]", color="darkorange")
-ax.axhline(u_max[1], ls=":", c="r"); ax.axhline(u_min[1], ls=":", c="r")
-ax.legend(); ax.grid(alpha=.3); ax.set_title("각속도 (점선 = 제약)")
+ax.plot(u_aff[1], color="tab:red", label="(A) omega")
+ax.plot(u_bil[1], color="tab:green", label="(B) omega")
+ax.axhline(u_max[1], ls=":", c="k"); ax.axhline(u_min[1], ls=":", c="k")
+ax.legend(fontsize=8); ax.grid(alpha=.3); ax.set_title("angular speed omega [rad/s]")
 
-fig.suptitle("Step 3: Koopman MPC — 물리 모델 없이 데이터만으로 제어", fontsize=12)
+fig.suptitle("Step 3: convexity vs accuracy — the real trade-off", fontsize=12)
 fig.tight_layout()
 plt.show()
 
-# --- 직접 해보기 -------------------------------------------------------------
 print("""
 직접 해보기
 -----------
-1. N_mpc를 15 -> 5 로 줄여보세요. 추종이 나빠지는 대신 QP가 빨라집니다.
-   실시간성과 성능의 트레이드오프를 직접 확인할 수 있습니다.
+1. run_mpc_bilinear의 n_iter를 3 -> 1 로 줄여보세요. 선형화 반복이
+   줄면 국소 해의 품질이 떨어집니다 — 비볼록 문제의 특징입니다.
 
-2. Q[:3,:3]의 yaw 가중치 0.1을 10으로 올려보세요. 자세를 더 맞추려다
-   위치 추종이 나빠지는 것을 볼 수 있습니다.
+2. N_mpc를 15 -> 5 로 줄여보세요. 계산은 빨라지지만 추종이 나빠집니다.
 
-3. 위쪽 'dt = 0.1' 주석을 해제해보세요. 학습 dt와 제어 dt가 어긋나면
-   모델이 예측하는 한 스텝과 실제 한 스텝이 달라져 성능이 떨어집니다.
-   -> 논문 VI절이 'sampling rate selection'을 열린 문제로 꼽는 이유입니다.
+3. lifting에서 use_trig=False로 바꿔보세요. bilinear조차 정확해지지
+   못합니다 — 모델 구조와 딕셔너리가 **둘 다** 맞아야 한다는 04번의 결론.
 
-4. 02번에서 use_trig=False로 학습한 모델로 이 스크립트를 돌려보세요.
-   딕셔너리 선택이 제어 성능까지 어떻게 전파되는지 볼 수 있습니다.
+4. 학습 dt(0.05)와 다른 dt로 f_discrete를 호출해보세요. 논문 VI절이
+   'sampling rate selection'을 열린 문제로 꼽는 이유를 체감할 수 있습니다.
 """)
