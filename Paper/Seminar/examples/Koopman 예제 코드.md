@@ -552,7 +552,7 @@ EDMD 완료 — 소요시간 0.0861 초
 
 | 스크립트 | 대응 개념 노트 |
 |:---|:---|
-| 01_collect_data | [[EDMD]] 1번 (데이터 행렬), persistent excitation |
+| 01_collect_data | [[EDMD]] 1번 (데이터 행렬), persistent excitation → 실험 결과: [[실험 기록 - 데이터 수집]] |
 | 02_edmd_fit | [[Observable Function]], [[EDMD]] 2~5번, [[Pseudo-inverse]] |
 | 03_mpc_control | [[Koopman MPC]] 1~3번, [[Koopman with Control Input]], [[Affine]] |
 | 04_dictionary_study | [[Observable Function]], [[Koopman-Invariant Subspace]], [[EDMD]] 7번 |
