@@ -430,6 +430,8 @@ $$
 
 #### 2단계 — Fisher 정보: "데이터가 $K$ 를 얼마나 알려주는가"
 
+> 📎 Fisher 정보 자체의 정의·직관·Cramér–Rao bound는 [[Fisher Information]] 참고
+
 $$
 \mathcal{I} = \mathbb{E}\Big[\tfrac{\partial\log p(z_{t+1}|K,z_k)}{\partial K}\ \tfrac{\partial\log p(z_{t+1}|K,z_k)}{\partial K}^\top\Big] \tag{14}
 $$
@@ -741,6 +743,7 @@ $$
 > **수학 기초** (Koopman 맥락과 독립적으로도 유용)
 > - [[Pseudo-inverse]] — $\dagger$ 가 무엇인가, 최소자승·직교사영·수치 안정성
 > - [[Affine]] — 선형과 아핀의 차이, "차원을 올려 선형화"라는 발상, input-/control-affine 구분
+> - [[Fisher Information]] — "데이터가 얼마나 알려주는가", Cramér–Rao bound, 능동학습의 토대
 
 ---
 

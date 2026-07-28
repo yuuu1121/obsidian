@@ -141,6 +141,8 @@ $$
 
 ### (b) Fisher 정보 — "데이터가 $K$ 를 얼마나 알려주는가"
 
+> 📎 Fisher 정보 자체(정의·Cramér–Rao·D-optimality)는 [[Fisher Information]]에 따로 정리했습니다. 여기서는 Koopman 맥락만 다룹니다.
+
 $$
 \mathcal{I} = \mathbb{E}\left[\frac{\partial \log p(z_{t+1}|K,z_k)}{\partial K}\ \frac{\partial \log p(z_{t+1}|K,z_k)}{\partial K}^\top\right] \tag{논문 (14)}
 $$
