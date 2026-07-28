@@ -121,17 +121,29 @@ $z_t := \psi(x_t)$ 로 두면 $z_{t+1} = Kz_t$ — **완전한 선형 상태방�
 >
 > 이후 논문의 거의 모든 기술적 내용은 결국 **"어떻게 유한차원으로 잘라도 정확할 것인가"** 라는 하나의 질문으로 수렴한다.
 
-### Fig. 2의 가환도
+### Fig. 2의 가환도 — 이 논문 전체를 요약하는 한 장
 
-```
-        x_t  ──── T (비선형, 저차원) ────▶  x_{t+1}
-         │                                    │
-       g │ lifting                    lifting │ g
-         ▼                                    ▼
-      g(x_t) ──── K (선형, 무한차원) ────▶  g(x_{t+1})
-```
+![[koopman-operator-theory-overview.png]]
 
-$T$ 와 $\mathcal{K}$ 는 **다른 공간에서 작용하지만 같은 동역학을 encode** 한다.
+> [!note] 그림 읽는 법 — 아래에서 위로
+> **① 아래쪽 (Original Domain $x\in\mathcal{X}$)**
+> 회색 박스. 우리가 실제로 가진 것은 상태 $x_t$ 와, 그것을 $x_{t+1}$ 로 보내는 **Unknown Nonlinear Map $T$** 뿐이다. 화살표가 회색인 이유는 **$T$ 를 모른다**는 뜻이다 — 소프트 로봇의 점탄성이나 공중 로봇의 지면 효과처럼 제1원리로 쓸 수 없는 동역학이 여기 있다.
+>
+> **② 가운데 노란 화살표 (Lifting)**
+> $x \to g(x)$. **[[Observable Function|리프팅 함수]]** 가 상태를 함수공간으로 밀어 올린다. 왼쪽 그림의 **굽은 곡면(원 상태공간)이 평평한 파란 평면(Koopman 공간)으로 펴지는** 시각화가 이 연산의 기하학적 의미다. 비선형 다양체가 선형 부분공간으로 대응된다.
+>
+> **③ 위쪽 (Lifted Domain: Koopman Space)**
+> 파란 박스. Observable $g(x_t)$ 가 **Linear Operator $\mathcal{K}$** 로 전파되어 $g(x_{t+1}) = [\mathcal{K}g](x_t)$ 가 된다. 이것이 (3)식이다. 화살표가 파란색·실선인 이유는 **$\mathcal{K}$ 가 선형이고 데이터로 추정 가능**하기 때문이다.
+>
+> **④ 왼쪽 상단 텍스트 — 대가와 해법**
+> - *Linear Dynamics $\mathcal{K}$* : 얻은 것 (선형성)
+> - *$g\in\mathcal{F}$: Infinite-dimensional vector space* : **치른 대가** (무한차원)
+> - *Finite Estimation $K$ from measurements* : **타협점** — 측정으로부터 유한차원 행렬 $K$ 를 추정 → (7)식 [[EDMD]]
+
+> [!important] 이 그림에서 놓치기 쉬운 두 가지
+> **1. 오른쪽 세로 점선이 핵심이다.** 두 경로($T$ 를 따라간 뒤 관측 vs. 관측한 뒤 $\mathcal{K}$ 로 전파)가 **같은 지점에서 만난다**는 것 — 즉 $T$ 와 $\mathcal{K}$ 는 다른 공간에서 작용하지만 **동일한 동역학을 encode** 한다. 이 가환성(commutativity)이 Koopman 이론의 전부다.
+>
+> **2. 그림에는 "Finite Estimation $K$"만 적혀 있고 그 오차는 그려져 있지 않다.** 실제로 유한차원으로 자르는 순간 위쪽 경로와 아래쪽 경로는 **정확히 만나지 않는다.** 그 어긋남의 크기를 결정하는 것이 [[Koopman-Invariant Subspace|불변 부분공간]]에 얼마나 가까운지이며, 그것을 측정하는 지표가 [[Consistency Index]]다. **이 논문의 §V-C 전체가 이 그림에 그려지지 않은 간극에 관한 것이다.**
 
 ---
 

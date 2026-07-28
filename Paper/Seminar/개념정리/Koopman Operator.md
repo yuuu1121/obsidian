@@ -72,16 +72,20 @@ $$
 
 ## 2. 그림으로 보는 두 경로 (논문 Fig. 2)
 
-논문의 Fig. 2는 다음 가환도(commutative diagram)를 설명한다.
+![[koopman-operator-theory-overview.png]]
 
-```
-        x_t  ──────── T ────────▶  x_{t+1}
-         │                            │
-         │ g (lifting)                │ g (lifting)
-         ▼                            ▼
-      g(x_t) ─────── K ────────▶  g(x_{t+1})
-      (Koopman 공간, 무한차원, 선형)
-```
+그림의 층위를 아래에서 위로 읽으면 이론의 논리 순서가 그대로 나온다.
+
+| 층위 | 그림의 요소 | 의미 |
+|:---|:---|:---|
+| **아래** | `Original Domain x∈X`, 회색 박스, 굽은 곡면 | 우리가 실제로 가진 것: 상태 $x_t$ 와 **Unknown Nonlinear Map $T$**. 회색 = 모른다 |
+| **가운데** | 노란 화살표 `x → g(x)` | **리프팅** — 굽은 곡면을 평평한 평면으로 편다 |
+| **위** | `Lifted Domain: Koopman Space`, 파란 박스 | Observable $g(x_t)$ 가 **Linear Operator $\mathcal{K}$** 로 전파 → $g(x_{t+1})=[\mathcal{K}g](x_t)$ |
+| **좌상단** | `Infinite-dimensional vector space` | **치른 대가** |
+| **좌상단** | `Finite Estimation K from measurements` | **타협점** — 측정에서 유한차원 $K$ 추정 → [[EDMD]] |
+
+> [!important] 그림의 기하학적 핵심
+> 왼쪽의 **굽은 곡면 → 평평한 파란 평면** 시각화가 리프팅의 본질이다. 원 상태공간에서 비선형 다양체 위를 기어가던 궤적이, 리프팅 공간에서는 **평면 위의 직선적 진화**가 된다. 좌표계를 바꿨을 뿐 궤적 자체는 같다.
 
 같은 결과에 도달하는 **두 개의 경로**가 있다.
 
