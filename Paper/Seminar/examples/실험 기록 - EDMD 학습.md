@@ -214,6 +214,7 @@ lifting = Lifting(poly_order=3, use_trig=True, cross_terms=True)
 > [!tip] 관련 노트
 > - [[Koopman 예제 코드]] ④⑤⑥ — EDMD 수식과 rollout 구분
 > - [[실험 기록 - 데이터 수집]] — 01번 실험 (데이터 품질)
+> - [[실험 기록 - MPC 제어]] — 03번 실험 (`use_trig=False`가 제어까지 어떻게 전파되는지)
 > - [[EDMD]] — 닫힌 형태 해와 투영 오차
 > - [[Observable Function]] — 딕셔너리 설계 전략
 > - [[Koopman with Control Input]] — affine vs bilinear의 이론
