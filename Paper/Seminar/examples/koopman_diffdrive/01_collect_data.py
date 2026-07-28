@@ -17,7 +17,11 @@ Koopman은 (x_t, x_{t+1}, u_t) 삼중항만 있으면 됩니다. 하나의 긴 �
 import numpy as np
 import matplotlib.pyplot as plt
 
-from koopman_lib import collect_data, DT
+from koopman_lib import collect_data, setup_korean_font, DT
+
+# 그래프 제목의 한글이 깨지지 않도록 폰트 지정.
+# 한글 폰트가 없는 환경에서는 조용히 넘어가고 그래프는 정상 출력됩니다.
+setup_korean_font()
 
 # --- 데이터 수집 -------------------------------------------------------------
 # n_traj x t_per = 200 x 50 = 10,000 개의 (현재, 다음, 입력) 삼중항이 나옵니다.

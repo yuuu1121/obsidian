@@ -38,7 +38,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.linalg import pinv
 
-from koopman_lib import Lifting, f_discrete
+from koopman_lib import Lifting, f_discrete, setup_korean_font
+
+setup_korean_font()      # 그래프 한글 깨짐 방지 (폰트 없으면 자동으로 건너뜀)
 
 # --- 데이터 ------------------------------------------------------------------
 d = np.load("data_diffdrive.npz")
@@ -172,11 +174,11 @@ ax1.bar(idx - w/2, [r[2] for r in rows], w, label="input-affine", color="tab:red
 ax1.bar(idx + w/2, [r[3] for r in rows], w, label="bilinear", color="tab:green")
 ax1.set_yscale("log")
 ax1.set_xticks(idx); ax1.set_xticklabels(names, rotation=20, ha="right", fontsize=8)
-ax1.set_ylabel("1-step RMS error")
-ax1.set_title("Model structure decides, not dictionary size")
+ax1.set_ylabel("1-step RMS 오차")
+ax1.set_title("딕셔너리 크기가 아니라 모델 구조가 결정합니다")
 ax1.legend(); ax1.grid(alpha=.3, axis="y")
 ax1.axhline(1e-14, ls=":", c="k", lw=1)
-ax1.text(len(rows)-0.5, 2e-14, "machine precision", fontsize=7, ha="right")
+ax1.text(len(rows)-0.5, 2e-14, "기계 정밀도", fontsize=7, ha="right")
 
 # r[4] (trig 포함 여부)로 마커 모양만 바꾸고, 색은 항상 affine=빨강/bilinear=초록
 # 고정 -> "어떤 딕셔너리인가(마커)"와 "어떤 모델 구조인가(색)"를 동시에 읽을 수 있습니다.
@@ -187,12 +189,12 @@ for r in rows:
     ax2.annotate(r[0], (r[1], r[3]), fontsize=7, xytext=(4, -10),
                  textcoords="offset points")
 ax2.set_yscale("log")
-ax2.set_xlabel("dictionary dimension $N_\\psi$")
-ax2.set_ylabel("1-step RMS error")
-ax2.set_title("red = input-affine, green = bilinear\n(circle = has trig, square = no trig)")
+ax2.set_xlabel("딕셔너리 차원 $N_\\psi$")
+ax2.set_ylabel("1-step RMS 오차")
+ax2.set_title("빨강 = input-affine, 초록 = bilinear\n(원 = 삼각함수 포함, 사각 = 미포함)")
 ax2.grid(alpha=.3)
 
-fig.suptitle("Step 4: dictionary AND model structure must match the nonlinearity",
+fig.suptitle("Step 4: 딕셔너리와 모델 구조가 '함께' 비선형성에 맞아야 합니다",
              fontsize=12)
 fig.tight_layout()
 plt.show()

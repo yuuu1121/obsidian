@@ -23,6 +23,65 @@ DT = 0.05
 
 
 # =============================================================================
+# 0. 그래프 한글 폰트 설정 (선택적)
+# =============================================================================
+
+def setup_korean_font(verbose=False):
+    """matplotlib 그래프에서 한글이 깨지지 않도록 폰트를 설정합니다.
+
+    matplotlib 기본 폰트(DejaVu Sans)에는 한글 글리프가 없어서, 한글 제목을
+    쓰면 글자 대신 두부(□)가 찍힙니다. 이 함수는 시스템에 설치된 한글 폰트를
+    찾아 지정합니다.
+
+    OS마다 있는 폰트가 다르므로 후보를 순서대로 시도하고,
+    **하나도 없으면 조용히 넘어갑니다** (그래프는 그대로 그려지고 한글만 깨짐).
+    즉 이 함수 때문에 스크립트가 죽는 일은 없습니다.
+
+    Returns
+    -------
+    str or None : 실제로 적용된 폰트 이름. 못 찾았으면 None.
+    """
+    # OS별 대표 한글 폰트 — 앞에서부터 시도합니다
+    candidates = [
+        "Malgun Gothic",    # Windows 기본
+        "AppleGothic",      # macOS 기본
+        "NanumGothic",      # 나눔고딕 (Linux에서 흔히 설치)
+        "NanumBarunGothic",
+        "Noto Sans CJK KR", # Linux 배포판 기본인 경우가 많음
+        "Gulim", "Dotum",   # 구형 Windows 폰트
+    ]
+
+    try:
+        import matplotlib.font_manager as fm
+        installed = {f.name for f in fm.fontManager.ttflist}
+
+        for name in candidates:
+            if name in installed:
+                plt.rcParams["font.family"] = name
+                # ⚠️ 한글 폰트로 바꾸면 축의 음수 부호(−2, −1 ...)가 깨지는
+                #    별개의 문제가 생깁니다. 유니코드 마이너스(U+2212) 대신
+                #    ASCII 하이픈을 쓰도록 해서 막습니다.
+                plt.rcParams["axes.unicode_minus"] = False
+                if verbose:
+                    print(f"[font] 한글 폰트 적용: {name}")
+                return name
+
+        if verbose:
+            # 콘솔 인코딩(cp949 등)에서 깨지지 않도록 ASCII 문자만 씁니다
+            print("[font] No Korean font found - titles may show as boxes.")
+            print("       Linux: sudo apt install fonts-nanum")
+            print("       then remove ~/.cache/matplotlib and rerun")
+
+    except Exception as e:
+        # 폰트 설정이 실패해도 본 작업(학습·제어)에는 아무 지장이 없으므로
+        # 예외를 삼키고 계속 진행합니다.
+        if verbose:
+            print(f"[font] 폰트 설정 건너뜀: {e}")
+
+    return None
+
+
+# =============================================================================
 # 1. 시스템 모델 (ground truth) — 학습에는 쓰지 않고 데이터 생성/검증에만 사용
 # =============================================================================
 

@@ -19,7 +19,10 @@ import time
 import numpy as np
 import matplotlib.pyplot as plt
 
-from koopman_lib import Lifting, edmd_with_input, fit_decoder, rollout, DT
+from koopman_lib import (Lifting, edmd_with_input, fit_decoder, rollout,
+                         setup_korean_font, DT)
+
+setup_korean_font()      # 그래프 한글 깨짐 방지 (폰트 없으면 자동으로 건너뜀)
 
 # --- 데이터 로드 -------------------------------------------------------------
 # 01번이 저장한 파일을 읽습니다. npz는 여러 배열을 한 파일에 담는 numpy 포맷.

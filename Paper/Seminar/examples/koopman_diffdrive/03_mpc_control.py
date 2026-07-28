@@ -40,7 +40,9 @@ try:
 except ImportError:
     raise SystemExit("cvxpy가 필요합니다:  pip install cvxpy")
 
-from koopman_lib import Lifting, f_discrete
+from koopman_lib import Lifting, f_discrete, setup_korean_font
+
+setup_korean_font()      # 그래프 한글 깨짐 방지 (폰트 없으면 자동으로 건너뜀)
 
 # =============================================================================
 # 모델 준비 — affine 과 bilinear 를 같은 데이터/딕셔너리로 학습
@@ -341,27 +343,27 @@ ax.plot(x_aff[0], x_aff[1], "-", lw=1.5, color="tab:red", label="(A) affine / co
 ax.plot(x_bil[0], x_bil[1], "-", lw=1.5, color="tab:green", label="(B) bilinear / SQP")
 ax.scatter(*x_ref[:2, 0], c="k", zorder=5, s=40)
 ax.axis("equal"); ax.legend(fontsize=8); ax.grid(alpha=.3)
-ax.set_xlabel("x [m]"); ax.set_ylabel("y [m]"); ax.set_title("Tracking in xy plane")
+ax.set_xlabel("x [m]"); ax.set_ylabel("y [m]"); ax.set_title("추종 결과 (xy 평면)")
 
 ax = fig.add_subplot(2, 2, 2)
 ax.plot(e_aff, color="tab:red", label=f"(A) affine  mean {e_aff.mean():.2f} m")
 ax.plot(e_bil, color="tab:green", label=f"(B) bilinear mean {e_bil.mean():.2f} m")
 ax.set_yscale("log"); ax.legend(fontsize=8); ax.grid(alpha=.3)
-ax.set_xlabel("step"); ax.set_ylabel("||x - x_ref|| [m]"); ax.set_title("Tracking error")
+ax.set_xlabel("step"); ax.set_ylabel("||x - x_ref|| [m]"); ax.set_title("추종 오차")
 
 ax = fig.add_subplot(2, 2, 3)
 ax.plot(u_aff[0], color="tab:red", label="(A) v")
 ax.plot(u_bil[0], color="tab:green", label="(B) v")
 ax.axhline(u_max[0], ls=":", c="k"); ax.axhline(u_min[0], ls=":", c="k")
-ax.legend(fontsize=8); ax.grid(alpha=.3); ax.set_title("linear speed v [m/s]")
+ax.legend(fontsize=8); ax.grid(alpha=.3); ax.set_title("선속도 v [m/s]")
 
 ax = fig.add_subplot(2, 2, 4)
 ax.plot(u_aff[1], color="tab:red", label="(A) omega")
 ax.plot(u_bil[1], color="tab:green", label="(B) omega")
 ax.axhline(u_max[1], ls=":", c="k"); ax.axhline(u_min[1], ls=":", c="k")
-ax.legend(fontsize=8); ax.grid(alpha=.3); ax.set_title("angular speed omega [rad/s]")
+ax.legend(fontsize=8); ax.grid(alpha=.3); ax.set_title("각속도 omega [rad/s]")
 
-fig.suptitle("Step 3: convexity vs accuracy — the real trade-off", fontsize=12)
+fig.suptitle("Step 3: 볼록성 vs 정확도 — 실제 트레이드오프", fontsize=12)
 fig.tight_layout()
 plt.show()
 
