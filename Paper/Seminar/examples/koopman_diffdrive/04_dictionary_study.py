@@ -43,20 +43,28 @@ from koopman_lib import Lifting, f_discrete
 # --- 데이터 ------------------------------------------------------------------
 d = np.load("data_diffdrive.npz")
 X, Y, U, dt = d["X"], d["Y"], d["U"], float(d["dt"])
-M = X.shape[1]
+M = X.shape[1]                                # 데이터 포인트 개수 (열 하나 = 샘플 하나)
 
 
 # --- 두 가지 모델 구조 --------------------------------------------------------
+# fit_affine 과 fit_bilinear 는 겉보기엔 거의 같은 코드(둘 다 pinv 최소자승 한 번)
+# 지만, 회귀 행렬 Z에 어떤 블록을 쌓느냐가 이 스크립트 전체의 핵심 차이입니다.
+# Z가 커질수록 모델이 표현할 수 있는 psi-u 결합 방식이 늘어난다는 점에 주목하세요.
 
 def fit_affine(lifting, X, Y, U):
     """Input-affine:  psi(x+) = K psi(x) + B u
 
     [K  B] = Psi(Y) @ pinv([Psi(X); U])
+
+    Z에는 psi(x)와 u가 각자 독립된 블록으로만 들어갑니다. 즉 K가 곱해지는
+    대상이 'psi(x) 또는 u' 이지 'psi(x)와 u의 곱'이 아닙니다. 그래서 아무리
+    딕셔너리에 cos(theta)를 넣어도 v*cos(theta) 같은 항은 이 구조로 표현이
+    안 됩니다 (koopman_lib.f_continuous 참고).
     """
-    PhiX = lifting.lift_matrix(X)
-    PhiY = lifting.lift_matrix(Y)
-    Z = np.vstack([PhiX, U])
-    K = PhiY.dot(pinv(Z))
+    PhiX = lifting.lift_matrix(X)                 # (N_psi, M)
+    PhiY = lifting.lift_matrix(Y)                 # (N_psi, M)
+    Z = np.vstack([PhiX, U])                      # (N_psi + m, M)  psi와 u를 그냥 쌓기만 함
+    K = PhiY.dot(pinv(Z))                         # (N_psi, N_psi + m)
     return K, Z, PhiX
 
 
@@ -68,24 +76,37 @@ def fit_bilinear(lifting, X, Y, U):
     (단, 제어 단계에서는 u 에 대해 비선형이라 MPC가 비볼록이 됩니다
      -> [[Koopman MPC]] 3번의 트레이드오프)
     """
-    PhiX = lifting.lift_matrix(X)
-    PhiY = lifting.lift_matrix(Y)
+    PhiX = lifting.lift_matrix(X)                 # (N_psi, M)
+    PhiY = lifting.lift_matrix(Y)                 # (N_psi, M)
+    # blocks[-1]이 fit_affine과의 차이. U[j:j+1,:] 는 (1, M) 인 j번째 입력
+    # 채널이고, 그것을 PhiX 전체 (N_psi, M) 에 브로드캐스트 곱하면 각 열에서
+    # u_j(t) * psi(x_t) 라는 '입력과 상태함수의 곱'이 만들어집니다. K가 이
+    # 블록에 곱해지는 부분이 바로 위 docstring의 sum_j u_j B_j psi(x) 항이며,
+    # v*cos(theta) 같은 곱셈 비선형성을 표현할 자리가 여기서 생깁니다.
     blocks = [PhiX, U] + [U[j:j + 1, :] * PhiX for j in range(U.shape[0])]
-    Z = np.vstack(blocks)
-    K = PhiY.dot(pinv(Z))
+    Z = np.vstack(blocks)                         # (N_psi + m + m*N_psi, M)
+    K = PhiY.dot(pinv(Z))                         # (N_psi, N_psi + m + m*N_psi)
     return K, Z, PhiX
 
 
 def evaluate(lifting, fitter):
-    """1-step 예측 오차를 원 상태공간에서 측정합니다."""
+    """1-step 예측 오차를 원 상태공간에서 측정합니다.
+
+    흐름: (1) fitter로 K, Z, PhiX를 얻고 -> (2) X -> PhiX 관계로부터 디코더
+    C를 최소자승으로 구하고 -> (3) K@Z 로 다음 스텝의 리프팅 상태를 예측한
+    뒤 C로 원 상태공간에 되돌리고 -> (4) 실제 Y와 비교해 RMS를 냅니다.
+    fit_affine/fit_bilinear 어느 쪽이 오든 동일한 절차로 공정하게 비교됩니다.
+    """
     K, Z, PhiX = fitter(lifting, X, Y, U)
-    C = X.dot(pinv(PhiX))                       # 디코더
-    pred = C.dot(K.dot(Z))                      # 예측된 다음 상태
+    C = X.dot(pinv(PhiX))                       # 디코더, (3, N_psi)
+    pred = C.dot(K.dot(Z))                      # (3, M)  예측된 다음 상태
     rms = np.linalg.norm(Y - pred) / np.sqrt(M)
     return rms, K.shape
 
 
 # --- 비교할 딕셔너리 ----------------------------------------------------------
+# 다항식 차수/교차항만 올린 것(poly1~poly3)과, 삼각함수를 넣은 것(+ trig)을
+# 나란히 두어 "차원을 키우는 것"과 "맞는 함수를 넣는 것"을 구분해서 봅니다.
 dicts = [
     ("poly1",                 Lifting(poly_order=1, use_trig=False, cross_terms=False)),
     ("poly2",                 Lifting(poly_order=2, use_trig=False, cross_terms=True)),
@@ -108,6 +129,8 @@ for name, lf in dicts:
 print("=" * 74)
 
 # --- 핵심 관찰 ---------------------------------------------------------------
+# rows의 각 튜플은 (이름, 차원, affine 오차, bilinear 오차, trig 포함 여부).
+# best는 bilinear 오차(r[3]) 기준 최솟값 -> 아래 관찰 2/3에서 근거로 씁니다.
 best = min(rows, key=lambda r: r[3])
 print(f"""
 관찰 1 — input-affine 열을 보세요
@@ -132,6 +155,13 @@ print(f"""
 """)
 
 # --- 시각화 -----------------------------------------------------------------
+# 색상/마커 규칙 (두 축 모두 동일):
+#   빨강(tab:red)   = input-affine 모델
+#   초록(tab:green) = bilinear 모델
+#   원(o)  = 딕셔너리에 trig(cos/sin) 포함  ("poly1 + trig", "poly2 + trig")
+#   사각형(s) = trig 미포함
+# ax1은 딕셔너리별 막대 비교, ax2는 차원 대 오차의 산점도 — 둘 다 로그축이라
+# machine-precision(1e-14 수준)과 그 밖의 값들 사이 몇 자릿수 차이가 한눈에 보입니다.
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(13, 5))
 
 names = [r[0] for r in rows]
@@ -148,6 +178,8 @@ ax1.legend(); ax1.grid(alpha=.3, axis="y")
 ax1.axhline(1e-14, ls=":", c="k", lw=1)
 ax1.text(len(rows)-0.5, 2e-14, "machine precision", fontsize=7, ha="right")
 
+# r[4] (trig 포함 여부)로 마커 모양만 바꾸고, 색은 항상 affine=빨강/bilinear=초록
+# 고정 -> "어떤 딕셔너리인가(마커)"와 "어떤 모델 구조인가(색)"를 동시에 읽을 수 있습니다.
 for r in rows:
     mk = "o" if r[4] else "s"
     ax2.scatter(r[1], r[2], marker=mk, s=90, c="tab:red", zorder=5)

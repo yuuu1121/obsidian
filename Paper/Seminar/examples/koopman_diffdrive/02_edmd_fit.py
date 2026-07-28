@@ -22,9 +22,11 @@ import matplotlib.pyplot as plt
 from koopman_lib import Lifting, edmd_with_input, fit_decoder, rollout, DT
 
 # --- 데이터 로드 -------------------------------------------------------------
+# 01번이 저장한 파일을 읽습니다. npz는 여러 배열을 한 파일에 담는 numpy 포맷.
 d = np.load("data_diffdrive.npz")
-X, Y, U, dt = d["X"], d["Y"], d["U"], float(d["dt"])
-M = X.shape[1]
+X, Y, U = d["X"], d["Y"], d["U"]      # (3,M), (3,M), (2,M)
+dt = float(d["dt"])                   # npz는 스칼라도 0차원 배열로 저장하므로 float() 필요
+M = X.shape[1]                        # 데이터 개수 = 열 개수
 print(f"데이터 로드: {M} 쌍, dt={dt}")
 
 # --- 딕셔너리 선택 -----------------------------------------------------------
@@ -48,23 +50,36 @@ print(f"  K_u   shape: {K_u.shape}   <- 입력 영향 (input-affine)")
 print(f"  C     shape: {C.shape}   <- 디코더 (리프팅 -> 원 상태)")
 print("\n  ** 반복 최적화 없이 닫힌 형태 해로 한 번에 구했습니다 **")
 
-# 재구성 오차 — 디코더가 제대로 작동하는지
-recon = np.linalg.norm(X - C.dot(PhiX)) / np.sqrt(M)
+# --- 재구성 오차: 디코더 C가 제대로 작동하는지 확인 --------------------------
+# C @ psi(x) 가 다시 x를 주는지 봅니다. 딕셔너리가 상태 자신을 포함하므로
+# (full-state observability) 이 값은 거의 0 (기계 정밀도 ~1e-15) 이어야 합니다.
+# 만약 크게 나온다면 딕셔너리에 상태가 안 들어갔거나 규약이 어긋난 것입니다.
+recon = np.linalg.norm(X - C.dot(PhiX)) / np.sqrt(M)   # RMS = Frobenius norm / sqrt(M)
 print(f"\n재구성 RMS 오차: {recon:.3e}  (거의 0이어야 정상)")
 
 # --- 예측 성능 검증 ----------------------------------------------------------
-rng = np.random.default_rng(1)
-n_tests, horizon = 6, 30
+# 학습에 쓴 데이터에서 무작위로 구간을 뽑아, 그 구간의 입력 시퀀스를 주고
+# 모델이 얼마나 잘 따라가는지 봅니다.
+rng = np.random.default_rng(1)        # 검증용 난수 — 학습 데이터의 seed(0)와 분리
+n_tests, horizon = 6, 30              # 테스트 6개, 각 30스텝(= 1.5초 @ dt=0.05)
 
 fig, axes = plt.subplots(2, 3, figsize=(13, 6))
 final_errors = []
 
-for i, ax in enumerate(axes.ravel()):
+for i, ax in enumerate(axes.ravel()):  # ravel(): 2x3 격자를 1차원으로 펴서 순회
+    # M - horizon 까지만 뽑아야 구간이 데이터 끝을 넘지 않습니다
     idx = rng.integers(0, M - horizon)
+
+    # ⚠️ 주의: 데이터가 200개 궤적을 이어붙인 것이라, 뽑은 구간이 궤적
+    #    경계를 걸칠 수 있습니다. 그러면 중간에 상태가 점프해 오차가 커
+    #    보입니다. 교육용이라 그대로 뒀지만, 엄밀히 하려면 궤적 인덱스를
+    #    따로 관리해서 경계를 피해야 합니다.
     xs, preds = rollout(X[:, idx], U[:, idx:idx + horizon],
                         K_psi, K_u, C, lifting, dt=dt)
-    err = np.linalg.norm(xs - preds, axis=0)
-    final_errors.append(err[-1])
+
+    # 각 시점의 오차 크기 = 3차원 벡터의 노름. axis=0 이면 열별로 계산됩니다.
+    err = np.linalg.norm(xs - preds, axis=0)   # (horizon+1,)
+    final_errors.append(err[-1])               # 마지막 스텝 오차만 따로 모음
 
     ax.semilogy(err, "o-", ms=3)
     ax.set_xlabel("step"); ax.set_ylabel("||x - x_pred||")

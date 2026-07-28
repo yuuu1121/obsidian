@@ -20,8 +20,11 @@ import matplotlib.pyplot as plt
 from koopman_lib import collect_data, DT
 
 # --- 데이터 수집 -------------------------------------------------------------
+# n_traj x t_per = 200 x 50 = 10,000 개의 (현재, 다음, 입력) 삼중항이 나옵니다.
+# 짧은 궤적을 여러 개 쓰는 이유: 긴 궤적 하나는 상태공간의 좁은 영역만
+# 훑기 때문입니다. 초기 상태를 매번 새로 뽑아야 커버리지가 넓어집니다.
 X, Y, U = collect_data(n_traj=200, t_per=50, dt=DT, seed=0)
-M = X.shape[1]
+M = X.shape[1]                        # 데이터 개수 (열 하나 = 샘플 하나)
 
 print(f"수집 완료: {M} 개의 데이터 쌍 (200 궤적 x 50 스텝)")
 print(f"  X (현재 상태) shape: {X.shape}   <- (상태차원 3, 데이터수 M)")
@@ -47,6 +50,8 @@ for i, (name, ax) in enumerate(zip(["v (linear)", "omega (angular)"], axes[1])):
     ax.set_title(f"input: {name}")
 
 # 수집한 궤적 일부를 xy 평면에 표시
+# X는 궤적들이 열 방향으로 이어붙여져 있으므로, 50칸씩(t_per) 끊으면
+# 궤적 하나가 됩니다. 처음 10개만 그립니다.
 ax = axes[1, 2]
 for k in range(0, 10 * 50, 50):
     ax.plot(X[0, k:k + 50], X[1, k:k + 50], lw=0.8)

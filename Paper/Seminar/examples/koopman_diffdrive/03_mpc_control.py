@@ -52,19 +52,31 @@ X, Y, U, dt = d["X"], d["Y"], d["U"], float(d["dt"])
 lifting = Lifting(poly_order=1, use_trig=True, cross_terms=False)
 n_psi = lifting.dim()
 
+# PhiX, PhiY : (n_psi, M)  -- 상태/다음상태를 딕셔너리로 리프팅한 것
+# C          : (nx, n_psi) -- 디코더 (리프팅 공간 -> 원 상태로 복원)
 PhiX = lifting.lift_matrix(X)
 PhiY = lifting.lift_matrix(Y)
 C = X.dot(pinv(PhiX))
 
-# (A) input-affine
+# (A) input-affine:  PhiY ~= A_aff @ PhiX + B_aff @ U
+# koopman_lib.edmd_with_input과 동일한 구성입니다 — [PhiX; U]를 세로로 쌓아
+# 하나의 최소자승(K_aff = PhiY @ pinv([PhiX; U]))으로 A, B를 한번에 풉니다.
+# K_aff : (n_psi, n_psi + 2)  ->  앞 n_psi열이 A_aff, 뒤 2열이 B_aff
 K_aff = PhiY.dot(pinv(np.vstack([PhiX, U])))
 A_aff, B_aff = K_aff[:, :n_psi], K_aff[:, n_psi:]
 
-# (B) bilinear
+# (B) bilinear:  PhiY ~= A_bil @ PhiX + B_bil @ U + sum_j U[j] * (Bj[j] @ PhiX)
+# 핵심은 blocks에 U[j]*PhiX 항을 추가로 쌓는 것입니다 — 이게 입력 u_j와
+# 상태 PhiX의 '곱'을 회귀 변수로 명시적으로 넣어주는 부분이라, affine
+# 모델에는 없던 u*state 교차항을 선형회귀 하나로 흡수할 수 있게 됩니다.
+# blocks[i] shape: PhiX,U는 (n_psi,M)/(2,M), U[j:j+1,:]*PhiX는 (n_psi,M) 브로드캐스트
+# -> np.vstack(blocks) : (n_psi + 2 + 2*n_psi, M)
 blocks = [PhiX, U] + [U[j:j + 1, :] * PhiX for j in range(2)]
 K_bil = PhiY.dot(pinv(np.vstack(blocks)))
-A_bil = K_bil[:, :n_psi]
-B_bil = K_bil[:, n_psi:n_psi + 2]
+A_bil = K_bil[:, :n_psi]                      # (n_psi, n_psi)
+B_bil = K_bil[:, n_psi:n_psi + 2]             # (n_psi, 2)
+# Bj[j] : (n_psi, n_psi) -- u_j에 곱해지는 상태 선형변환. 각 j마다 K_bil에서
+# n_psi열씩 슬라이스해서 꺼냅니다 (blocks에 쌓은 순서와 정확히 대응)
 Bj = [K_bil[:, n_psi + 2 + j * n_psi: n_psi + 2 + (j + 1) * n_psi] for j in range(2)]
 
 # 모델 정확도 비교 (1-step)
@@ -78,58 +90,89 @@ print(f"   (B) bilinear     : {err_bil:.3e}   <- 기계 정밀도 = 정확한 �
 print()
 
 # =============================================================================
-# 기준 궤적
+# 기준 궤적 -- sinusoidal weave (지그재그로 전진하며 좌우로 흔드는 경로)
 # =============================================================================
 T_track = 250
 nx = 3
 A_amp, L = 5.0, 20.0
 
 t = np.linspace(0, T_track * dt, T_track)
-y_ref = L * (t / (T_track * dt))
-x_ref_pos = A_amp * np.sin(2 * np.pi * y_ref / L)
+y_ref = L * (t / (T_track * dt))                      # y는 시간에 비례해 단조 전진
+x_ref_pos = A_amp * np.sin(2 * np.pi * y_ref / L)      # x는 y를 따라 사인파로 흔들림
+# theta_ref: 경로의 접선 방향각. dx/dy가 아니라 (dy, dx) 순서로 arctan2에
+# 넣는 이유는 '진행방향 = y축 기준'이 아니라 표준 좌표계(atan2(dy,dx))로
+# 접선각을 구하기 위함입니다 (여기선 두 축 다 매끈해서 결과는 동일).
+# np.gradient로 이산 미분(중심차분)한 뒤 atan2로 각도를 얻으면 -pi~pi로
+# 잘리므로, np.unwrap으로 이 불연속(2pi 점프)을 제거해 연속적인 theta로
+# 만듭니다 -- 그래야 MPC 추종오차 계산에서 각도가 튀지 않습니다.
 theta_ref = np.unwrap(np.arctan2(np.gradient(y_ref), np.gradient(x_ref_pos)))
-x_ref = np.vstack((x_ref_pos, y_ref, theta_ref))
-Phi_ref = lifting.lift_matrix(x_ref)
+x_ref = np.vstack((x_ref_pos, y_ref, theta_ref))       # (nx, T_track)
+Phi_ref = lifting.lift_matrix(x_ref)                   # (n_psi, T_track) -- 리프팅 공간에서의 참조궤적
 
 # MPC 파라미터
-N_mpc = 15
+N_mpc = 15          # 예측 구간(horizon) 길이
 Q = np.eye(n_psi) * 0.1
+# 리프팅된 상태 z 전체에 작은 가중치(0.1)를 주되, 앞 nx=3개(x,y,theta 원래
+# 좌표에 해당)에는 훨씬 큰 가중치를 줘서 '실제로 추종하고 싶은 물리량'을
+# 우선시합니다. 나머지 z 성분(cos/sin(theta) 등)은 상태 표현을 위한
+# 보조항이라 직접 추종 목표로 삼지 않습니다.
 Q[:nx, :nx] = np.diag([10.0, 10.0, 0.1])
-R = np.eye(2) * 0.1
-u_min = np.array([-1.5, -5.0])
-u_max = np.array([1.5, 5.0])
+R = np.eye(2) * 0.1                        # 입력 크기에 대한 가중치 (에너지/부드러움 페널티)
+u_min = np.array([-1.5, -5.0])             # [v_min, omega_min]
+u_max = np.array([1.5, 5.0])               # [v_max, omega_max]
 
 
 # =============================================================================
 # (A) 볼록 QP — input-affine
 # =============================================================================
 def run_mpc_affine():
+    """cvxpy 기초: 미지수를 cp.Variable로 선언하고, 등식/부등식 제약을
+    파이썬 리스트로 모은 뒤, cp.Problem(cp.Minimize(cost), cons)로 풀어
+    prob.solve() 한 번이면 QP 솔버가 최적해를 채워줍니다.
+
+    이 함수는 receding-horizon 방식입니다: 매 스텝 k마다 H스텝짜리 QP를
+    새로 풀고, 그중 '첫 입력(Uv[:,0])'만 실제로 적용한 뒤 나머지는 버립니다.
+    다음 스텝에서 실제 상태로부터 다시 H스텝 QP를 풉니다 (MPC의 정의).
+    """
     x = np.zeros((nx, T_track)); x[:, 0] = x_ref[:, 0]
     u_hist = np.zeros((2, T_track - 1))
     times = []
 
     for k in range(T_track - 1):
-        H = min(N_mpc, T_track - 1 - k)
-        Uv = cp.Variable((2, H))
-        Zv = cp.Variable((n_psi, H + 1))
+        H = min(N_mpc, T_track - 1 - k)   # 마지막 근처에서는 horizon을 줄여 배열 범위를 안 넘게 함
+
+        # cp.Variable((2, H))  ->  2행(v, omega) x H열(미래 스텝) 크기의 '미지수 행렬'.
+        # 아직 값이 없고, 아래 cp.Problem.solve()가 이 자리를 채웁니다.
+        Uv = cp.Variable((2, H))          # 미래 H스텝의 입력 (구할 값)
+        Zv = cp.Variable((n_psi, H + 1))  # 미래 H+1개 시점의 리프팅 상태 (구할 값, 초기값 포함)
 
         cost = 0
-        cons = [Zv[:, 0] == lifting.phi(x[:, k])]
+        # 제약 리스트: cvxpy에서 '==', '<=', '>=' 로 만든 Constraint 객체들을
+        # 파이썬 list에 그냥 쌓으면 됩니다. 이 전체가 QP의 실행가능영역(feasible set).
+        cons = [Zv[:, 0] == lifting.phi(x[:, k])]   # 초기조건: 현재 실제 상태를 리프팅해서 고정
         for i in range(H):
+            # 동역학 제약이 A_aff @ Zv + B_aff @ Uv 로 Zv, Uv에 대해 '선형'입니다.
+            # 선형 등식 제약 + 아래 박스 제약(선형 부등식) + 이차비용(quad_form)
+            # 조합이 바로 QP(quadratic program)의 정의이고, 이 조합은 항상 볼록입니다.
             cons += [Zv[:, i + 1] == A_aff @ Zv[:, i] + B_aff @ Uv[:, i]]
-            cons += [Uv[:, i] <= u_max, Uv[:, i] >= u_min]
-            cost += cp.quad_form(Zv[:, i] - Phi_ref[:, k + i], Q)
-            cost += cp.quad_form(Uv[:, i], R)
-        cost += cp.quad_form(Zv[:, H] - Phi_ref[:, k + H], Q)
+            cons += [Uv[:, i] <= u_max, Uv[:, i] >= u_min]   # 입력 박스 제약 (선형 부등식)
+            # cp.quad_form(v, Q) == v.T @ Q @ v 를 cvxpy가 이해하는 형태로 만들어주는 함수.
+            # Q가 양의준정부호이면 이 항은 v에 대해 볼록 이차함수가 됩니다.
+            cost += cp.quad_form(Zv[:, i] - Phi_ref[:, k + i], Q)   # 참조궤적과의 편차 페널티
+            cost += cp.quad_form(Uv[:, i], R)                       # 입력 크기 페널티
+        cost += cp.quad_form(Zv[:, H] - Phi_ref[:, k + H], Q)       # 마지막(terminal) 편차도 페널티
 
+        # 비용이 볼록 이차식이고 제약이 전부 선형이므로 이 문제는 볼록 QP입니다.
+        # 즉 지역해 걱정 없이 전역 최적해가 한 번의 solve()로 보장됩니다.
         prob = cp.Problem(cp.Minimize(cost), cons)
         ts = time.time()
-        prob.solve(warm_start=True)
+        prob.solve(warm_start=True)   # warm_start: 솔버 내부적으로 이전 solve의 정보를 재사용해 가속
         times.append(time.time() - ts)
 
+        # 풀리지 않으면(수치 문제 등) Uv.value가 None일 수 있으므로 방어적으로 0 처리
         u = np.zeros(2) if Uv.value is None else np.clip(Uv.value[:, 0], u_min, u_max)
         u_hist[:, k] = u
-        x[:, k + 1] = f_discrete(x[:, k], u, dt=dt)
+        x[:, k + 1] = f_discrete(x[:, k], u, dt=dt)   # 실제 로봇(ground truth)에 첫 입력만 적용
 
     return x, u_hist, np.mean(times)
 
@@ -145,6 +188,35 @@ def run_mpc_bilinear(n_iter=3):
     이렇게 하면 각 반복은 QP가 되지만, 전체는 **비볼록 문제의 국소 해**를
     찾는 것입니다. 초기 추측(u_prev)에 의존한다는 점이 볼록 QP와의
     결정적 차이입니다 — [[Koopman MPC]] 3번.
+
+    ---------------------------------------------------------------------
+    선형화 유도 (테일러 1차 전개):
+    문제의 항은 u_j(z) := u_j * (B_j @ z) 로, u와 z 둘 다에 대해 곱셈이라
+    (u,z) 결합공간에서 '쌍선형(bilinear)'입니다. 두 변수를 함께 바꾸는 항이라
+    QP가 요구하는 선형 제약이 아닙니다. 그래서 이전 iterate (u_prev, z_prev)
+    주변에서 1차 테일러 전개를 합니다:
+
+        f(u, z) = u_j * (B_j z)
+        f(u_prev+du, z_prev+dz) ~= f(u_prev,z_prev)
+                                    + df/du_j * du_j + df/dz * dz   (1차항만)
+                                  = u_prev_j (B_j z_prev)                 <- 상수항
+                                    + du_j (B_j z_prev)                   <- df/du_j = B_j z_prev
+                                    + u_prev_j (B_j dz)                   <- df/dz   = u_prev_j B_j
+
+        du_j = u_j - u_prev_j,  dz = z - z_prev 를 대입해 정리하면:
+
+        u_j (B_j z) ~= u_j (B_j z_prev) + u_prev_j (B_j (z - z_prev))
+
+    즉 아래 코드의
+        Uv[j,i] * (Bj[j] @ z_prev[:,i])              <- u는 미지수(Uv), z는 이전 해(z_prev)로 고정
+        + u_prev[j,i] * (Bj[j] @ (Zv[:,i] - z_prev[:,i]))  <- u는 이전 해(u_prev)로 고정, z는 미지수(Zv)
+    두 항이 정확히 위 식의 두 항입니다. 두 항 모두 Uv 또는 Zv에 대해
+    '선형'이 되도록 다른 쪽을 상수(이전 iterate 값)로 고정한 것이 핵심입니다
+    — 이래야 매 iteration이 다시 QP로 풀립니다.
+
+    ⚠️ n_iter가 부족하거나 초기 추측(u_prev)이 나쁘면 이 선형화 자체가
+       부정확해지고, 국소해가 나쁜 곳으로 수렴할 수 있습니다 (아래 '직접
+       해보기' 1번 참고).
     """
     x = np.zeros((nx, T_track)); x[:, 0] = x_ref[:, 0]
     u_hist = np.zeros((2, T_track - 1))
@@ -153,11 +225,13 @@ def run_mpc_bilinear(n_iter=3):
 
     for k in range(T_track - 1):
         H = min(N_mpc, T_track - 1 - k)
-        u_prev = u_warm[:, :H].copy()
+        u_prev = u_warm[:, :H].copy()   # 이번 스텝 SQP의 초기 추측 (0번째 iter의 선형화 기준점)
         ts = time.time()
 
         for _ in range(n_iter):
-            # 현재 u_prev로 명목 궤적 z_prev 계산
+            # --- 1) 현재 u_prev로 명목(nominal) 궤적 z_prev를 실제로 전개 -----
+            # bilinear 모델식 그대로(비선형 그대로) z_prev를 계산합니다.
+            # 이 z_prev가 다음 QP에서 '선형화 기준점'으로 쓰입니다.
             z_prev = np.zeros((n_psi, H + 1))
             z_prev[:, 0] = lifting.phi(x[:, k])
             for i in range(H):
@@ -165,14 +239,17 @@ def run_mpc_bilinear(n_iter=3):
                 z_prev[:, i + 1] = (A_bil @ z_prev[:, i] + B_bil @ up
                                     + sum(up[j] * (Bj[j] @ z_prev[:, i]) for j in range(2)))
 
+            # --- 2) (u_prev, z_prev) 주변에서 선형화한 QP를 새로 구성 --------
             Uv = cp.Variable((2, H))
             Zv = cp.Variable((n_psi, H + 1))
             cost = 0
             cons = [Zv[:, 0] == lifting.phi(x[:, k])]
             for i in range(H):
-                # 선형화된 동역학
+                # 선형화된 동역학: affine 부분(A_bil, B_bil)은 원래도 선형이라
+                # 그대로 두고, bilinear 항 u_j*(Bj@z)만 테일러 1차항으로 치환합니다.
                 lin = A_bil @ Zv[:, i] + B_bil @ Uv[:, i]
                 for j in range(2):
+                    # 위 유도의 두 항: u_j(B_j z_prev) + u_prev_j*B_j*(z - z_prev)
                     lin = lin + Uv[j, i] * (Bj[j] @ z_prev[:, i]) \
                               + u_prev[j, i] * (Bj[j] @ (Zv[:, i] - z_prev[:, i]))
                 cons += [Zv[:, i + 1] == lin]
@@ -181,21 +258,31 @@ def run_mpc_bilinear(n_iter=3):
                 cost += cp.quad_form(Uv[:, i], R)
             cost += cp.quad_form(Zv[:, H] - Phi_ref[:, k + H], Q)
 
+            # 이 QP 자체는 볼록이지만(모든 항이 이제 선형/이차), 그 해가 원래의
+            # 비볼록 문제의 진짜 최적해라는 보장은 없습니다 — 선형화가 근사이기
+            # 때문입니다. 그래서 n_iter번 반복해 z_prev/u_prev를 갱신하며
+            # 선형화 기준점을 해에 가깝게 좁혀갑니다 (SQP의 아이디어).
             prob = cp.Problem(cp.Minimize(cost), cons)
             try:
                 prob.solve(warm_start=True)
             except Exception:
-                break
+                break   # 솔버 실패 시 이번 반복까지의 u_prev를 그대로 사용
             if Uv.value is None:
                 break
-            u_prev = np.clip(Uv.value, u_min[:, None], u_max[:, None])
+            u_prev = np.clip(Uv.value, u_min[:, None], u_max[:, None])   # 다음 iter의 선형화 기준점 갱신
 
         times.append(time.time() - ts)
-        u = u_prev[:, 0]
+        u = u_prev[:, 0]           # SQP 반복이 끝난 후 첫 스텝 입력만 실제로 적용 (receding horizon)
         u_hist[:, k] = u
         x[:, k + 1] = f_discrete(x[:, k], u, dt=dt)
 
-        u_warm = np.zeros((2, N_mpc))                    # 다음 스텝 warm start
+        # --- warm start: 이번에 구한 해를 한 칸씩 밀어 다음 스텝의 초기 추측으로 --
+        # 이유: MPC의 horizon은 스텝마다 1씩 미끄러지므로(receding horizon),
+        # 이번 스텝의 u_prev[:,1:H] (2번째~H번째 예측입력)는 다음 스텝에서
+        # 여전히 유효한 예측 구간(0번째~H-1번째)에 대응합니다. 처음부터 다시
+        # 0으로 시작하는 것보다 훨씬 좋은 초기 추측이라 SQP 수렴이 빨라지고,
+        # n_iter가 작아도(3회) 그럴듯한 해에 도달할 수 있습니다.
+        u_warm = np.zeros((2, N_mpc))
         u_warm[:, :max(H - 1, 0)] = u_prev[:, 1:H]
 
     return x, u_hist, np.mean(times)
