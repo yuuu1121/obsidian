@@ -273,7 +273,7 @@ $$
 
 ### `n_iter`가 무엇을 반복하는가
 
-bilinear 모델의 제약 $z_{i+1}=Az_i+Bu_i+\sum_j u_{i,j}B_jz_i$ 에는 $u_{i,j}z_i$ 라는 **두 최적화 변수의 곱**이 있어 QP가 아닙니다. 그래서 이전 해 $(u^{\text{prev}}, z^{\text{prev}})$ 주변에서 **1차 테일러 전개**로 펴줍니다.
+bilinear 모델의 제약 $z_{i+1}=Az_i+Bu_i+\sum_j u_{i,j}B_jz_i$ 에는 $u_{i,j}z_i$ 라는 **두 최적화 변수의 곱**이 있어 QP(Quadratic Program)가 아닙니다. 그래서 이전 해 $(u^{\text{prev}}, z^{\text{prev}})$ 주변에서 **1차 테일러 전개**로 펴줍니다.
 
 $$
 u_j(B_jz) \;\approx\; \underbrace{u_j\,(B_jz^{\text{prev}})}_{u\text{만 변수}} \;+\; \underbrace{u_j^{\text{prev}}\,B_j(z-z^{\text{prev}})}_{z\text{만 변수}}
