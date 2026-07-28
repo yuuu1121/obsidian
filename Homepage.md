@@ -10,13 +10,21 @@ banner_x: 0.5
 -  ### **TODO**
 	- [**Daily**](obsidian://advanced-uri?vault=YJU_Obsidian&daily=true)
 	- **IROS**
-		- [ ] 논문 초안 작성 📅2026-03-01 #논문
+		- [x] 논문 초안 작성 📅2026-03-01 #논문
 		- [x] 시뮬레이터 구현 #논문
-		- [ ] Active Marker 제작 #논문
+		- [x] Active Marker 제작 #논문
 		- [x] RTK-GPS 주문 #논문
-		- [ ] Active Marker 아크릴 가공 주문 #논문
+		- [x] Active Marker 아크릴 가공 주문 #논문
 		- [x] Active Marker 전선 주문 #논문
-		- [ ] Active Marker PCB JLCPCB Assembly 주문 #논문 
+		- [x] Active Marker PCB JLCPCB Assembly 주문 #논문 
+		- [x] Active Marker 수조 Jig 설계 #논문 
+		- [x] Active Marker Blueboat Jig 설계 #논문 
+		- [x] 테더선 수리 #논문 
+		- [x] PKRC PCB 납땜 및 전장 조립 #논문 
+		- [x] PKRC UKF-M 동작 테스트 #논문 
+		- [x] PKRC-Blueboat Path Planning 동작 테스트 #논문 
+		- [x] USBL 마운트 설계 #논문 
+		- [x] Acoustic Modem 동작 테스트 #논문 
 		```dataviewjs
 		const tasks = dv.pages('"Daily Notes"').file.tasks.where(t => t.text.includes("#논문") && !t.completed)
 		if (tasks.length > 0) dv.taskList(tasks, false)

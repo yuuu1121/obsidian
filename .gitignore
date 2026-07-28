@@ -1,5 +1,12 @@
-.DS_Store 
+.DS_Store
 .obsidian
 .obsidian/workspace-mobile.json
 3_Archive/31_Attachments/310_Videos/
 3_Archive/4_Zotero/DB/
+
+# OMC / Claude Code operational artifacts (not part of the vault)
+.omc/
+.claude/settings.local.json
+
+# stray git internals
+.git/index.lock.stale-backup-*
