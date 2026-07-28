@@ -48,7 +48,7 @@ dg-publish: false
 | **§II-C** | 입력이 있는 시스템 (실용적 근사 3가지) | [[Koopman with Control Input]] |
 | **§III** | 로보틱스 파이프라인 — 데이터 수집 → 리프팅 설계 → 다운스트림 | [[Observable Function]], [[Koopman MPC]] |
 | **§IV** | 플랫폼별 구현 사례 (manipulator ~ multiagent) | — |
-| **§V** | 심화 이론 — 연속시간, KCF, 딕셔너리 구성 | [[Koopman with Control Input]], [[Consistency Index]] |
+| **§V** ⭐ | **심화 이론 — 이 논문의 이론적 본체**<br>§V-A 연속시간 generator / §V-B KCF·input-state separable / §V-C 딕셔너리 품질 | [[Koopman Operator]], [[Koopman with Control Input]], [[Consistency Index]], [[Koopman-Invariant Subspace]] |
 | **§VI** | 열린 문제 8가지 | — |
 
 ---
@@ -273,7 +273,7 @@ $$
 
 ---
 
-## 4. 입력이 있는 시스템 (§II-C, §V-B)
+## 4. 입력이 있는 시스템 — 실용적 근사 (§II-C)
 
 > 📎 상세: [[Koopman with Control Input]]
 
@@ -295,47 +295,13 @@ $$
 
 **②가 지배적**이다. 결과가 완전한 선형 상태공간 모델이므로 고전 제어 도구를 문자 그대로 쓸 수 있기 때문이다. 논문은 이것이 [36]의 **input-state separable model의 특수 사례**임을 짚어, 임시방편이 아니라 이론적 배경이 있음을 명확히 한다.
 
-### 이론적으로 엄밀한 두 프레임 (§V-B)
+### 이 근사들의 이론적 근거는?
 
-**(A) 무한 입력 시퀀스** [105] — 입력 시퀀스를 상태에 포함시키고 **좌시프트 연산자** $S$ 를 그 동역학으로 삼아 **제어 시스템을 자율 시스템으로 변환**한다.
+위 3종은 **왜 그렇게 해도 되는지**에 대한 근거가 여기까지는 없다. 논문은 그것을 §V-B로 미루며, 거기서 두 가지 엄밀한 프레임(**무한 입력 시퀀스** [105], **Koopman Control Family** [36])을 제시한다.
 
-$$
-\chi^+ = (T_u(x,u_s(0)),\ Su_s) =: L(\chi) \tag{22}
-$$
-$$
-\mathcal{K}_Lf = f\circ L \tag{23}
-$$
+특히 KCF의 **input-state separable form** $\psi(x^+)=A(u)\psi(x)$ 이 위 ②를 포함한 실무 모델 전부를 특수 사례로 포섭한다는 것이 이 논문의 이론적 하이라이트다.
 
-무한차원 의존 때문에 실용적으론 **linear predictor** 근사를 쓴다.
-
-$$
-z^+ \approx Az + Bu \tag{24}
-$$
-
-> [!warning] 논문의 명시적 경고
-> 이 모델은 무한 입력 시퀀스를 고려하지 않으므로 $\mathcal{K}_L$ 의 정보를 다 담지 못한다. **리프팅 차원을 무한대로 보내도 궤적 수렴을 일반적으로 결론지을 수 없다.**
-
-**(B) Koopman Control Family (KCF)** [36] — 입력을 상수로 고정한 시스템 족으로 표현한다.
-
-$$
-x^+ = T_{\hat u}(x) := T_u(x, u\equiv\hat u) \tag{25}
-$$
-$$
-x_{m+1} = T_{u_m}\circ T_{u_{m-1}}\circ\cdots\circ T_{u_0}(x_0) \tag{26}
-$$
-
-공통 불변 부분공간 위에서 모델은 반드시 **input-state separable form**을 갖는다 ([36, Th. 4.3]).
-
-$$
-\boxed{\ \psi(x^+) = A(u)\,\psi(x)\ }
-$$
-
-> [!success] 통합적 관점 — 이 논문의 이론적 하이라이트
-> **리프팅 선형·쌍선형·선형 스위칭 모델이 전부 이 형태의 특수 사례**다 ([36, Lemmas 4.4–4.5]). 즉 실무에서 쓰이는 모델들이 서로 무관한 heuristic이 아니라, **KCF 연산자들의 서로 다른 유한차원 근사**로 통합 이해된다.
->
-> **리프팅 상태에 선형, 입력에 비선형** — 개루프 입력이 동역학을 따르지 않기에 입력의 비선형성만은 선형 연산자로 흡수할 수 없다.
-
-두 프레임은 적절한 조건에서 **동등함이 증명되어 있다** [162]. 용도만 갈린다 — 일반 이론 분석은 (A), 유한차원·MPC·궤적 학습은 (B).
+> 📎 **→ 아래 [7-B. 제어 입력의 엄밀한 처리](#7-b-제어-입력의-엄밀한-처리-v-b)에서 (21)~(26)식과 함께 상세히 다룬다.** 상세 노트: [[Koopman with Control Input]]
 
 ---
 
@@ -582,13 +548,222 @@ $$
 
 ---
 
-## 7. 심화 이론 — 딕셔너리 구성 (§V-C)
+## 7. 심화 이론 (§V) — 이 논문의 이론적 본체
+
+> [!abstract] §V가 존재하는 이유
+> §II는 "실무에서 이렇게들 한다"를 소개했고, §III는 그것을 로봇에 적용했다. 그런데 §III-B 말미에서 저자들은 **자기비판**을 한다 — *"대부분의 방법은 엄밀한 수렴 분석이 없다. 구성된 observable들이 실제로 Koopman-불변 부분공간을 span 하는지 검토하지 않는다."*
+>
+> **§V는 그 빚을 갚는 절이다.** 앞에서 실용적 편의로 넘어간 세 지점을 각각 정면으로 다룬다.
+>
+> | 절 | 앞에서 넘어간 것 | §V의 답 |
+> |:---|:---|:---|
+> | **§V-A** | 이산시간만 다뤘다 | 연속시간 정식화, **Koopman generator** |
+> | **§V-B** | 입력 처리를 heuristic 3종으로 소개 | 엄밀한 두 프레임 — **무한 입력 시퀀스**와 **KCF** |
+> | **§V-C** | "딕셔너리는 잘 고르세요" | 품질을 재는 **basis-independent 지표**와 대수적 탐색 |
+
+---
+
+### 7-A. 연속시간 정식화 (§V-A)
+
+> 📎 상세: [[Koopman Operator]] 8번
+
+실제 로봇 동역학은 미분방정식으로 주어지는 경우가 많다. 데이터는 샘플링되므로 실무에선 이산시간을 쓰지만, **이론적 토대는 연속시간에서 세워야** 안정성·불변량 같은 성질을 논할 수 있다.
+
+**시스템과 flow map**
+
+$$
+\dot{x} = G(x), \qquad x\in\mathcal{X}\subseteq\mathbb{R}^{N_x} \tag{17}
+$$
+
+$G$ 는 연속미분가능하다고 가정한다. 시간 $t\ge0$ 에 대한 **flow map** $G^t : \mathcal{X}\to\mathcal{X}$ 는
+
+$$
+G^t(x(0)) := x(0) + \int_{\tau=0}^{t} G(x(\tau))\,d\tau \tag{18}
+$$
+
+즉 **"$t$ 시간 동안 흘려보내는 연산"** 이다. 모든 $t\ge0$ 에서 잘 정의된다고 가정한다(complete flow).
+
+> [!note] 왜 flow map을 먼저 정의하는가
+> 이산시간의 $T$ 에 해당하는 것이 연속시간에는 **하나가 아니라 $t$ 마다 하나씩** 있다. $G^{0.1}$, $G^{0.2}$, … 각각이 별개의 사상이다. 그래서 Koopman 연산자도 **하나가 아니라 족(family)** 이 된다.
+
+**연산자 족**
+
+각 $t\ge0$ 마다 (2)식과 같은 방식으로 정의한다.
+
+$$
+\mathcal{K}^t f = f\circ G^t, \qquad \forall f\in\mathcal{F} \tag{19}
+$$
+
+**반군 구조**
+
+$\mathcal{F}$ 가 Banach 공간이고 $\{\mathcal{K}^t\}_{t\ge0}$ 가 **강연속 반군(strongly continuous semigroup)** 이면 — 즉
+
+1. $\mathcal{K}^0 = \mathrm{id}$ (0초 흘리면 제자리)
+2. $\mathcal{K}^{t_1+t_2} = \mathcal{K}^{t_1}\mathcal{K}^{t_2}$ (이어 흘리기 = 합쳐 흘리기)
+3. $\lim_{t\to0}\|\mathcal{K}^tf - f\| = 0$ (시간이 0으로 가면 연속적으로 항등에 접근)
+
+를 만족하면 — **무한소 생성자(infinitesimal generator)** 를 정의할 수 있다.
+
+$$
+\boxed{\ \mathcal{L}_G f := \lim_{t\to0}\frac{\mathcal{K}^tf - f}{t} = G\cdot\nabla f\ } \tag{20}
+$$
+
+$\cdot$ 은 내적, $\nabla$ 는 그래디언트다. $\mathcal{L}_G$ 를 **Koopman generator** 라 한다.
+
+> [!important] (20)식의 정체는 연쇄법칙이다
+> 겁먹을 필요 없다. 궤적을 따라 $f$ 가 어떻게 변하는지 미분해보면
+> $$\frac{d}{dt}f(x(t)) = \nabla f\cdot\dot{x} = \nabla f\cdot G(x)$$
+> — **연쇄법칙 그 자체**다.
+>
+> | | 이산시간 | 연속시간 |
+> |:---|:---|:---|
+> | 대상 | $\mathcal{K}$ (연산자 하나) | $\{\mathcal{K}^t\}$ (연산자 족) + $\mathcal{L}_G$ (생성자) |
+> | 하는 일 | **한 스텝 밀기** | **궤적을 따른 방향 미분** (Lie derivative) |
+> | 관계 | $\mathcal{K} = \mathcal{K}^{\Delta t}$ | $\mathcal{K}^t = e^{t\mathcal{L}_G}$ |
+>
+> 생성자 $\mathcal{L}_G$ 하나가 연산자 족 전체를 결정한다 — 행렬지수 $e^{At}$ 가 $A$ 하나로 결정되는 것과 같은 구조다.
+
+> [!note] 논문의 각주가 짚는 엄밀성
+> 강연속 반군이 되려면 $G$ 와 $\mathcal{F}$ 를 적절히 골라야 하며(각주 5, [160, Ch. 1]), generator의 정의도 $\mathcal{F}$ 의 **조밀한 부분집합**에서만 성립하도록 완화할 수 있다(각주 6). 즉 (20)식은 $\mathcal{F}$ 전체에서 무조건 성립하는 것이 아니다.
+
+---
+
+### 7-B. 제어 입력의 엄밀한 처리 (§V-B)
+
+> 📎 상세: [[Koopman with Control Input]]
+
+§II-C에서 소개한 실용적 근사 3종(joint lifting / input-affine / control-coherent)은 **왜 그렇게 해도 되는지**에 대한 근거가 없었다. §V-B는 그 근거를 두 갈래로 제시한다.
+
+**출발점 — 근본적 난점**
+
+$$
+x_{t+1} = T_u(x_t, u_t), \qquad x\in\mathcal{X}\subseteq\mathbb{R}^{N_x},\ u\in\mathcal{U}\subseteq\mathbb{R}^{N_u} \tag{21}
+$$
+
+> [!warning] 상태와 입력의 비대칭 — §V-B 전체를 지배하는 문제
+> - **상태**: 시스템의 **내재적 속성**. 내부 동역학에 따라 진화 → Koopman이 다룰 수 있다
+> - **입력**: 특히 개루프에서는 **사전에 알 수 없고**, 진화에 큰 영향을 주며, **정해진 동역학 규칙을 따르지 않는다**
+>
+> Koopman 연산자는 "동역학의 선형 표현"인데, 입력은 애초에 동역학을 갖지 않는다. 그러니 그 틀에 자연스럽게 들어가지 않는다.
+
+#### ① 무한 입력 시퀀스 프레임 [105]
+
+**발상**: 입력이 동역학을 안 따른다면, **입력 시퀀스 자체를 상태에 넣어** 동역학을 부여하자.
+
+$\ell(\mathcal{U})$ 를 모든 무한 입력 시퀀스 $\{u_s(i)\}_{i=0}^\infty$ 의 공간, $S:\ell(\mathcal{U})\to\ell(\mathcal{U})$ 를 **좌시프트 연산자**라 하자.
+
+$$
+S:\ \{u_s(0), u_s(1), u_s(2), \dots\}\ \longmapsto\ \{u_s(1), u_s(2), u_s(3), \dots\}
+$$
+
+확장 상태 $\chi := (x, u_s)\in\mathcal{X}\times\ell(\mathcal{U})$ 에 대해
+
+$$
+\chi^+ = (x, u_s)^+ = \big(T_u(x, u_s(0)),\ Su_s\big) =: L(\chi) \tag{22}
+$$
+
+> [!success] 트릭의 핵심 — 제어계가 자율계로 바뀐다
+> (22)를 보면 **입력이 사라졌다.** $L$ 은 $\chi$ 만의 함수다. 매 스텝 "시퀀스의 첫 원소를 꺼내 쓰고, 시퀀스를 한 칸 민다"는 규칙이 곧 입력의 동역학이 된 것이다.
+>
+> 자율 시스템이 되었으니 (2)식의 표준 Koopman 정의를 **그대로** 쓸 수 있다.
+> $$\mathcal{K}_L f = f\circ L, \qquad \forall f\in\mathcal{H} \tag{23}$$
+> $\mathcal{H}$ 는 정의역이 $\mathcal{X}\times\ell(\mathcal{U})$, 공역이 $\mathbb{C}$ 이며 $L$ 과의 합성에 닫힌 함수공간이다.
+
+**대가**: 무한 입력 시퀀스에 의존하므로 (23)을 직접 다루기는 (2)보다 **훨씬 어렵다**. 유한 입력 시퀀스만 가지고 일반적인 유한차원 모델을 찾는 직접적 방법이 없다.
+
+그래서 [105]는 MPC를 목표로 삼는다 — MPC는 **단기 예측만 정확하면 되므로** 리프팅 선형 모델(**linear predictor**)로 근사한다.
+
+$$
+z^+ \approx Az + Bu, \qquad z_0 = \psi(x_0) \tag{24}
+$$
+
+$A, B$ 는 EDMD류로 추정한다.
+
+> [!danger] 논문이 명시하는 한계 — 놓치기 쉬운 지점
+> (24)는 무한 입력 시퀀스를 고려하지 않으므로 $\mathcal{K}_L$ 의 정보를 일반적으로 **다 담지 못한다**. 더 강한 진술이 이어진다.
+>
+> **"리프팅 상태의 차원을 무한대로 보내도, 리프팅 선형 모델의 궤적이 비선형 시스템의 궤적으로 수렴한다고 일반적으로 결론지을 수 없다."** ([105, Corollary 1 이후 논의])
+>
+> 즉 §II-B에서 본 자율계의 수렴 정리 [30]가 **입력이 있는 경우로 그대로 확장되지 않는다.** 흔한 오해를 저자들이 직접 차단하는 대목이다.
+
+#### ② Koopman Control Family (KCF) [36]
+
+**발상**: 무한 시퀀스를 피하고, **입력을 상수로 고정한 시스템들의 족**으로 표현하자.
+
+$$
+x^+ = T_{\hat u}(x) := T_u(x,\ u\equiv\hat u), \qquad \hat u\in\mathcal{U} \tag{25}
+$$
+
+각 $\hat u$ 마다 (1)식 형태의 **자율 시스템**이 하나씩 생긴다. 임의의 입력 시퀀스로 만든 궤적은 이들의 **합성**으로 정확히 표현된다.
+
+$$
+x_{m+1} = T_{u_m}\circ T_{u_{m-1}}\circ\cdots\circ T_{u_0}(x_0) \tag{26}
+$$
+
+각 부분시스템에 (2)식을 적용해 **Koopman Control Family** $\{\mathcal{K}_{\hat u}\}_{\hat u\in\mathcal{U}}$ 를 정의한다.
+
+$$
+\mathcal{K}_{\hat u}\,g = g\circ T_{\hat u}, \qquad \forall g\in\mathcal{F}
+$$
+
+그러면 궤적을 따른 관측값 진화가 **연산자들의 곱**이 된다.
+
+$$
+g(x_{m+1}) = \big[\mathcal{K}_{u_0}\mathcal{K}_{u_1}\cdots\mathcal{K}_{u_m}\,g\big](x_0), \qquad \forall g\in\mathcal{F}
+$$
+
+> [!note] 두 프레임의 차이를 한 줄로
+> - **[105]**: 연산자는 **하나**($\mathcal{K}_L$), 대신 상태공간이 무한차원($\mathcal{X}\times\ell(\mathcal{U})$)
+> - **[36]**: 상태공간은 그대로($\mathcal{X}$), 대신 연산자가 **여러 개**($\hat u$ 마다 하나)
+>
+> 무한을 어디로 밀어냈는지가 다를 뿐, 같은 어려움을 다르게 나눠 진 것이다.
+
+**Input-State Separable Model — §V-B의 결론**
+
+KCF의 **공통 불변 부분공간(common invariant subspace)** 위에서 모델은 반드시 다음 형태를 갖는다 ([36, Th. 4.3]).
+
+$$
+\boxed{\ \psi(x^+) = \psi\circ T(x,u) = A(u)\,\psi(x)\ }
+$$
+
+$\psi:\mathcal{X}\to\mathbb{C}^{N_\psi}$ 는 리프팅 함수, $A:\mathcal{U}\to\mathbb{C}^{N_\psi\times N_\psi}$ 는 **행렬값 함수**다.
+
+> [!important] 이 형태가 말하는 것 — 리프팅 상태에 선형, 입력에 비선형
+> **왜 입력에는 비선형이어야 하는가?** 개루프에서 입력은 정해진 동역학을 따르지 않으므로, **Koopman 연산자의 구조로 입력의 비선형성을 선형 연산자로 표현할 방법이 없다.** 위 "상태와 입력의 비대칭"이 여기서 수식으로 회수된다.
+>
+> 즉 실무에서 쓰는 $Kz+Bu$ 는 편의가 아니라 **$A(u)$ 를 $u$ 의 1차 다항식으로 제한한 근사**이며, 그 제한이 언제 타당한지를 이 형태가 알려준다.
+
+> [!success] 통합 관점 — 이 논문의 이론적 하이라이트
+> 널리 쓰이는 모델들이 **전부 이 형태의 특수 사례**다 ([36, Lemmas 4.4–4.5]).
+>
+> | 모델 | $A(u)$ |
+> |:---|:---|
+> | **Lifted linear** | $A(u)\psi = K\psi + Bu$ — 상수 + 아핀 항 |
+> | **Bilinear** | $A(u) = K + \sum_{j=1}^{N_u}u_jB_j$ |
+> | **Linear switched** [161] | $A(u) = A_{\sigma(u)}$, 유한 개 모드 |
+>
+> 서로 무관한 heuristic처럼 보이던 것들이 **KCF 연산자들의 서로 다른 유한차원 근사**로 통합된다. 이것이 §II-C의 실용적 선택들에 사후적 정당성을 부여하는 대목이다.
+>
+> 적절한 공통 불변 부분공간이 없으면, KCF의 작용을 임의 부분공간 위로 **직교 사영**해 근사한다. 이론 분석·학습법·정확도 bound는 [36] 참고.
+
+**두 프레임은 동등하다**
+
+적절한 함수공간 조건 하에서 [105]와 [36]이 **동등함이 증명되어 있다** [162]. 다만 정보를 다루는 방식이 근본적으로 다르므로 용도가 갈린다.
+
+| 상황 | 적합한 프레임 | 이유 |
+|:---|:---|:---|
+| 모든 가능한 입력 하의 일반 이론 분석, 불변량, **도달불가능 집합**, 스펙트럼 성질 | **무한 입력 시퀀스** [105] | **단일 연산자**라서 분석 도구를 쓰기 쉽다 |
+| 유한차원 표현, 유한시간 궤적, **MPC 유한구간 예측**, 궤적 데이터 기반 학습 | **KCF** [36] | 무한 시퀀스 불필요 + **input-state separable form** 사용 가능 |
+
+---
+
+### 7-C. 딕셔너리 구성 (§V-C)
 
 > 📎 상세: [[Consistency Index]], [[Koopman-Invariant Subspace]]
 
-이 절이 §III-B의 자기비판("수렴 보장이 없다")에 대한 논문의 답이다.
+§III-B의 자기비판("수렴 보장이 없다")에 대한 논문의 직접적인 답이다.
 
-### 최적화 기반 방법의 함정
+#### 최적화 기반 방법의 함정
 
 $$
 \underset{\psi}{\text{minimize}}\ \ \big\|\Psi(Y)-\Psi(Y)\Psi(X)^\dagger\Psi(X)\big\|_F \tag{27}
@@ -605,7 +780,7 @@ $$
 >
 > **→ residual은 부분공간의 품질이 아니라 기저 선택의 artifact를 반영한다.** (27)로 학습한 모델은 **장기 예측에 부적합**할 수 있다.
 
-### Consistency Index — basis-independent 해법 [163]
+#### Consistency Index — basis-independent 해법 [163]
 
 $$
 K_F = \Psi(Y)\Psi(X)^\dagger, \qquad K_B = \Psi(X)\Psi(Y)^\dagger \tag{29}
@@ -638,7 +813,7 @@ $$
 **Fig. 4 실험**: 감쇠 진자 $[\dot\theta,\ddot\theta]=[\dot\theta,\ -9.81\sin\theta-0.1\dot\theta]$, 딕셔너리 $[\theta,\dot\theta,\mathrm{NN}_1,\mathrm{NN}_2,\mathrm{NN}_3]$.
 → **consistency index 최소화가 residual 최소화보다 장기 예측에서 명확히 우월.** 이유: 전자는 함수공간의 **비가산적으로 많은** 원소를 고려하고, 후자는 **유한 개**만 본다.
 
-### 대수적 탐색 — SSD / T-SSD
+#### 대수적 탐색 — SSD / T-SSD
 
 **불변성의 데이터 표현**: $\psi^\top = \psi_s^\top C$ 로 두면
 
@@ -661,15 +836,18 @@ $$
 > [!warning] 이 절의 실무적 한계 — 논문이 스스로 밝힌 것
 > 최적화 기반 딕셔너리 선택은 우수하지만 **큰 데이터셋이 필요하고 일반적으로 오프라인 사전계산에만 적용 가능**하다. §I의 "runtime learning / small data"와 긴장 관계다.
 
-### 연속시간 확장 (§V-A)
+---
 
-$\dot x = G(x)$, flow map $G^t$, 연산자족 $\mathcal{K}^tf = f\circ G^t$ (19). 강연속 반군 조건 하에 **Koopman generator**:
-
-$$
-\mathcal{L}_Gf := \lim_{t\to0}\frac{\mathcal{K}^tf-f}{t} = G\cdot\nabla f \tag{20}
-$$
-
-본질은 **연쇄법칙**이다 — 궤적을 따른 방향 미분(Lie derivative). 📎 [[Koopman Operator]] §6
+> [!abstract] §V 총평 — 이 절이 논문에서 갖는 위치
+> §V는 §II·§III가 실용적 편의로 넘어간 세 지점에 **사후적 정당성 또는 명시적 한계**를 부여한다.
+>
+> | | 앞에서 한 일 | §V의 판정 |
+> |:---|:---|:---|
+> | **연속시간** (7-A) | 다루지 않음 | generator로 정식화. 이산시간은 $\mathcal{K}=\mathcal{K}^{\Delta t}$ 인 특수 사례 |
+> | **입력 처리** (7-B) | heuristic 3종 | input-state separable form이 **전부를 포섭** ✅ / 단 리프팅 차원→∞ 라도 **수렴 보장 없음** ⚠️ |
+> | **딕셔너리** (7-C) | "잘 고르세요" | residual은 **틀린 지표** ⚠️ / consistency index와 T-SSD가 대안 ✅ |
+>
+> **읽는 순서 제안**: 실무자는 §II·§III만으로 구현할 수 있지만, **왜 그게 되는지 / 언제 깨지는지**를 알려면 §V가 필수다. 특히 7-B의 "수렴 보장 없음"과 7-C의 Fig. 3 반례는 **실제로 물리는 함정**이다.
 
 ---
 
