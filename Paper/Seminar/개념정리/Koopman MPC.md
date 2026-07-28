@@ -53,7 +53,7 @@ $$
 
 ## 2. 선형 실현이면 볼록 QP가 됩니다
 
-$F_K$ 를 **선형**으로 고르면([[Koopman with Control Input|input-affine 형태]] $z^+ = Kz + Bu$), 1번의 (12)식은 다음과 같은 **이차계획법(QP)** 으로 정리됩니다.
+$F_K$ 를 **선형**으로 고르면([[Koopman with Control Input|input-affine 형태]] $z^+ = Kz + Bu$ — 여기서 "아핀"의 정확한 의미는 [[Affine]] 참고), 1번의 (12)식은 다음과 같은 **이차계획법(QP)** 으로 정리됩니다.
 
 $$
 \begin{aligned}

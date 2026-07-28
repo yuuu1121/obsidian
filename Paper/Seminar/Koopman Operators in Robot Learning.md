@@ -289,7 +289,7 @@ $$
 | 방식 | 형태 | 장점 | 단점 |
 |:---|:---|:---|:---|
 | **① Joint lifting** | $g(x,u)$ 결합 공간 | 직관적·간단 | **미래 입력 가정**, 임의 입력에 일반화 실패 |
-| **② Input-affine** ⭐ | $g(x_{t+1})\approx Kg(x_t)+Bu_t$ | **선형 구조 보존** → LQR/MPC 직결 | 아핀성은 근사일 뿐 |
+| **② Input-affine** ⭐ | $g(x_{t+1})\approx Kg(x_t)+Bu_t$ | **선형 구조 보존** → LQR/MPC 직결 ([[Affine]]) | 아핀성은 근사일 뿐 |
 | **③ Control-coherent** [37] | 입력 변화에도 일관된 임베딩 | 새 제어 시퀀스로 **일반화 우수** | 최신 기법, 비용 |
 
 **②가 지배적**이다. 결과가 완전한 선형 상태공간 모델이므로 고전 제어 도구를 문자 그대로 쓸 수 있기 때문이다. 논문은 이것이 [36]의 **input-state separable model의 특수 사례**임을 짚어, 임시방편이 아니라 이론적 배경이 있음을 명확히 한다.
@@ -665,6 +665,10 @@ $$
 > **제어**
 > - [[Koopman with Control Input]] — 실용 근사 3가지 + KCF 이론, input-state separable form
 > - [[Koopman MPC]] — 볼록 QP화, Fisher 정보 능동학습, robustness
+>
+> **수학 기초** (Koopman 맥락과 독립적으로도 유용)
+> - [[Pseudo-inverse]] — $\dagger$ 가 무엇인가, 최소자승·직교사영·수치 안정성
+> - [[Affine]] — 선형과 아핀의 차이, "차원을 올려 선형화"라는 발상, input-/control-affine 구분
 
 ---
 
