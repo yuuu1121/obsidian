@@ -96,7 +96,9 @@ $$
 \boxed{\ K_{\text{EDMD}} = \Psi(Y)\,\Psi(X)^{\dagger}\ } \tag{7}
 $$
 
-여기서 $\dagger$ 는 **의사역행렬(pseudo-inverse)** 입니다.
+여기서 $\dagger$ 는 **의사역행렬(pseudo-inverse)** 입니다. → 📎 [[Pseudo-inverse]]
+
+$\Psi(X)$ 는 $N_\Psi\times M$ 로 **정사각이 아니라서** 역행렬 자체가 정의되지 않고, 데이터가 딕셔너리보다 많아($M \gg N_\Psi$) **모든 식을 정확히 만족하는 $K$ 도 없습니다.** 그럴 때 "오차를 최소화하는 답"을 주는 것이 $\dagger$ 입니다.
 
 > [!success] 이것이 EDMD의 가장 큰 장점
 > **딥러닝처럼 반복 학습이 필요 없고 한 번의 행렬 연산으로 구해집니다.** SVD 한 번이면 끝입니다.
@@ -288,7 +290,7 @@ $$
 
 | 항목 | 주의점 |
 |:---|:---|
-| **수치 안정성** | $\Psi(X)$ 가 ill-conditioned면 pseudoinverse가 폭발합니다. **SVD 절단**(작은 특이값 버리기) 또는 Tikhonov 정규화 $K = \Psi(Y)\Psi(X)^\top(\Psi(X)\Psi(X)^\top + \gamma I)^{-1}$ 사용 |
+| **수치 안정성** | $\Psi(X)$ 가 ill-conditioned면 pseudoinverse가 폭발합니다. **SVD 절단**(작은 특이값 버리기) 또는 Tikhonov 정규화 $K = \Psi(Y)\Psi(X)^\top(\Psi(X)\Psi(X)^\top + \gamma I)^{-1}$ 사용 → 상세: [[Pseudo-inverse]] §5 |
 | **데이터 개수** | $M \ge N_\Psi$ 는 필수, 실제로는 $M \gg N_\Psi$ 권장 |
 | **스케일링** | 딕셔너리 성분들의 크기가 크게 다르면 최소자승이 큰 성분에 편향됩니다. 정규화 필수 |
 | **행/열 규약** | 문헌마다 $\Psi$ 를 $N_\Psi\times M$ 로 쓸지 $M\times N_\Psi$ 로 쓸지 다릅니다. 논문 본문은 $N_\Psi\times M$ |
@@ -320,6 +322,7 @@ for t in range(horizon):
 | 주제 | 어디로 |
 |:---|:---|
 | **(a)** 의사역행렬이 왜 최소자승 해인가 | ↑ 4번의 접힌 섹션 (정규방정식 유도) |
+| 의사역행렬 자체가 뭔지 (기초부터) | [[Pseudo-inverse]] — 정의·SVD·수치 안정성 |
 | **(b)** 투영 연산자의 기하학적 의미 | ↑ 6번의 접힌 섹션 (평면과 그림자 그림) |
 | **(c)** 불변 부분공간을 실제로 어떻게 찾는가 | [[Koopman-Invariant Subspace]] (SSD/T-SSD), [[Consistency Index]] |
 | 딕셔너리 설계를 아예 우회하는 법 | [[HVOK]] (시간지연 임베딩) |
@@ -329,6 +332,7 @@ for t in range(horizon):
 
 ## Related Notes
 > [!tip] 관련 노트
+> - [[Pseudo-inverse]] — (7)식의 $\dagger$ 가 무엇인가 (선형대수 기초)
 > - [[Koopman Operator]] — 왜 $K$ 를 구하려 하는가 (상위 개념)
 > - [[Observable Function]] — $\Psi$ 를 어떻게 고르는가 (7번의 답)
 > - [[Koopman-Invariant Subspace]] — EDMD가 정확해지는 조건

@@ -153,53 +153,109 @@ $z_t := \psi(x_t)$ 로 두면 $z_{t+1} = Kz_t$ — **완전한 선형 상태방�
 
 ### EDMD — 이 논문의 계산적 심장
 
+> [!abstract] 한 문장 요약
+> EDMD는 **"상태를 딕셔너리로 들어올린 뒤 → 그 공간에서 선형 관계를 최소자승($K = \Psi(Y)\Psi(X)^\dagger$)으로 한 번에 푸는 것"** 이며, 정확도의 열쇠는 **딕셔너리 크기가 아니라 선택한 부분공간이 Koopman-불변에 얼마나 가까운가**입니다.
+
+아래 1~8번을 순서대로 읽으면 EDMD가 왜 그렇게 생겼는지가 쌓입니다.
+
+#### 1. 데이터 행렬 구성
+
+먼저 시스템 $x_{t+1} = T(x_t)$ 에서 데이터를 모읍니다.
+
+$$
+X = [\,x_1, x_2, \ldots, x_M\,], \qquad Y = [\,y_1, y_2, \ldots, y_M\,]
+$$
+
+여기서 $y_i = T(x_i)$ 입니다. 즉 **$X$ 는 "현재 상태들", $Y$ 는 그 "한 스텝 뒤 상태들"** 입니다. 실제로는 하나의 궤적을 시간축으로 밀어서 $Y = [x_2, \ldots, x_{M+1}]$ 처럼 쓸 수도 있습니다.
+
+#### 2. 리프팅 (Lifting)
+
+핵심 아이디어는 상태 $x$ 를 그대로 쓰지 않고, **관측함수(딕셔너리) $\Psi$ 로 더 높은 차원으로 "들어올리는"** 것입니다. 예를 들어 $\Psi(x) = [x,\ x^2,\ \sin(x), \ldots]$ 같은 형태입니다.
+
+$$
+\Psi(X) = [\,\Psi(x_1),\ \Psi(x_2),\ \ldots,\ \Psi(x_M)\,]
+$$
+
+즉 각 데이터 포인트마다 딕셔너리를 적용한 결과를 **열로 쌓은 행렬**입니다. (세로 = 리프팅 차원 $N_\Psi$, 가로 = 데이터 개수 $M$. 보통 $M \gg N_\Psi$)
+
+#### 3. 최소자승 문제 (식 6)
+
+우리가 원하는 것은 리프팅된 공간에서 선형 관계 $\Psi(x_{t+1}) \approx K\Psi(x_t)$ 를 만족하는 $K$ 를 찾는 것입니다. 이를 오차 최소화 문제로 표현합니다.
+
 $$
 \underset{K}{\text{minimize}}\ \ \big\|\Psi(Y) - K\Psi(X)\big\|_F \tag{6}
 $$
+
+$\|\cdot\|_F$ 는 **Frobenius 노름**(행렬 원소들의 제곱합의 제곱근)입니다. 쉽게 말해 **"$K\Psi(X)$ 가 $\Psi(Y)$ 에 최대한 가깝도록"** 하는 $K$ 를 찾는 것입니다.
+
+#### 4. 닫힌 형태 해 (식 7)
+
+이 선형 최소자승 문제는 **명시적인 해**를 가집니다.
 
 $$
 \boxed{\ K_{\mathrm{EDMD}} = \Psi(Y)\Psi(X)^{\dagger}\ } \tag{7}
 $$
 
+여기서 $\dagger$ 는 **의사역행렬(pseudo-inverse)** 입니다 → 📎 [[Pseudo-inverse]]
+
 > [!success] 왜 이 한 줄이 로보틱스에서 중요한가
-> **닫힌 형태 해(closed-form)** 다. 반복 최적화가 없다. SVD 한 번이면 끝.
+> **딥러닝처럼 반복 학습이 필요 없고 한 번의 행렬 연산으로 구해집니다.** SVD 한 번이면 끝.
 > - 논문 [68] 보고: 학습 단계가 경쟁 데이터 기반 방법 대비 **수 자릿수(orders of magnitude) 빠름**
 > - [17]의 online DMD 변형: 시변 시스템에 대해 **실시간 연산자 갱신** 가능
 > - → 이것이 §I의 "runtime learning" 주장을 실제로 뒷받침하는 계산적 근거다
 
-### 예측자와 고유함수
+#### 5. 예측자(predictor) (식 8, 9)
 
-$f = v_f^\top\psi \in \mathrm{span}(\psi)$ 에 대해
-
-$$
-\mathcal{P}^{\mathrm{EDMD}}_{\mathcal{K}f} := v_f^\top K_{\mathrm{EDMD}}\psi \tag{8}
-$$
-
-$v$ 가 **좌고유벡터** ($v^\top K_{\mathrm{EDMD}} = \lambda v^\top$) 이면 근사 [[Koopman Eigenfunction|Koopman 고유함수]]가 나온다.
+딕셔너리 스팬 안의 함수 $f(\cdot) = v_f^\top\Psi(\cdot)$ 에 대해, $\mathcal{K}f$ 의 근사 예측은
 
 $$
-\mathcal{P}^{\mathrm{EDMD}}_{\mathcal{K}\phi} = v^\top K_{\mathrm{EDMD}}\psi = \lambda v^\top\psi = \lambda\phi \tag{9}
+\mathcal{P}^{\mathrm{EDMD}}_{\mathcal{K}f} := v_f^\top K_{\mathrm{EDMD}}\Psi \tag{8}
 $$
 
-### ⚠️ EDMD가 실제로 근사하는 것
+특히 $v_\phi$ 가 $K_{\mathrm{EDMD}}$ 의 **좌고유벡터**($v_\phi^\top K_{\mathrm{EDMD}} = \lambda_\phi v_\phi^\top$)이면, 근사 [[Koopman Eigenfunction|Koopman 고유함수]]를 얻습니다.
 
-> [!warning] $K_{\mathrm{EDMD}} \ne \mathcal{K}$
-> EDMD 행렬은 Koopman 연산자 자체가 아니라 **$\mathrm{span}(\psi)$ 위로의 사영된 작용**을 encode 한다.
-> $$\mathcal{P}_{\mathrm{span}(\psi)}\mathcal{K} : \mathcal{F}\to\mathcal{F} \tag{10}$$
-> 내적은 데이터가 만드는 **경험적 측도** 기준이다.
+$$
+\mathcal{P}^{\mathrm{EDMD}}_{\mathcal{K}\phi} = v_\phi^\top K_{\mathrm{EDMD}}\Psi = \lambda_\phi v_\phi^\top\Psi = \lambda_\phi\phi \tag{9}
+$$
+
+즉 **고유함수 $\phi$ 는 시간에 따라 단순히 고유값 $\lambda_\phi$ 로 스케일되며 진화한다**는 뜻입니다 ($\phi(x_t) = \lambda_\phi^t\phi(x_0)$) — 이것이 Koopman의 "선형성" 매력의 핵심입니다.
+
+#### 6. 개념적으로 가장 중요한 포인트
+
+> [!danger] $K_{\mathrm{EDMD}} \ne \mathcal{K}$
+> $K_{\mathrm{EDMD}}$ 는 **진짜 Koopman 연산자 $\mathcal{K}$ 자체가 아닙니다.** 이것은 $\mathcal{K}$ 의 작용을 $\mathrm{span}(\Psi)$ 위로 **직교 투영(projection)** 한 것을 인코딩합니다.
+> $$\mathcal{P}_{\mathrm{span}(\Psi)}\mathcal{K} : \mathcal{F}\to\mathcal{F} \tag{10}$$
+> 투영은 **경험적 측도** 기반 $L_2$ 내적으로 정의됩니다.
 > $$\mu_{\mathcal{X}} = \frac{1}{M}\sum_{i=1}^{M}\delta_{x_i} \tag{11}$$
+> 데이터 포인트마다 디랙 측도를 놓은 것이니, **"가진 데이터 위에서만 오차를 재는 투영"** 이라고 이해하면 됩니다.
 
-**수렴성** [30]: 딕셔너리·데이터가 커지면 연산자 위상에서 수렴, 고유값 포착, 고유함수 약수렴.
+**수렴성** [30]: 딕셔너리·데이터가 커지면 연산자 위상에서 수렴, 고유값 포착, 고유함수 약수렴. **다만 이 수렴성이 실용적 성능을 보장하지는 않습니다** — 바로 다음 항목입니다.
+
+#### 7. 딕셔너리 선택의 미묘함
 
 > [!danger] 논문이 반복 강조하는 반직관적 사실
-> **"큰 부분공간이 반드시 좋은 예측을 주지 않는다."**
+> **"딕셔너리를 크게 만든다고 항상 좋은 것은 아닙니다."**
 >
-> 반례: $x^+ = 0.5x$, $\psi_1(x)=x$, $\psi_2(x)=[x,\sin(x)]$
-> - $\mathrm{span}(\psi_1)\subset\mathrm{span}(\psi_2)$ 임에도
-> - $\psi_1$: 불변 → 예측 **정확(exact)** ✅
-> - $\psi_2$: 불변 아님 → 일부 함수에서 **큰 오차** ❌
+> 예시로 선형 시스템 $x^+ = 0.5x$ 를 봅시다.
 >
-> 게다가 **시스템 모델 없이는 목표 정확도를 위한 딕셔너리 차원의 하한을 추정할 방법조차 없다.** → 딕셔너리는 반드시 **시스템/데이터 정보에 기반해 설계·학습**되어야 한다.
+> | 딕셔너리 | 부분공간 | 결과 |
+> |:---|:---|:---|
+> | $\Psi_1(x)=x$ | 작음 | **Koopman-불변** → 예측 **정확(exact)** ✅ |
+> | $\Psi_2(x)=[x,\sin(x)]$ | **더 큼** | 불변 아님 → 일부 함수에서 **큰 오차** ❌ |
+>
+> $\mathrm{span}(\Psi_1)\subset\mathrm{span}(\Psi_2)$ 인데도 **작은 쪽이 이깁니다.** 즉 오차는 **부분공간의 크기가 아니라 $\mathrm{span}(\Psi)$ 가 얼마나 [[Koopman-Invariant Subspace|Koopman-불변]]에 가까운가**에 달려 있습니다.
+>
+> 게다가 **시스템 모델 없이는 목표 정확도를 위한 딕셔너리 차원의 하한을 추정할 방법조차 없습니다.** → 딕셔너리는 반드시 **시스템/데이터 정보에 기반해 설계·학습**되어야 합니다.
+
+#### 8. DMD와의 관계 (Remark 1)
+
+DMD는 원래 **유체 흐름의 특징(coherent feature)을 뽑기 위해** 나온 방법입니다 [34]. EDMD보다 **먼저** 개발되었지만, exact DMD는 **리프팅이 없는 EDMD의 특수한 경우**로 볼 수 있습니다. 즉 딕셔너리를 항등함수 $\Psi(x)=x$ 로 두면 DMD가 됩니다.
+
+$$
+K_{\mathrm{DMD}} = YX^{\dagger}
+$$
+
+DMD는 "데이터에 가장 잘 맞는 선형 시스템 행렬"을 구하는 것이고, EDMD는 **그것을 리프팅된 공간에서** 하는 것입니다.
 
 ### HVOK — 딕셔너리 설계를 우회하는 길
 
