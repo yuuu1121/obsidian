@@ -1094,6 +1094,7 @@ Asada [16]가 **특정 조건 하에서 unforced 이종(heterogeneous) 시스템
 > - [[Pseudo-inverse]] — $\dagger$ 가 무엇인가, 최소자승·직교사영·수치 안정성
 > - [[Affine]] — 선형과 아핀의 차이, "차원을 올려 선형화"라는 발상, input-/control-affine 구분
 > - [[Fisher Information]] — "데이터가 얼마나 알려주는가", Cramér–Rao bound, 능동학습의 토대
+> - [[Quadratic Program]] — QP·볼록성·SQP, MPC가 실시간으로 풀리는 근거
 
 ---
 

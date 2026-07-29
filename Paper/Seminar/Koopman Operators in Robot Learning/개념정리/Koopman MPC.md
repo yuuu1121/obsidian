@@ -98,7 +98,7 @@ $$
 \qquad\text{s.t.}\qquad Az \le b,\quad Cz = d
 $$
 
-**목적함수가 이차식, 제약이 전부 선형(아핀)** 인 최적화 문제를 **QP(Quadratic Program)** 라 합니다.
+**목적함수가 이차식, 제약이 전부 선형(아핀)** 인 최적화 문제를 **QP(Quadratic Program)** 라 합니다. → 📎 [[Quadratic Program]]
 
 > [!success] $P \succeq 0$ 이면 QP는 볼록입니다 — 이것이 결정적입니다
 > | 볼록(convex) | 비볼록(non-convex) |
