@@ -291,22 +291,97 @@ def _min_gap(g: Geom, phi_c: float, phi_in: float, modified: bool,
     return best
 
 
+_PHASE_CACHE: dict = {}
+
+
+def conjugate_phase(g: Geom, n: int = 40000) -> float:
+    """Offset direction at which the STANDARD profile is conjugate to its pins.
+
+    The profile equation places its first lobe on the +y axis, but a pin only
+    lands there for particular tooth counts.  When it does not, assuming an
+    offset along +y makes the outline overlap the pins by ~e, which silently
+    poisons every clearance measurement.  Measured requirement:
+
+        z_p = 40, 12, 16 -> 0 deg      z_p = 15, 11 -> 270 deg
+        z_p = 30, 26     -> 180 deg    z_p = 13     ->  90 deg
+
+    Rather than encode that table, solve for it: conjugacy means the minimum
+    gap is exactly zero, so scan the offset direction and take the phase whose
+    |gap| is smallest.  Self-checking and valid for any tooth count.
+    """
+    key = (g.rp, g.rrp, g.a, g.zc)
+    if key in _PHASE_CACHE:
+        return _PHASE_CACHE[key]
+
+    std = Geom(rp=g.rp, rrp=g.rrp, a=g.a, zc=g.zc, bc=g.bc,
+               drp=0.0, drrp=0.0, T=g.T)
+    th = np.linspace(0.0, 2.0 * math.pi, n)
+    px, py = profile(std, th, False)
+    pang = 2.0 * math.pi / g.zp * np.arange(g.zp)
+    pcx, pcy = g.rp * np.sin(pang), g.rp * np.cos(pang)
+
+    def worst(phase: float) -> float:
+        X = px + g.a * math.cos(phase)
+        Y = py + g.a * math.sin(phase)
+        b = math.inf
+        for k in range(g.zp):
+            d = np.hypot(X - pcx[k], Y - pcy[k]).min() - g.rrp
+            if d < b:
+                b = d
+        return b
+
+    # quarter-turn candidates cover every case seen; refine around the best
+    coarse = [math.radians(d) for d in range(0, 360, 5)]
+    best = min(coarse, key=lambda p: abs(worst(p)))
+    lo, hi = best - math.radians(5), best + math.radians(5)
+    for _ in range(40):                       # golden-section on |gap|
+        m1 = lo + 0.382 * (hi - lo)
+        m2 = lo + 0.618 * (hi - lo)
+        if abs(worst(m1)) < abs(worst(m2)):
+            hi = m2
+        else:
+            lo = m1
+    phase = 0.5 * (lo + hi)
+
+    resid = worst(phase)
+    if abs(resid) > 1e-3:                     # 1 um: conjugacy must be exact
+        raise RuntimeError(
+            f"could not find a conjugate phase (best residual {resid*1000:.3f} "
+            f"um at {math.degrees(phase):.2f} deg) -- check the geometry")
+    _PHASE_CACHE[key] = phase
+    return phase
+
+
 def entry_angle(g: Geom, modified: bool = True):
     """Beta: how far the disc turns from its free (centred) position before the
     clearance is taken up and the first pin is touched.  Song 3.5 defines the
     return error / backlash as 2*beta.
 
     Out of contact the crank and the disc turn together, so phi_in = phi_c =
-    beta (the paper's own assumption).  Bisect on the signed minimum gap."""
+    beta (the paper's own assumption).  Bisect on the signed minimum gap.
+
+    The eccentric offset is taken along the geometry's conjugate phase (see
+    conjugate_phase) -- assuming +y instead makes the standard profile overlap
+    its pins for tooth counts where no pin sits on that axis, which returns a
+    spurious beta = 0."""
+    ph = conjugate_phase(g)
+
     def f(beta):
-        return _min_gap(g, beta, beta, modified)
+        # rotate the disc by beta while keeping the offset on the conjugate axis
+        return _min_gap(g, beta, ph, modified)
 
     f0 = f(0.0)
     if f0 <= 0.0:
-        return 0.0                      # no clearance: already touching
+        # zero clearance is only legitimate for the unmodified profile
+        if not modified:
+            return 0.0
+        raise RuntimeError(
+            f"modified profile already interferes at rest (gap "
+            f"{f0*1000:.3f} um) -- modification coefficients are too large "
+            f"for e = {g.a:.3f} mm")
 
     hi = math.radians(0.02)
-    for _ in range(14):
+    for _ in range(16):
         if f(hi) <= 0.0:
             break
         hi *= 2.0
@@ -334,6 +409,7 @@ def transmission_error(g: Geom, modified: bool = True, n_steps: int = 73,
     """
     period = 2.0 * math.pi / g.zp
     phis = np.linspace(0.0, period, n_steps)
+    ph0 = conjugate_phase(g)      # offset axis for THIS tooth count
 
     # precompute the unrotated outline once; rotate it per trial angle
     th = np.linspace(0.0, 2.0 * math.pi, n_profile)
@@ -345,8 +421,8 @@ def transmission_error(g: Geom, modified: bool = True, n_steps: int = 73,
 
     def gap(phi_c, phi_in):
         c, s = math.cos(phi_c), math.sin(phi_c)
-        X = c * px + s * py + g.a * math.cos(phi_in)
-        Y = -s * px + c * py + g.a * math.sin(phi_in)
+        X = c * px + s * py + g.a * math.cos(phi_in + ph0)
+        Y = -s * px + c * py + g.a * math.sin(phi_in + ph0)
         best = math.inf
         for k in range(g.zp):
             d = np.hypot(X - pcx[k], Y - pcy[k]).min() - g.rrp
