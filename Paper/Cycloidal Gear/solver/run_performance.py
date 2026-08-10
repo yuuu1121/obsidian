@@ -53,7 +53,8 @@ def read_geom(wb):
         rp=num("C6", "r_p"), rrp=num("C7", "r_rp"), a=num("C8", "a"),
         zc=int(num("C9", "z_c")), bc=num("C10", "b_c"),
         drp=num("C33", "d_rp"), drrp=num("C34", "d_rrp"),
-        T=float(s["C41"].value) if isinstance(s["C41"].value, (int, float))
+        # C42 holds the output torque; fall back to the paper's 420 N.m
+        T=float(s["C42"].value) if isinstance(s["C42"].value, (int, float))
           else 420.0,
     )
 
@@ -129,10 +130,12 @@ def main():
     put(6, "핀 중심원 반경 r_p", g.rp, "mm", "1.설계입력 C6")
     put(7, "핀 반경 r_rp", g.rrp, "mm", "1.설계입력 C7")
     put(8, "편심량 a", g.a, "mm", "1.설계입력 C8")
-    put(9, "이빨 수 z_c", g.zc, "개", "= 감속비", "0")
+    # NOTE: never start a note with "=" -- Excel parses the cell as a formula
+    # and then strips every formula on the sheet as corrupt.
+    put(9, "이빨 수 z_c", g.zc, "개", "감속비와 동일", "0")
     put(10, "핀 수 z_p", g.zp, "개", "z_c + 1", "0")
     put(11, "기어 폭 b_c", g.bc, "mm", "접촉 길이")
-    put(12, "출력 토크 T", g.T, "N.m", "C41 에 값을 넣으면 그 값을 씁니다 (기본 420)")
+    put(12, "출력 토크 T", g.T, "N.m", "1.설계입력 C42")
     put(13, "핀위치 수정 d_rp", g.drp, "mm", "1.설계입력 C33")
     put(14, "핀반경 수정 d_rrp", g.drrp, "mm", "1.설계입력 C34")
     put(15, "K1 (수정 후)", g.K1m, "-", "a*z_p/(r_p+d_rp).  논문 B 명시대로 갱신한 값",
@@ -286,6 +289,32 @@ def main():
         ws.merge_cells(start_row=r, start_column=3, end_row=r, end_column=5)
         ws.row_dimensions[r].height = max(30, 13 * (len(v) // 60 + 1))
         r += 1
+
+    # ---- guard: a text cell that begins with "=" makes Excel treat the whole
+    # sheet's formulas as corrupt and silently strip them.  Refuse to save.
+    import re as _re
+    _ALLOWED = {"IF", "AND", "OR", "NOT", "ABS", "MAX", "MIN", "SQRT", "COS",
+                "SIN", "ATAN2", "RADIANS", "DEGREES", "SUM", "COUNT", "TEXT",
+                "ISNUMBER", "SEARCH", "PI"}
+    bad = []
+    for row in ws.iter_rows():
+        for c in row:
+            v = c.value
+            if not (isinstance(v, str) and v.startswith("=")):
+                continue
+            for fn in _re.findall(r"([A-Za-z_][A-Za-z0-9_.]*)\s*\(", v):
+                if fn.upper() not in _ALLOWED:
+                    bad.append(f"{c.coordinate}: unknown function {fn!r}")
+            t = _re.sub(r'"[^"]*"', "", v)
+            t = _re.sub(r"'[^']*'!", "", t)
+            if _re.search(r"[가-힣]", t):
+                bad.append(f"{c.coordinate}: 한글로 시작하는 텍스트가 "
+                           f"수식으로 인식됩니다 -> {v[:50]}")
+    if bad:
+        print("\n[중단] 저장하지 않았습니다. 잘못된 셀:")
+        for b in bad[:10]:
+            print("   ", b)
+        raise SystemExit("잘못된 수식 때문에 저장을 취소했습니다.")
 
     wb.save(XLSX)
     print(f"\nwrote sheet [{SHEET}] into {XLSX.name}")
