@@ -1394,5 +1394,5 @@ $$\mathbf{R}_f\mathbf{u} \le \mathbf{a}_f + \alpha$$
 | 종단 집합 | $\mathcal{X}_f$ | 예측 지평 끝에서 상태가 들어가야 하는 불변 안전 영역 |
 | 종단 비용 | $x^\mathsf{T}Px$ | 지평 너머 무한 미래의 비용 추정. $P$ 는 리카티 방정식의 해 |
 | 재귀적 실현가능성 | — | 지금 풀리면 다음 샘플에도 반드시 풀린다는 보장 |
-| 1-노름 목적함수 | $\sum|e| + \lambda\sum|\Delta u|$ | 제곱 대신 절댓값. LP로 풀 수 있게 만든다 (식 5.21) |
+| 1-노름 목적함수 | $\sum \lvert e \rvert + \lambda\sum \lvert \Delta u \rvert$ | 제곱 대신 절댓값. LP로 풀 수 있게 만든다 (식 5.21) |
 | 빅-M 트릭 | $\mathbf{a}_i + K_i(1-L_i)$ | 정수 변수로 제약을 켜고 끄는 장치 (식 5.22) |
