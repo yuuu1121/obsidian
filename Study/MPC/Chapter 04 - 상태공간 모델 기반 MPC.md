@@ -134,7 +134,37 @@ $$J = (\mathbf{r} - \mathbf{y})^\mathrm{T}\mathbf{Q}(\mathbf{r} - \mathbf{y}) + 
 
 여기서 굵은 $\mathbf{Q}, \mathbf{R}$ 은 각각 $Q, R$ 을 **대각으로 $N_\mathrm{p}$ 번 늘어놓은 블록 대각 행렬**이다(코드 4.1에서 `kron(eye(Np),Q)` 로 만드는 그것). 즉 "매 스텝 같은 가중치를 쓴다"는 뜻이다([[가중 노름과 대각 가중행렬]] 참고).
 
-이제 $\mathbf{y} = \mathbf{G_u}\mathbf{u} + \mathbf{f_x}\hat x(t)$ 를 대입하고 $\mathbf{u}$ 로 미분해서 0으로 놓으면 — **제약이 없는 경우** — 해가 공식으로 떨어진다.
+이제 **제약이 없는 경우**의 해를 구해 보자. 중간 단계를 하나도 건너뛰지 않고 따라가겠다.
+
+**1단계 — 예측식을 대입한다.** 예측 오차를 $\mathbf{e} = \mathbf{r} - \mathbf{y}$ 라 하고 $\mathbf{y} = \mathbf{G_u}\mathbf{u} + \mathbf{f_x}\hat x(t)$ 를 넣으면:
+
+$$\mathbf{e} = \mathbf{r} - \mathbf{G_u}\mathbf{u} - \mathbf{f_x}\hat{x}(t)$$
+
+여기서 **지금 이미 아는 것들만 모아** $\mathbf{b} = \mathbf{r} - \mathbf{f_x}\hat x(t)$ 로 묶자. 그러면 $\mathbf{e} = \mathbf{b} - \mathbf{G_u}\mathbf{u}$ 로 짧아진다. 비용함수는:
+
+$$J = (\mathbf{b} - \mathbf{G_u}\mathbf{u})^\mathrm{T}\mathbf{Q}(\mathbf{b} - \mathbf{G_u}\mathbf{u}) + \mathbf{u}^\mathrm{T}\mathbf{R}\mathbf{u}$$
+
+**2단계 — 괄호를 전개한다.** 곱셈을 그대로 풀어 쓰면 네 항이 나온다.
+
+$$J = \mathbf{b}^\mathrm{T}\mathbf{Q}\mathbf{b} - \mathbf{b}^\mathrm{T}\mathbf{Q}\mathbf{G_u}\mathbf{u} - \mathbf{u}^\mathrm{T}\mathbf{G_u}^\mathrm{T}\mathbf{Q}\mathbf{b} + \mathbf{u}^\mathrm{T}\mathbf{G_u}^\mathrm{T}\mathbf{Q}\mathbf{G_u}\mathbf{u} + \mathbf{u}^\mathrm{T}\mathbf{R}\mathbf{u}$$
+
+가운데 두 항은 **서로 전치 관계인 스칼라**다($\mathbf{b}^\mathrm{T}\mathbf{Q}\mathbf{G_u}\mathbf{u}$ 는 1×1 이고, $\mathbf{Q}$ 가 대칭이므로 그 전치가 $\mathbf{u}^\mathrm{T}\mathbf{G_u}^\mathrm{T}\mathbf{Q}\mathbf{b}$ 다). 스칼라는 전치해도 자기 자신이므로 두 항은 같은 값이고, 합치면 2배가 된다.
+
+$$J = \mathbf{b}^\mathrm{T}\mathbf{Q}\mathbf{b} - 2\,\mathbf{u}^\mathrm{T}\mathbf{G_u}^\mathrm{T}\mathbf{Q}\mathbf{b} + \mathbf{u}^\mathrm{T}\big(\mathbf{G_u}^\mathrm{T}\mathbf{Q}\mathbf{G_u} + \mathbf{R}\big)\mathbf{u}$$
+
+**3단계 — $\mathbf{u}$ 로 미분한다.** 벡터 미분 공식 두 개만 쓰면 된다. 상수 벡터 $\mathbf{c}$ 와 대칭 행렬 $\mathbf{M}$ 에 대해:
+
+$$\frac{\partial}{\partial \mathbf{u}}\big(\mathbf{u}^\mathrm{T}\mathbf{c}\big) = \mathbf{c}, \qquad \frac{\partial}{\partial \mathbf{u}}\big(\mathbf{u}^\mathrm{T}\mathbf{M}\mathbf{u}\big) = 2\mathbf{M}\mathbf{u}$$
+
+첫 항 $\mathbf{b}^\mathrm{T}\mathbf{Q}\mathbf{b}$ 에는 $\mathbf{u}$ 가 없으므로 미분하면 0이다. 나머지 두 항에 위 공식을 적용하면:
+
+$$\frac{\partial J}{\partial \mathbf{u}} = -2\,\mathbf{G_u}^\mathrm{T}\mathbf{Q}\mathbf{b} + 2\big(\mathbf{G_u}^\mathrm{T}\mathbf{Q}\mathbf{G_u} + \mathbf{R}\big)\mathbf{u}$$
+
+**4단계 — 0으로 놓아 정규방정식을 얻는다.** 양변을 2로 나누고 정리하면:
+
+$$\big(\mathbf{G_u}^\mathrm{T}\mathbf{Q}\mathbf{G_u} + \mathbf{R}\big)\mathbf{u} = \mathbf{G_u}^\mathrm{T}\mathbf{Q}\mathbf{b}$$
+
+**5단계 — 역행렬을 곱하고 $\mathbf{b}$ 를 원래대로 되돌린다.** $\mathbf{R}$ 이 양정부호이므로 왼쪽 괄호는 가역이다.
 
 $$\mathbf{u} = (\mathbf{G_u}^\mathrm{T}\mathbf{Q}\,\mathbf{G_u} + \mathbf{R})^{-1}\mathbf{G_u}^\mathrm{T}\mathbf{Q}\big(\mathbf{r} - \mathbf{f_x}\hat{x}(t)\big) \tag{4.3}$$
 
@@ -389,8 +419,8 @@ $$
 
 $C$ 행렬의 첫 행 $[1\ 0\ 0\ 0]$ 은 "첫 출력은 그냥 $u-u_w$", 둘째 행 $[0\ -1\ 0\ 7.74]$ 는 "둘째 출력은 $-w + 7.74\theta$" 라는 뜻이다. 앞의 상승률 정의 $\dot h = -w + u_0\theta$ 와 비교하면 $u_0=774$ ft/s 가 여기서는 7.74 로 나타나는데, 이는 각도를 **crad(=$10^{-2}$ rad)** 단위로 쓰기 때문이다.
 
-> [!warning] 원문 수식 확인 필요
-> 이산 상태행렬 $A$ 의 (1,3) 원소는 추출 텍스트에서 `0.0131`로 읽히지만, 연속시간 $A$ 의 대응 원소가 $0$ 인 점을 고려하면 0.1초 이산화 결과로는 다소 큰 값이다(다른 원소들과 달리 연속시간에서 0인 항이 이산화로 커진 경우). 시뮬레이션을 직접 재현할 때는 PDF 원본을 대조하는 편이 안전하다.
+> [!note] 이산 행렬의 값은 책의 값을 그대로 옮긴 것
+> 위 이산 $A$ 의 (1,3) 원소 $0.0131$ 은 연속시간 $A$ 의 대응 원소가 $0$ 이라 얼핏 의아하지만, **책 원문의 값 그대로다.** 연속 모델을 0.1초 영차 유지(ZOH)로 직접 이산화해 보면 첫 행의 값들이 책과 정확히 일치하지는 않는다. 이 노트는 책의 값을 따른다.
 
 **시뮬레이션 결과 1 — 기본 설정.** 가중 행렬 $R=\mathrm{diag}(5,5)$, $Q=\mathrm{diag}(1,1)$, 제어 지평 10, 예측 지평 30으로 두고 돌린 결과가 그림 4.2다.
 
@@ -402,10 +432,10 @@ $C$ 행렬의 첫 행 $[1\ 0\ 0\ 0]$ 은 "첫 출력은 그냥 $u-u_w$", 둘째 
 
 ![[mpc_fig_4_3.png]]
 
-> 그림 4.3이 말하는 것: 두 번째 출력(상승률)의 설정값이 바뀌어도 **첫 번째 출력(대기속도)은 거의 영향을 받지 않는다.** 가중치라는 다이얼 하나로 "어느 출력을 지키고 어느 출력을 양보할 것인가"를 설계자가 직접 정할 수 있다는 것이 이 그림의 요점이다. 다만 대가가 있다 — 그림 4.2와 비교하면 상승률 쪽 응답이 그만큼 느려지거나 조작이 커진다.
+> 그림 4.3이 말하는 것: 두 번째 출력(상승률)의 설정값이 바뀌어도 **첫 번째 출력(대기속도)은 거의 영향을 받지 않는다.** 가중치라는 다이얼 하나로 "어느 출력을 지키고 어느 출력을 양보할 것인가"를 설계자가 직접 정할 수 있다는 것이 이 그림의 요점이다.
 
-> [!warning] 원문 수식 확인 필요
-> 본문은 "오차 가중 행렬을 $R=\mathrm{diag}(10,1)$ 로 바꾼다"고 쓰지만, 앞에서 오차 가중은 $Q$, 제어 노력 가중은 $R$ 로 정의했다. 문맥상 **출력 오차 가중 $Q$ 를 $\mathrm{diag}(10,1)$ 로 바꾼 것**으로 읽는 것이 자연스럽다. 원문의 기호 사용이 일관되지 않은 지점이다.
+> [!note] 이 예제의 기호 사용 — $R$ 이 출력 가중, $Q$ 가 제어 가중
+> 4.1절 일반식에서는 $Q$ 가 오차 가중, $R$ 이 제어 노력 가중이었다. 그런데 **이 예제에서 책은 반대로 표기한다.** $R=\mathrm{diag}(5,5)$, $Q=\mathrm{diag}(1,1)$ 로 두고 나서 "**오차 가중 행렬**을 $R=\mathrm{diag}(10,1)$ 로 바꾼다"고 쓰기 때문이다. 즉 예제 4.1에서 $R$ 은 출력(오차) 가중, $Q$ 는 제어 가중이다. 위 본문의 수식은 책 표기를 그대로 따랐다. 다른 절의 $Q,R$ 과 역할이 뒤바뀌어 있으니 읽을 때 주의하자.
 
 **코드 4.1.** 책은 예제를 재현할 수 있도록, 식 (4.2)에 따라 제어 동작을 계산하는 데 필요한 행렬들을 만들어 주는 MATLAB 함수를 제공한다.
 
@@ -536,6 +566,9 @@ $$\mathbf{\mu} = [\,\mu_1(t)\ \dots\ \mu_{n_\beta}(t)\,]^\mathrm{T}$$
 $$\mathbf{y}_\beta(h_j) = [\,y_{\beta_1}(h_j)\ \dots\ y_{\beta_{n_\beta}}(h_j)\,]$$
 $$d(t+h_j) = r(t+h_j) - CA^{j}x(t) - e(t+h_j)$$
 
+> [!note] 첨자에 대한 주의
+> 원문은 자유 응답 항을 $CA^{j}x(t)$ 로 적지만, 바로 위의 분해식이 $y(t+k)=CA^{k}x(t)+\dots$ 이고 여기서 평가하는 시점이 $t+h_j$ 이므로 **$CA^{h_j}x(t)$ 가 맞다.** $j$ 는 일치점의 번호일 뿐 시각이 아니다. 원문 오타로 보이며, 위 수식은 책 표기를 그대로 옮겼다.
+
 $d$ 는 **시각 $t$ 에서 이미 알고 있는 값들만 모아 놓은 항**이다(목표값 빼기 자유 응답 빼기 예측 오차). 3장의 $\mathbf{w}-\mathbf{f}$ 와 같은 역할이다.
 
 **3단계 — 벡터 형태로 압축한다.** $\mathbf{d} = [d(t+h_1)\ \dots\ d(t+h_{n_H})]^\mathrm{T}$ 로 놓고, 행이 각 일치점에서의 $\mathbf{y}_\beta$ 인 행렬을 $\mathbf{Y}_\beta$ 라 하면:
@@ -609,7 +642,32 @@ $Q_k$ 는 대칭 양반정부호 행렬, $R_k > 0$ 이다. 첫 항 $x(N_\mathrm{
 
 $$I^*_1\big(x(N_\mathrm{p}-1)\big) = \min_{u(N_\mathrm{p}-1)} \Big\{ x(N_\mathrm{p})^\mathrm{T}Q_{N_\mathrm{p}}x(N_\mathrm{p}) + u(N_\mathrm{p}-1)^\mathrm{T}R_{N_\mathrm{p}-1}u(N_\mathrm{p}-1)\Big\}$$
 
-여기서 $x(N_\mathrm{p}) = Ax(N_\mathrm{p}-1) + Bu(N_\mathrm{p}-1)$ 을 대입하면 이 식은 $u(N_\mathrm{p}-1)$ 에 대한 이차식이다. 미분해서 0으로 놓으면 해석적으로 풀린다.
+이것도 중간 단계를 다 밟아 보자. 표기를 줄이기 위해 $x = x(N_\mathrm{p}-1)$, $u = u(N_\mathrm{p}-1)$, $Q_N = Q_{N_\mathrm{p}}$, $R = R_{N_\mathrm{p}-1}$ 로 쓴다.
+
+**1단계 — 동특성을 대입한다.** $x(N_\mathrm{p}) = Ax + Bu$ 이므로:
+
+$$I^*_1 = \min_u\Big\{(Ax+Bu)^\mathrm{T}Q_N(Ax+Bu) + u^\mathrm{T}Ru\Big\}$$
+
+**2단계 — 전개한다.** 앞의 식 (4.3) 유도와 똑같은 방식이다.
+
+$$(Ax+Bu)^\mathrm{T}Q_N(Ax+Bu) = x^\mathrm{T}A^\mathrm{T}Q_NAx + x^\mathrm{T}A^\mathrm{T}Q_NBu + u^\mathrm{T}B^\mathrm{T}Q_NAx + u^\mathrm{T}B^\mathrm{T}Q_NBu$$
+
+가운데 두 항은 서로 전치인 스칼라이고 $Q_N$ 이 대칭이므로 같은 값이다. 합치면:
+
+$$J_u = x^\mathrm{T}A^\mathrm{T}Q_NAx + 2\,u^\mathrm{T}B^\mathrm{T}Q_NAx + u^\mathrm{T}\big(B^\mathrm{T}Q_NB + R\big)u$$
+
+**3단계 — $u$ 로 미분한다.** 첫 항에는 $u$ 가 없으니 0, 나머지에 앞서 쓴 두 공식 $\partial(u^\mathrm{T}c)/\partial u = c$ 와 $\partial(u^\mathrm{T}Mu)/\partial u = 2Mu$ 를 적용한다.
+
+$$\frac{\partial J_u}{\partial u} = 2\,B^\mathrm{T}Q_NAx + 2\big(B^\mathrm{T}Q_NB+R\big)u$$
+
+**4단계 — 0으로 놓는다.** 양변을 2로 나누면:
+
+$$\big(B^\mathrm{T}Q_NB+R\big)u = -\,B^\mathrm{T}Q_NAx$$
+
+> [!note] 부호가 음수인 이유
+> 식 (4.3)에서는 $+\mathbf{G_u}^\mathrm{T}\mathbf{Q}\mathbf{b}$ 였는데 여기서는 $-B^\mathrm{T}Q_NAx$ 다. 차이는 **기준값의 유무**다. (4.3)은 $\mathbf{r}$ 을 따라가는 추종(tracking) 문제라 오차가 $\mathbf{r}-\mathbf{y}$ 였지만, 여기는 상태를 원점으로 몰아가는 **조절(regulation)** 문제라 $\mathbf{r}=0$ 이다. 그래서 되먹임이 "상태의 반대 방향으로" 밀게 된다.
+
+**5단계 — 역행렬을 곱한다.** $R>0$ 이므로 가역이다.
 
 $$u(N_\mathrm{p}-1) = -(B^\mathrm{T}Q_{N_\mathrm{p}}B + R)^{-1}B^\mathrm{T}Q_{N_\mathrm{p}}A\,x(N_\mathrm{p}-1) = K_{N_\mathrm{p}-1}\,x(N_\mathrm{p}-1) \tag{4.11}$$
 
@@ -658,9 +716,36 @@ $$u(k) = K_k\,x(k), \qquad K_k = -(B^\mathrm{T}P_{k+1}B + R)^{-1}B^\mathrm{T}P_{
 
 $$P_k = (A+BK_k)^\mathrm{T}P_{k+1}(A+BK_k) + K^\mathrm{T}_k R_k K_k + Q_k$$
 
-몇 번 정리하면 다음 형태로 바뀐다.
+이것이 어떻게 식 (4.13)의 짧은 형태로 바뀌는지 한 줄씩 따라가 보자.
+
+**1단계 — 괄호를 전개한다.**
+
+$$(A+BK_k)^\mathrm{T}P_{k+1}(A+BK_k) = A^\mathrm{T}P_{k+1}A + A^\mathrm{T}P_{k+1}BK_k + K_k^\mathrm{T}B^\mathrm{T}P_{k+1}A + K_k^\mathrm{T}B^\mathrm{T}P_{k+1}BK_k$$
+
+따라서 $P_k$ 는 다음 다섯 항의 합이다.
+
+$$P_k = A^\mathrm{T}P_{k+1}A + A^\mathrm{T}P_{k+1}BK_k + \underbrace{K_k^\mathrm{T}B^\mathrm{T}P_{k+1}A + K_k^\mathrm{T}\big(B^\mathrm{T}P_{k+1}B\big)K_k + K_k^\mathrm{T}R_kK_k}_{\text{이 세 항이 사라진다}} + Q_k$$
+
+**2단계 — 뒤의 세 항을 $K_k^\mathrm{T}$ 로 묶는다.** 세 항 모두 왼쪽에 $K_k^\mathrm{T}$ 를 갖고 있다.
+
+$$K_k^\mathrm{T}\Big[\,B^\mathrm{T}P_{k+1}A + \big(B^\mathrm{T}P_{k+1}B + R_k\big)K_k\,\Big]$$
+
+**3단계 — 대괄호 안이 0임을 확인한다.** 식 (4.12)의 이득 정의를 보자.
+
+$$K_k = -(B^\mathrm{T}P_{k+1}B + R_k)^{-1}B^\mathrm{T}P_{k+1}A$$
+
+양변 왼쪽에 $(B^\mathrm{T}P_{k+1}B+R_k)$ 를 곱하면 역행렬이 상쇄된다.
+
+$$\big(B^\mathrm{T}P_{k+1}B + R_k\big)K_k = -\,B^\mathrm{T}P_{k+1}A$$
+
+이것을 2단계의 대괄호에 넣으면 $B^\mathrm{T}P_{k+1}A - B^\mathrm{T}P_{k+1}A = 0$ 이다. **즉 $K_k$ 를 최적으로 고른 덕분에 세 항이 통째로 사라진다.**
+
+**4단계 — 남은 것을 적는다.**
 
 $$P_k = A^\mathrm{T}P_{k+1}A + A^\mathrm{T}P_{k+1}B K_k + Q_k \tag{4.13}$$
+
+> [!tip] 이 상쇄가 말해 주는 것
+> 세 항이 사라진 것은 우연이 아니다. 대괄호 안의 식은 정확히 **앞의 "마지막 단계부터 거꾸로" 유도 4단계에서 "0으로 놓았던" 그 정규방정식**이다. 최적점에서는 비용의 기울기가 0이므로, 그 조건을 만족하는 $K_k$ 를 대입하면 관련 항들이 자동으로 지워진다. 최적화의 1차 조건이 대수적으로 다시 나타난 셈이다.
 
 이것이 **이산시간 리카티 방정식(discrete-time Riccati equation)** 이다. $P_N = Q_{N_\mathrm{p}-1}$ 에서 출발해 **거꾸로** $P_k$ 를 재귀적으로 계산하는 데 쓴다([[리카티 방정식]] 참고).
 
@@ -806,10 +891,11 @@ $$y(t) = \underbrace{\begin{bmatrix}h_1 & h_2 & \cdots & h_N\end{bmatrix}}_{C} x
 > [!tip] 비유 — 컨베이어 벨트
 > 이 $A$ 행렬을 **컨베이어 벨트**로 생각하면 이해가 쉽다. $B$ 가 새 입력 $u(t)$ 를 벨트의 맨 앞에 얹고, $A$ 의 부대각선 1들이 매 스텝 모든 값을 한 칸씩 뒤로 민다. 벨트에 놓인 값들에 각각 무게 $h_1,\dots,h_N$ 을 곱해서 합한 것이 출력이다. 이것이 정확히 **컨볼루션**이다. 즉 "상태"란 여기서 **최근 $N$ 개 입력에 대한 기억 장치**다.
 
-차원은 $A\in\mathbb{R}^{(N-1)\times(N-1)}$, $B\in\mathbb{R}^{(N-1)\times 1}$, $C\in\mathbb{R}^{1\times(N-1)}$, $D\in\mathbb{R}$ 가 된다. MIMO의 경우 절차는 같고, $u(t)$ 가 벡터, $h_j$ 가 행렬이 된다는 점만 다르다.
+MIMO의 경우 절차는 같고, $u(t)$ 가 벡터, $h_j$ 가 행렬이 된다는 점만 다르다.
 
-> [!warning] 원문 수식 확인 필요
-> 위 상태 벡터는 $u(t-1)$ 부터 $u(t-N)$ 까지 $N$ 개 원소로 정의되었는데, 본문은 "마지막 $N-1$ 개 입력을 상태에 저장한다"고 하고 차원도 $(N-1)\times(N-1)$ 로 적는다. 상태 벡터 정의와 차원 표기가 서로 어긋난다. 어느 쪽으로 맞추든 컨베이어 벨트 구조 자체는 동일하다.
+> [!note] 책 내부의 차원 표기 불일치 — 이 노트는 $N$ 을 따른다
+> 책 본문은 "마지막 $N-1$ 개 입력을 상태에 저장한다"고 쓰고 차원도 $A\in\mathbb{R}^{(N-1)\times(N-1)}$, $B\in\mathbb{R}^{(N-1)\times 1}$, $C\in\mathbb{R}^{1\times(N-1)}$ 로 적는다. 그러나 **실제로 제시된 상태 벡터는 $u(t-1)$ 부터 $u(t-N)$ 까지 $N$ 개**이고 **$C=[h_1\ h_2\ \cdots\ h_N]$ 도 원소가 $N$ 개**다. 서술과 수식이 어긋나는 책 내부의 불일치이며, 이 노트는 벡터와 $C$ 를 따라 **$N$ 차원**으로 읽는다.
+> 덧붙여 책 원문의 $A$ 행렬 마지막 행 $[0\ 0\ \cdots\ 1]$ 도 정방 시프트 행렬의 모양과는 맞지 않는다(순수 시프트라면 마지막 행은 $[\cdots\ 1\ 0]$ 이어야 한다). 이 역시 원문 쪽 문제이며, 어느 쪽으로 읽든 **컨베이어 벨트 구조라는 본질은 같다.**
 
 ### 계단 응답 → 상태공간
 
@@ -994,7 +1080,7 @@ $$
 3. 상태공간 제어기로 상승률 설정값을 0에서 5 ft/s 로 바꾸는 효과를 시뮬레이션하라(대기속도 설정값은 그대로).
 4. 결과를 예제 4.1과 비교하라.
 
-→ **연습시키는 것**: 같은 기체라도 **동작점이 다르면 선형화 모델이 달라진다**는 것. **힌트**: 순항($u_0=774$)과 착륙($u_0=221$)의 $A$ 행렬을 비교하면 착륙 쪽 감쇠 항들이 훨씬 크다(예: $(2,2)$ 원소가 $-0.319$ 대 $-0.530$). 응답이 더 빠르되 상호작용도 달라질 것으로 예상해 놓고 시뮬레이션과 대조해 보면 좋다.
+→ **연습시키는 것**: 같은 기체라도 **동작점이 다르면 선형화 모델이 달라진다**는 것. **힌트**: 순항($u_0=774$)과 착륙($u_0=221$)의 $A$ 행렬을 비교하면 착륙 쪽은 $(2,2)$ 원소가 $-0.319$ 에서 $-0.530$ 으로, $(3,3)$ 원소가 $-0.429$ 에서 $-0.412$ 로 바뀐다. 응답이 더 빠르되 상호작용도 달라질 것으로 예상해 놓고 시뮬레이션과 대조해 보면 좋다.
 
 **4.5 같은 기체를 DMC로 제어하기.** 예제 4.1의 항공기 모델에 대해:
 1. 두 입력 각각에 대한 계단 응답 계수를 구하라.

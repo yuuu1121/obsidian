@@ -234,3 +234,757 @@ $$y(t+1) = a\,y(t) + b\,u(t) + \frac{\theta(t)}{\Delta}$$
 > 왜 적분 불확실성 모델에서는 띠 자체가 아니라 **띠의 성장률**이 수렴하는가? 힌트: $1/\Delta$ 는 적분기이고, 적분기의 출력은 입력이 유계여도 무한히 커질 수 있다.
 
 ---
+
+## 6.2 Min–Max 모델 예측 제어 (Min–Max Model Predictive Control)
+
+### 최악의 경우를 최소화한다
+
+MPC에는 두 개의 축이 있다. **제약(constraints)** 은 최적화기에게 **무엇이 실현 가능한지**를 알려주고, **목적함수(objective function)** 는 **무엇이 바람직한지**라는 제어 선호를 표현한다. 유계 불확실성을 명시적으로 고려할 때는 이 두 요소를 **예측 궤적의 한계를 최적화하는 데** 쓸 수 있다.
+
+특히 **최악의 상황에 대해 목적함수를 최소화**하면 강인한 제어기를 얻는다. 즉 다음을 푼다.
+
+$$\min_{\mathbf{u}\in\mathbb{U}_\theta}\ \max_{\theta\in\Theta}\ J(\mathbf{u},\theta) \tag{6.6}$$
+
+- 안쪽 $\max$: 불확실성이 **가장 나쁘게** 굴었을 때의 비용.
+- 바깥쪽 $\min$: 그 최악의 비용을 **가장 작게** 만드는 입력.
+- $\mathbb{U}_\theta$ : 결정 공간이 외란 실현값 $\theta$ 에 **의존한다**는 것을 강조하는 표기.
+
+최소화 대상 함수는 공정 출력이 기준 궤적을 얼마나 잘 따라가는지를 재는 **노름(norm)의 최댓값**이다.
+
+> [!example] 비유 — 최악의 시나리오로 짐 싸기
+> 여행 짐을 쌀 때 "비 올 수도, 추울 수도, 더울 수도 있다"를 다 고려해 **어떤 날씨가 와도 곤란하지 않을 만큼** 챙기는 것이 min–max다. 안전하다. 대신 **가방이 무거워진다.** 이 "무거운 가방"이 바로 **보수성(conservativeness)** 이고, 6.3절부터는 이 가방을 어떻게 가볍게 할지가 주제다.
+
+> [!warning] 계산 시간이라는 벽
+> 일반적으로 이런 유형의 문제를 푸는 데 필요한 시간은 **비용 구간과 제어 구간이 길어지면 실시간 응용에는 금지적(prohibitive)** 이다. 다만 **문제의 구조를 바꾸면** 계산량을 상당히 줄일 수 있다. 특히 불확실성이 **덧셈형**이면, 강인 MPC 문제를 목적함수의 종류에 따라 **QP, SDP, LP** 로 재구성할 수 있다.
+
+책은 문헌에 제시된 네 가지 대안을 순서대로 소개한다. min–max 최적화 자체의 성격은 [[min-max 최적화와 게임]] 노트를 참고하자.
+
+### 이차 노름 기반 QP (Quadratic Program Based on Quadratic Norm)
+
+다음 이차 기준을 최소화하는 MPC 제어기를 생각하자.
+
+$$J = (\mathbf{y}-\mathbf{r})^{T}(\mathbf{y}-\mathbf{r}) + \lambda\,\mathbf{u}^{T}\mathbf{u}, \qquad \lambda > 0$$
+
+시스템 기술 방식이 무엇이든 불확실 시스템 출력의 변화를 $\mathbf{y} = \mathbf{G}_u\mathbf{u} + \mathbf{G}_\theta\boldsymbol{\theta} + \mathbf{f}$ 로 쓸 수 있으므로, 이를 대입하면
+
+$$J(\mathbf{u},\boldsymbol{\theta}) = (\mathbf{G}_u\mathbf{u} + \mathbf{G}_\theta\boldsymbol{\theta} + \mathbf{f} - \mathbf{r})^{T}(\mathbf{G}_u\mathbf{u} + \mathbf{G}_\theta\boldsymbol{\theta} + \mathbf{f} - \mathbf{r}) + \lambda\,\mathbf{u}^{T}\mathbf{u}$$
+
+문헌 [4]가 보인 것은, **이 min–max 최적화 문제를 QP로 풀 수 있다**는 것이다. 그 트릭을 한 줄씩 따라가 보자.
+
+**1단계 — 0을 더하고 뺀다.** 목적함수를 다음처럼 다시 쓴다.
+
+$$J(\mathbf{u},\boldsymbol{\theta}) = J(\mathbf{u},\boldsymbol{\theta}) + J(\mathbf{u},\mathbf{0}) - J(\mathbf{u},\mathbf{0}) \le J(\mathbf{u},\mathbf{0}) + \gamma$$
+
+여기서 $J(\mathbf{u},\mathbf{0})$ 은 **불확실성이 0일 때의 공칭 비용**이고, $\gamma$ 는 문제의 최대화 부분에 대한 **상한으로 도입한 보조 변수**다. 즉
+
+$$\gamma \ \ge\ \max_{\boldsymbol{\theta}\in\Theta}\big(J(\mathbf{u},\boldsymbol{\theta}) - J(\mathbf{u},\mathbf{0})\big)$$
+
+**2단계 — 최댓값은 꼭짓점에서 나온다.** $J(\mathbf{u},\boldsymbol{\theta}) - J(\mathbf{u},\mathbf{0})$ 는 **강볼록(strictly convex)** 이므로, 그 최댓값은 폴리토프 $\Theta$ 의 **꼭짓점(vertex) 중 하나**에서 달성된다([31] 정리 3.4.6).
+
+> [!important] 이 챕터에서 가장 많이 재활용되는 사실
+> **볼록 함수의 최댓값은 볼록 다면체의 꼭짓점에서 나온다.** 그래서 "$\forall\theta\in\Theta$" 라는 **무한 개의 조건**을 "$\theta$ 의 꼭짓점들에 대해서만" 이라는 **유한 개의 조건**으로 바꿀 수 있다. 이 아이디어는 6.2, 6.4, 6.6절에서 계속 반복된다. 배경은 [[폴리토프와 꼭짓점]] 노트를 보자.
+
+**3단계 — 제약 있는 QP로 재구성.**
+
+$$\min_{\mathbf{u}}\ J(\mathbf{u},\mathbf{0}) + \gamma \qquad \text{s.t.}\quad \gamma \ge J(\mathbf{u},\boldsymbol{\theta}) - J(\mathbf{u},\mathbf{0}),\quad \theta\in\Theta$$
+
+따라서 폴리토프 $\Theta$ 의 $2^{(N\times n)}$ 개 꼭짓점에 대해 제약 $\gamma \ge J(\mathbf{u},\boldsymbol{\theta}) - J(\mathbf{u},\mathbf{0})$ 을 평가하면 $\theta$ 에 대한 의존성을 **제거**할 수 있다.
+
+> [!warning] 지수적 폭발
+> 이 접근은 **집합 $\Theta$ 의 차원에 대해 확장성이 나쁘다(scales poorly).** 꼭짓점이 $2^{N\times n}$ 개, 즉 지평 길이와 출력 개수에 대해 **지수적으로** 늘어난다. $N=10$, $n=2$ 만 되어도 $2^{20} \approx 100$ 만 개다.
+
+### 이차 노름 기반 SDP (Semidefinite Program Based on Quadratic Norm)
+
+**무한 지평(infinite horizon)** 을 고려할 때, 다음 이차 비용함수의 min–max 최적화는 **반정부호 계획(semidefinite program, SDP)** 으로 바꿀 수 있다.
+
+$$J(k) = \sum_{i=0}^{\infty}\Big(\hat{x}(t+i|t)^T Q\,\hat{x}(t+i|t) + u(t+i)^T R\,u(t+i)\Big)$$
+
+이때 공정은 **파라미터 불확실성**을 갖는 다음 형태로 기술된다.
+
+$$\Omega = \mathrm{Co}\{[A_1,B_1],[A_2,B_2],\dots,[A_L,B_L]\}$$
+
+$\mathrm{Co}$ 는 꼭짓점 $[A_i,B_i]$ 로 정의되는 **볼록 껍질(convex hull)** 이다. 즉 임의의 공정 $[A,B]\in\Omega$ 는
+
+$$[A,B] = \sum_{i=1}^{L}\lambda_i[A_i,B_i], \qquad \lambda_i \ge 0,\ \ \sum_{i=1}^{L}\lambda_i = 1$$
+
+로 표현된다. 이는 시스템이 다음과 같은 **선형 시변(linear time-varying)** 시스템일 것으로 기대한다는 뜻이다.
+
+$$x(t+1) = A(t)x(t) + B(t)u(t), \qquad y(t) = Cx(t), \qquad [A(t)\ B(t)] \in \Omega$$
+
+여기서 $A(k)$, $B(k)$ 는 고려하는 볼록 집합 안에서의 공정 실현값이다.
+
+> [!warning] 원문 수식 확인 필요
+> 추출된 원문에는 상태 방정식이 "x(t + 1) = A(t)x(t) + B(t)x(t)" 로 되어 있다. 두 번째 항이 $B(t)x(t)$ 인 것은 명백한 오타이며, 문맥상 $B(t)u(t)$ 가 맞다. 위 식은 그렇게 복원한 것이다.
+
+**Kothare 등이 [6]에서 제안한 이 방법의 핵심**은 다음과 같다. **이차 함수 $V(x) = x^T P x$ ($P>0$)** 를 하나 찾되, 그것이 **cost-to-go 함수 $J(t)$ 의 상한**이 되도록 한다.
+
+$$\gamma \ \ge\ V(x)\ \ge\ J(t)$$
+
+$\gamma$ 는 고려하는 볼록 집합 $\Omega$ 안의 **어떤 공정 실현값에 대해서든** $V(x)$ 의 상한이며, 이 $\gamma$ 를 최소화한다. 수학적으로 이는 최적화 문제
+
+$$\min_{u(t+i|k),\ i\ge 0}\ \underbrace{\max_{[A(t+i),B(t+i)]\in\Omega,\ i\ge 0}\ J(t)}_{\le\, V(x)\, \le\, \gamma}$$
+
+를 **선형행렬부등식(LMI)에 종속된 선형 최소화**로 바꾸는 것이다. 구체적으로는 선형 피드백 제어법칙 $u(t+i|t) = K x(t+i|t)$ 를 찾되, $\gamma$ 와 따라서 $V(x(t|t))$ 가 최소화되도록 한다. 이 조건에서 강인 MPC는 다음 LMI 문제로 변환된다.
+
+$$\min_{\gamma, W, Y}\ \gamma$$
+
+제약 조건은 다음 두 개다.
+
+$$\begin{bmatrix} 1 & x(t|t)^T \\ x(t|t) & W \end{bmatrix} \ge 0$$
+
+$$\begin{bmatrix} W & WA_j^T + Y^T B_j^T & W Q^{1/2} & Y^T R^{1/2}\\ A_jW + B_jY & W & 0 & 0\\ Q^{1/2}W & 0 & \gamma I & 0\\ R^{1/2}Y & 0 & 0 & \gamma I \end{bmatrix} \ge 0, \qquad j=1,\dots,L$$
+
+이 LMI 문제를 풀고 나면 피드백 이득은 $K = YW^{-1}$ 로, 그리고 $P = W^{-1}$ 로 얻어진다. 통상적인 MPC에서처럼 **제어 동작 $u(t) = Kx(t)$ 만 공정에 인가**하고, 다음 시각에는 가장 최신 상태 정보를 바탕으로 문제를 다시 푼다.
+
+마지막으로 Kothare 등 [6]은 **상태와 조작 변수에 대한 제약도 추가 LMI로 최적화 문제에 통합**할 수 있음을 보였고, 그 결과가 **강인 제약 MPC** 기법이다. LMI라는 도구가 낯설다면 [[선형행렬부등식 LMI]] 노트를 보자.
+
+> [!tip] 왜 $V(x)$ 라는 우회로를 쓰는가
+> 무한 지평의 비용을 직접 계산하는 것은 불가능하다(항이 무한 개다). 그래서 **"비용의 상한 역할을 하는 이차 함수"** 를 하나 찾아 그것을 대신 줄인다. 이 발상은 [[리아프노프 안정성과 비용함수]]와 정확히 같은 논리다. 궤적을 직접 풀지 않고 "높이 함수"를 감시하는 게으른 방법 말이다.
+
+### ∞–∞ 노름 기반 LP (Linear Program Based on ∞-∞ Norm)
+
+Campo와 Morari는 **$\infty$–$\infty$ 유형의 노름**을 쓰면 min–max 문제가 **선형계획(LP)** 으로 축소되어 계산이 적게 들고 표준 알고리즘으로 풀 수 있음을 보였다 [2]. 목적함수는 이제 다음과 같다.
+
+$$J(\mathbf{u},\boldsymbol{\theta}) = \max_{j=1\cdots N}\ \|\hat{y}(t+j|t) - r(t)\|_{\infty} = \max_{j=1\cdots N}\ \max_{i=1\cdots n}\ |\hat{y}_i(t+j|t) - r_i(t)| \tag{6.7}$$
+
+**이중 최댓값**을 읽어 보자. 안쪽 $\max_i$ 는 "이 시점에서 여러 출력 중 오차가 가장 큰 것", 바깥쪽 $\max_j$ 는 "예측 구간의 여러 시점 중 오차가 가장 큰 것"이다.
+
+> [!note] 이 목적함수의 성격
+> 이 목적함수는 **불확실성이 최악일 때 공정 출력과 기준 궤적 사이의 최대 오차**를 최소화한다. 대신 그렇게 하는 데 필요한 **제어 노력은 고려하지 않는다.**
+
+예측식 $\mathbf{y} = G_u\mathbf{u} + G_\theta\boldsymbol{\theta} + \mathbf{f}$ 를 이용하고 $g(\mathbf{u},\boldsymbol{\theta}) = (\mathbf{y}-\mathbf{r})$ 로 정의하면, 제어 문제는
+
+$$\min_{\mathbf{u}\in\mathbf{U}}\ \underbrace{\max_{\boldsymbol{\theta}\in\Theta}\ \max_{i=1\cdots n\times N}\ |g_i(\mathbf{u},\boldsymbol{\theta})|}_{\mu^*(\mathbf{u})}$$
+
+로 표현된다. 여기서 $\mu^*(\mathbf{u})$ 는 $-\mu \le g_i(\mathbf{u},\boldsymbol{\theta}) \le \mu$ ($\forall\boldsymbol{\theta}\in\Theta$, $i=1\cdots n\times N$)를 만족하는 임의의 $\mu$ 로 **상한**을 지을 수 있다.
+
+> [!tip] LP로 바꾸는 표준 트릭
+> 절댓값의 최댓값을 직접 최소화하는 것은 선형이 아니다. 그래서 **"모든 항보다 큰 새 변수 $\mu$ 를 도입하고, 그 $\mu$ 를 최소화한다."** 절댓값 하나는 부등식 두 개($-\mu\le g_i \le \mu$)로 풀린다. 이 트릭은 다음 절 1-노름에서도 그대로 재사용된다.
+
+이제 문제는 **가장 작은 상한 $\mu$ 와, 모든 $\theta\in\Theta$ 에 대해 유효한 어떤 $\mathbf{u}\in\mathbf{U}$ 를 찾는 것**이 된다. 제어 변수의 제약 $(\underline{\mathbf{y}}, \overline{\mathbf{y}})$ 까지 고려하면
+
+$$\min_{\mu,\mathbf{u}}\ \mu$$
+
+$$\text{s.t.}\quad -\mu \le g_i(\mathbf{u},\boldsymbol{\theta}) \le \mu, \qquad \underline{\mathbf{y}}_i - \mathbf{r}_i \le g_i(\mathbf{u},\boldsymbol{\theta}) \le \overline{\mathbf{y}}_i - \mathbf{r}_i, \qquad i=1,\dots,n\times N,\ \ \forall\boldsymbol{\theta}\in\Theta$$
+
+제어 문제가 **결정 변수 $(\mu,\mathbf{u})$ 에 대해 선형인 목적함수**와 **무한(연속) 개의 제약**을 갖는 최적화 문제로 변환되었다. 만약 $g(\mathbf{u},\boldsymbol{\theta})$ 가 모든 $\mathbf{u}\in\mathbf{U}$ 에 대해 $\boldsymbol{\theta}$ 의 **아핀 함수**이면, $g$ 의 최댓값과 최솟값은 $\Theta$ 의 **극점 중 하나**에서 얻어진다 [2]. 앞서와 마찬가지로 $\Theta$ 의 $2^{n\times N}$ 개 꼭짓점에서 제약이 만족되면 $\Theta$ 의 모든 점에서도 만족된다.
+
+> [!tip] 쌍대 문제를 풀어라
+> 제약의 개수가 결정 변수의 개수보다 **훨씬 많을 가능성이 높으므로**, **쌍대(dual) LP 문제**를 푸는 것이 계산상 덜 비싸다. 또한 제약의 구조는 5장에서 소개한 방법들로 활용할 수 있다.
+
+### 1-노름 기반 LP (Linear Program Based on 1-Norm)
+
+앞의 $\infty$–$\infty$ 노름은 **최대 편차에만** 관심이 있지만, 성능을 재는 데는 다른 노름이 더 적합할 수 있다. Allwright [7]는 절단 임펄스 응답으로 기술되는 공정에 대해 이 방법을 **1-노름**으로 확장할 수 있음을 증명했다. 좌행렬 표현(left matrix representation)에 대한 유도도 마찬가지로 간단하다. 목적함수는 다음과 같다.
+
+$$J(\mathbf{u},\boldsymbol{\theta}) = \sum_{j=N_1}^{N_2}\sum_{i=1}^{n}\big|y_i(t+j\mid t,\theta) - r_i(t+j)\big| + \lambda\sum_{j=1}^{N_u}\sum_{i=1}^{m}\big|\Delta u_i(t+j-1)\big| \tag{6.8}$$
+
+- $N_1, N_2$ : 예측 구간의 시작과 끝.
+- $N_u$ : 제어 구간([[예측 지평과 제어 지평]]).
+- $\lambda$ : 제어 증분에 대한 가중치([[제어 가중치 람다]]).
+
+이번에도 절댓값을 **보조 변수 + 부등식 쌍**으로 바꾼다. 모든 $\theta\in\Theta$ 에 대해 $\mu_i \ge 0$, $\beta_i \ge 0$ 들이 다음을 만족한다면
+
+$$-\mu_i \le \big(y_i(t+j) - r_i(t+j)\big) \le \mu_i$$
+
+$$-\beta_i \le \Delta u_i(t+j-1) \le \beta_i$$
+
+$$0 \le \sum_{i=1}^{n\times N}\mu_i + \lambda\sum_{i=1}^{m\times N_u}\beta_i \le \gamma$$
+
+$\gamma$ 는 다음 값의 상한이 된다.
+
+$$\mu^*(\mathbf{u}) = \max_{\boldsymbol{\theta}\in\mathcal{E}}\ \sum_{j}\sum_{i}\big|y_i(t+j,\theta) - r_i(t+j)\big| + \lambda\sum_{j=1}^{N_u}\sum_{i=1}^{m}\big|\Delta u_i(t+j-1)\big|$$
+
+($\mathcal{E}$ 는 $\Theta$ 의 꼭짓점 집합.) 따라서 문제는 상한 $\gamma$ 를 최소화하는 **LP**로 축소된다.
+
+$$\min_{\gamma,\mu,\beta,\mathbf{u}}\ \gamma$$
+
+$$\text{s.t.}\quad \mu \ge G_u\mathbf{u} + G_\theta\boldsymbol{\theta} + \mathbf{f} - \mathbf{r}, \qquad \mu \ge -G_u\mathbf{u} - G_\theta\boldsymbol{\theta} - \mathbf{f} + \mathbf{r}, \qquad \forall\boldsymbol{\theta}\in\Theta$$
+
+$$\beta \ge \mathbf{u}, \qquad \beta \ge -\mathbf{u}, \qquad \gamma \ge \mathbf{1}^{t}\mu + \lambda\mathbf{1}\beta$$
+
+여기서도 $\Theta$ 의 **꼭짓점만 고려**하면 $\theta$ 에 대한 의존성을 없앨 수 있다.
+
+> [!note] 확장은 쉽다
+> 변화율(slew rate) 제한이나 공정·조작 변수의 한계 같은 다른 문제 제약도 **쉽게 추가**할 수 있다. 그리고 앞서와 마찬가지로 제약의 구조를 활용해 최적화 문제의 계산 부담을 줄일 수 있다.
+
+> [!note] QP와 LP라는 약어 (각주 6, 7)
+> 이 챕터에서 "QP"는 문맥에 따라 "이차 계획(quadratic program)" 또는 "이차 계획법(quadratic programming)" 을 뜻하고, "LP"도 마찬가지로 "선형 계획" 또는 "선형 계획법"을 뜻한다.
+
+### 네 가지 방법 비교
+
+| 방법 | 목적함수 | 결과 문제 유형 | 특징 |
+|---|---|---|---|
+| 이차 노름 + 꼭짓점 | 이차 오차 + 이차 제어 노력 | QP | 보조 변수 $\gamma$ 도입, 꼭짓점 $2^{N\times n}$ 개, 차원에 취약 |
+| 이차 노름 + 무한 지평 | 무한합 $x^TQx + u^TRu$ | SDP (LMI) | $V(x)=x^TPx$ 상한, 피드백 이득 $K=YW^{-1}$ 를 직접 산출 |
+| $\infty$–$\infty$ 노름 | 최대 추종 오차 | LP | 계산 가벼움, **제어 노력을 무시** |
+| 1-노름 | 오차 절댓값 합 + 증분 절댓값 합 | LP | 제어 노력 포함, 보조 변수 $\mu,\beta,\gamma$ |
+
+### 예제 6.2 — min–max MPC로 출력 한계 지키기
+
+산업 현장에서 많은 공정의 **설정점(setpoint)** 은 경제적 목표를 만족시키기 위한 최적화 프로그램으로 결정된다. 그 결과 최적 설정점은 보통 **어떤 제약들의 교차점 위에** 놓인다. 예를 들어 처리량을 최대화하는 경우가 그렇다. 이는 보통 공정을 안전 또는 품질 제약에 **최대한 가까운 극한 조건**에서 운전하게 만든다. 이런 상황에서 불확실성 고려는 대단히 중요하다.
+
+이 점을 보이기 위해 다음 차분방정식으로 기술되는 공정을 보자.
+
+$$y(t+1) = -1.4\,y(t) + 0.42\,y(t-1) + 0.1\,u(t) + 0.2\,u(t-1) + \frac{\theta(t+1)}{\Delta}$$
+
+조건은 다음과 같다.
+
+| 항목 | 값 |
+|---|---|
+| 불확실성 범위 | $-0.03 \le \theta(t) \le 0.03$ |
+| 출력 제약 | $y(t) \le 1$ |
+| 제어 증분 제약 | $-1 \le \Delta u(t) \le 1$ |
+| 제어기 | 1-노름 MPC, 가중치 $0.2$ |
+| 예측 구간 / 제어 구간 | 3 / 1 |
+| 설정점 | 출력 제약값과 **동일** |
+
+불확실성은 불확실성 집합 안에서 **균등분포**로 무작위 생성했다.
+
+![[mpc_fig_6_1.png]]
+
+> **그림 6.1이 말하는 것.** (a)는 통상적인 MPC의 결과다. 출력 신호가 제약을 **위반한다.** MPC가 **기댓값에 대해서만** 제약을 확인했기 때문이다. (b)는 min–max 알고리즘을 적용한 결과다. MPC가 불확실성의 **가능한 모든 값**을 확인했으므로 제약이 **항상** 만족된다. 설정점이 제약선 위에 놓여 있다는 점에 주목하자. 여유가 0인 지점에서 운전하고 있으므로, 아주 작은 교란도 곧바로 위반이 된다.
+
+분명하게 정리하면 이렇다. **제약만 고려하는 MPC**는 문제를 풀어 출력 신호의 **기댓값**을 실현 가능 영역 안에 유지하지만, 외부 교란이나 불확실성 때문에 **출력이 실제로 유계라는 보장은 없다.** 반면 불확실성을 고려하면 MPC는 **최악의 상황에 대해** 목적함수를 최소화하고, **불확실성의 모든 가능한 경우에 대해** 변수 값을 제약 영역 안에 유지한다.
+
+### 예제 6.3 — 공정 이득의 불확실성에 대한 강인성
+
+다음 차분방정식으로 기술되는 2차 시스템을 보자.
+
+$$y(t+1) = 1.97036\,y(t) - 0.98019\,y(t-1) + 0.049627\,K\,\big(u(t) + 0.99335\,u(t-1)\big)$$
+
+여기서 $0.5 \le K \le 2$ 다. 즉 **공정의 정적 이득이 공칭값의 절반에서 두 배까지** 어떤 값이든 될 수 있다.
+
+| 항목 | 값 |
+|---|---|
+| 노름 | 이차 |
+| 제어 증분 가중치 | $0.1$ |
+| 제어 구간 | 1 |
+| 예측 구간 | 10 |
+| 제어 증분 제약 | $-1$ 에서 $1$ 사이 |
+
+![[mpc_fig_6_2.png]]
+
+> **그림 6.2가 말하는 것.** (a)는 세 가지 공정 이득값(공칭, 최대, 최소)에 대해 **제약 GPC**를 적용한 결과다. 이득이 **최댓값**을 가질 때 결과가 나빠져 **진동하는 거동**이 나타난다. (b)는 같은 경우들에 **min–max GPC**를 적용한 결과다. 최악의 경우를 고려하는 min–max GPC의 응답은 **모든 상황에서 수용 가능**하다.
+
+이 예제에서 min–max 문제는 **제어 증분 공간에서의 경사(gradient) 알고리즘**으로 풀었다. 이 공간에서 방문하는 각 점마다 목적함수를 **최대화하는 $K$ 값**을 결정해야 했는데, 이는 **불확실성 폴리토프의 극점**(이 경우 두 점)에서 목적함수를 계산해서 수행했다.
+
+![[mpc_fig_6_3.png]]
+
+> **그림 6.3이 말하는 것.** 출력 한계 띠다. 공정 이득을 파라미터 불확실성 집합 안에서 최솟값부터 최댓값까지 **균등하게 변화시키며 600가지 경우**로 시뮬레이션한 연구 결과다. **min–max 제약 GPC의 불확실성 띠가 제약 GPC의 띠보다 훨씬 작다.** 이것이 min–max의 값어치다. 최악을 대비한 대가로 실제 궤적들이 **좁은 다발**로 모인다.
+
+---
+
+## 6.3 폐루프 예측을 쓰는 Min–Max MPC (Min–Max MPC with Closed-Loop Predictions)
+
+### 개루프 예측의 함정
+
+앞 절의 min–max 정식화들은 결국 다음 문제를 푸는 것으로 요약된다.
+
+$$\min_{u(t),u(t+1),\dots,u(t+N-1)}\ \max_{\theta(t),\theta(t+1),\dots,\theta(t+N-1)}\ J(\cdot) \tag{6.9}$$
+
+결정 변수와 불확실성 변수에 대한 각각의 한계 $\mathbf{U}$, $\Theta$ 그리고 추가 공정 제약에 종속된다.
+
+여기서 주의할 점이 있다. **출력이나 상태 제약이 있는 min–max MPC를 풀 때, 해는 불확실성의 모든 가능한 실현값에 대해 제약을 만족해야 한다.** 즉 예측 구간을 따라 궤적의 불확실성 한계가 제약이 정의하는 폴리토프 안에 들어가야 한다.
+
+> [!warning] 두 가지 실패 양상
+> 1. **실현 불가능(infeasible).** 많은 경우 예측의 불확실성 한계가 예측 구간을 따라 **너무 크게 자라서** 실현 가능한 해를 아예 찾을 수 없다.
+> 2. **과도한 보수성.** 설령 실현 가능한 해를 찾더라도 **지나치게 보수적**이어서 **과도하게 조심스러운(overcautious)** 제어기가 된다.
+
+이 과도한 보수성의 원인은 무엇인가? 책의 진단은 명확하다. **통상적 MPC 예측의 개루프적(open-loop) 성질** 때문이다. 개루프 예측은 **이동 구간 원리**와 MPC의 **실제 폐루프적 성질**을 고려하지 않는다. 즉 예측은 시각 $t$ 에서 제어 구간 전체에 대해 **개루프 모드로** 이루어지며, **미래의 샘플링 시각에는 제어기가 공정에 대해 더 많은 정보를 갖게 된다는 사실을 전혀 반영하지 않는다.**
+
+### 체스 비유 — 왜 개루프가 손해인가
+
+이 아이디어를 보여주는 다른 방법은, 불확실성 하에서의 제어를 **게임 문제**로 보는 것이다(min–max 알고리즘은 게임 문제에서 널리 쓰인다). 강인 제어 문제를 **두 명이 두는 체스**로 생각해 보자.
+
+> [!example] 비유 — 체스 두 사람
+> **개루프 방식.** 첫 번째 플레이어(제어 동작)가 **게임이 시작되기도 전에** 비용함수를 최소화하는 **전체 수순**을 정한다(비용함수가 낮을수록 첫 번째 플레이어에게 좋다). 그다음 두 번째 플레이어(불확실성)가 비용을 최대화하는 불확실성 실현값의 수순을 고른다.
+>
+> **폐루프 방식.** 첫 번째 플레이어가 비용함수 $J$ 를 최소화하는 **한 수**를 둔다. 그러면 두 번째 플레이어(불확실성)가 비용함수를 최대화하려는 **한 수**를 둔다. 첫 번째 플레이어가 **두 번째 수를 둘 차례가 되면, 1단계에서 양쪽이 둔 수를 이미 알고 있으므로 더 잘 아는 상태에서 결정**할 수 있다.
+
+당연히 개루프 방식이 훨씬 불리하다. 전체 수순을 미리 다 정해 놓고 상대가 그걸 보고 대응하게 놔두는 셈이니, "어떤 대응이 와도 버티는 수순"을 짜려면 **극도로 방어적**이 될 수밖에 없다. 그래서 문제를 다음처럼 세워야 한다.
+
+$$\min_{u(t)}\left(\max_{\theta(t)}\left(\min_{u(t+1)}\left(\max_{\theta(t+1)}\cdots \min_{u(t+N-1)}\left(\max_{\theta(t+N-1)} J(\cdot)\right)\right)\cdots\right)\right) \tag{6.10}$$
+
+식 (6.9)의 통상적 개루프 정식화 대신 이 **중첩된(nested)** 형태를 쓰는 것이다.
+
+> [!important] 두 식의 차이를 한 문장으로
+> (6.9)는 $\min\max$ 가 **한 번**이다. 모든 입력을 정한 뒤 모든 불확실성이 정해진다. (6.10)은 $\min$ 과 $\max$ 가 **번갈아 $N$ 번** 나온다. 입력 하나 정하고, 불확실성 하나 보고, 다음 입력을 정한다. 이 교대(alternation)가 곧 **정보의 흐름**이고, 그것이 보수성을 줄인다.
+
+다시 말해 **시각 $t$ 의 제어 동작은 "이동 구간 원리가 쓰일 것이고, 미래 시각의 제어 동작은 비용함수를 최소화하도록 계산될 것이며, 동시에 불확실성은 비용함수를 최대화하려 최선을 다할 것"이라는 가정 아래 계산되어야 한다.**
+
+> [!warning] 그런데 이건 무한 지평이다
+> 체스 같은 게임에서 이는 **재귀적 전략**이 되고, 사실상 **무한 지평**으로 이어진다. 유한한 수 안에 모든 불확실성 실현값에 대해 승리(패배) 위치, MPC로 치면 **종말 영역(terminal region)** 이 발견되지 않는 한 끝나지 않는다. 그럼에도 실제 폐루프 전략은 **매 샘플링 시각마다 제어 구간이 줄어든다고 보고**, **도달한 최종 위치의 가치를 평가(추정)하는 함수**를 도입함으로써 근사할 수 있다. 이 "최종 위치의 가치"가 바로 종말 비용 $F(\cdot)$ 이다([[불변 집합 Invariant Set]]과의 연결을 기억하자).
+
+이제 문헌에 제안된 세 가지 폐루프 min–max 전략을 차례로 본다.
+
+### 선형 피드백 (Linear Feedback)
+
+폐루프 제어 정책을 세우는 가장 직접적인 선택은, 제어 동작을 **안정화 피드백 조절기 $K$ 와 min–max MPC의 조합**으로 계산하는 것이다 [8,9].
+
+$$u(t+k) = -K\,x(t+k\mid t) + v(t+k)$$
+
+여기서 보조 변수 $v(t)$ 로 주어지는 MPC 제어기의 제어 동작은, **안정화 조절기가 제공하는 입력에 대한 증분**이다.
+
+![[mpc_fig_6_4.png]]
+
+> **그림 6.4가 말하는 것.** 선형 피드백 구조를 갖는 min–max의 블록 다이어그램이다. 단순화를 위해 제어 목표는 **상태를 0으로 보내는 것**으로 두었다. 안쪽 루프에 상수 이득 $K$ 의 상태 피드백이 있고, min–max MPC는 그 위에 얹혀 **추가 입력 $v$** 를 만들어 낸다. 즉 MPC가 처음부터 모든 것을 결정하는 것이 아니라, **이미 동작하고 있는 안정화 제어기를 보정**하는 역할을 맡는다.
+
+> [!note] 이 방법의 정체 — 절반만 폐루프
+> 이 접근은 사실 **폐루프와 개루프 패러다임의 중간**에 있다. **피드백 이득은 폐루프 정책에 해당**하지만, **min–max 제어기가 계산하는 증분은 개루프 방식으로** 계산되기 때문이다.
+
+**$K$ 도 최적화 변수로 만들면** 이 방법의 이득을 더 키울 수 있다. MPC 틀에서 이는 **가능한 제어 법칙들에 대해 최적화**하는 것으로 번역되며, 최적화기가 $x(t+j)$ 의 **모든 가능한 선형 함수의 공간**에서 탐색해야 한다는 뜻이다.
+
+> [!warning] 실용적이지 않다
+> 이는 **비실용적인 비선형 최적화 문제**로 이어지며 풀기가 훨씬 어렵다. 다만 그 해는 **불확실성 띠의 크기 축소**와 연결되어 있고, 이는 매우 바람직한 성질이다. 단일 제어 프로파일 하나로는 가능한 모든 미래 불확실성을 감당하지 못해, min–max MPC의 전통적(개루프) 예측 전략이 **실현 불가능**해질 수 있기 때문이다.
+
+비슷하지만 더 편리한 접근이 [10]의 **외란 피드백(disturbance feedback)** 이며, 이는 **볼록 계획**으로 이어진다. 이 방법은 기술적으로 min–max MPC 제어기 가족에 속하지 않으므로 이 챕터 뒤(6.5절)에서 소개한다.
+
+### 동적 계획법 (Dynamic Programming)
+
+이 접근은 폐루프 중첩 문제 (6.10)을 **가장 안쪽 괄호부터 바깥쪽으로** 명시적으로 최적화한다. [[동적 계획법과 벨만 원리]] 의 정확한 응용이다.
+
+**1단계 — 가장 안쪽 문제.**
+
+$$J_{t+N-1}^*\big(x(t+N-1)\big) \triangleq \min_{u(t+N-1)} \overline{J}_{t+N-1}\big(x(t+N-1), u(t+N-1)\big)$$
+
+이는 $x(t+N-1)$ 에서 끝까지 가는 비용을 나타내며, $J_{t+N-1}^*$ 를 $x(t+N-1)$ 의 함수로 결정한다. 여기서
+
+$$\overline{J}_{t+N-1}\big(x(t+N-1),u(t+N-1)\big) \triangleq \max_{\theta(t+N-1)} L\big(x(t+N-1),u(t+N-1)\big) + F\big(x(t+N)\big)$$
+
+- $L(\cdot)$ : **단계 비용(stage cost)**. 한 스텝에서 치르는 비용.
+- $F(x(t+N))$ : **마지막 위치의 가치를 재는 종말 비용**. 앞서 말한 체스의 "최종 국면 평가 함수"다. **이것이 무한 루프에 빠지는 것을 막는 장치**다.
+
+**2단계 — 한 칸 뒤로.** 다음 단계에서는 이 문제를 만난다.
+
+$$J_{t+N-2}^*\big(x(t+N-2)\big) \triangleq \min_{u(t+N-2)} \overline{J}_{t+N-2}\big(x(t+N-2),u(t+N-2)\big) \tag{6.11}$$
+
+여기서
+
+$$\overline{J}_{t+N-2}\big(x(t+N-2),u(t+N-2)\big) \triangleq \max_{\theta(t+N-2)}\Big( L\big(x(t+N-2),u(t+N-2)\big) + J_{t+N-1}^*\big(f(x(t+N-2),u(t+N-2),\theta(t+N-2))\big)\Big)$$
+
+**앞 단계에서 구한 최적 비용 $J^*_{t+N-1}$ 이 이번 단계의 종말 비용 자리에 그대로 들어간다는 것**이 동적 계획법의 핵심이다. 문제 (6.11)을 명시적으로 풀 수 있다면 $J_{t+N-2}^*$ 를 얻고, 이런 식으로 계속 뒤로 가면 마침내
+
+$$J_{t}^*\big(x(t)\big) \triangleq \min_{u(t)} \overline{J}_{t}\big(x(t),u(t)\big), \qquad \overline{J}_{t}\big(x(t),u(t)\big) \triangleq \max_{\theta(t)} L\big(x(t),u(t)\big) + J_{t+1}^*\big(f(x(t),u(t),\theta(t))\big)$$
+
+에 도달한다. 특정 $x(t)$ 값에 대한 **폐루프 min–max MPC 제어 동작 $u^*(t)$ 는 $\overline{J}_t(x(t),u(t))$ 의 최솟값**이다.
+
+**제약이 있는 경우.** min–max MPC에 제약을 포함하면 앞의 각 단계는 다음처럼 기술된다.
+
+$$J_t^*(x(t)) \triangleq \min_{u(t)}\ \overline{J}_t(x(t),u(t)) \tag{6.12}$$
+
+$$\text{s.t.}\quad \mathbf{R}_x x(t) + \mathbf{R}_u u(t) \le \mathbf{r}, \qquad f(x(t),u(t),\theta(t)) \in \mathcal{X}(t+1), \qquad \theta(t)\in\Theta$$
+
+$$J_t(x(t),u(t)) \triangleq \max_{\theta(t)\in\Theta}\ L(x(t),u(t)) + J_{t+1}^*(x(t+1)) \tag{6.13}$$
+
+> [!important] 왜 최대화 문제 (6.13)에는 제약이 없는가
+> 이 게임에서 **공정을 제약 안에 유지하는 것은 입력 변수의 임무**이고, **불확실성의 목적은 제약 만족 여부와 무관하게 문제를 최대화하는 것**이기 때문이다 [11]. 불확실성은 "규칙을 지킬 의무가 없는 상대"다.
+
+또한 [11]에서는 **시스템이 선형이고 목적함수의 단계 비용이 이차이면, 해가 상태의 조각별 아핀(piecewise affine) 함수**임이 증명되었다([[조각별 아핀 PWA와 명시적 MPC]] 참고). 지금까지 보았듯 동적 계획법의 **핵심 관건은 함수 $J_{t+j}^*(x(t+j))$ 를 찾는 것**이다(이 접근법에 대한 추가 정보는 책의 부록 B 참고).
+
+### 결정 변수 개수 늘리기 (Increasing the Number of Decision Variables)
+
+또 다른 접근은, 문헌 [12]가 제안한 것처럼 **교란(불확실성)의 각 가능한 실현값마다 서로 다른 최적화 변수를 두는 것**이다. 이는 제어 관점에서 **이상적인 상황**을 만든다. 모델에 불확실성도 없고 외란도 없는 상황 말이다.
+
+단순화를 위해 $\theta(t)$ 가 $\theta^-$ 또는 $\theta^+$ 둘 중 하나이고 $t=0$ 이라 하자. 그러면 $x$ 는 두 개의 후속 상태를 가질 수 있다.
+
+$$x_1^+ = f(x_0, u_0, \theta^+), \qquad x_1^- = f(x_0, u_0, \theta^-)$$
+
+계산된 제어 동작 $u_0$ 는 $\theta(t)$ 가 $\theta^-$ 인지 $\theta^+$ 인지 **정해지기 전에** 골라야 하기 때문이다. **$t=1$ 이 되면 제어기는 $u_1$ 을 결정하기 전에 상태가 $x_1^+$ 인지 $x_1^-$ 인지 알게 된다.** 따라서 $t=0$ 의 각 불확실성 실현값에 대응하는 **두 개의 결정 변수 $u_1^+$, $u_1^-$** 를 도입해 두 가능성을 모두 고려할 수 있다.
+
+$t=2$ 에서는 다음 상태 집합을 갖는다.
+
+$$x_2^{++} = f(x_1^+, u_1^+, \theta^+), \qquad x_2^{+-} = f(x_1^+, u_1^+, \theta^-)$$
+$$x_2^{-+} = f(x_1^-, u_1^-, \theta^+), \qquad x_2^{--} = f(x_1^-, u_1^-, \theta^-)$$
+
+여기에 결정 변수 $u_2^{++}, u_2^{+-}, u_2^{-+}, u_2^{--}$ 가 대응된다.
+
+> [!warning] 나무가 지수적으로 자란다
+> 공정 불확실성이 두 값만 가질 수 있을 때(또는 최대화 문제에 두 값만 유의미할 때), 샘플링 시각 $j$ 마다 추가되는 결정 변수의 개수는 $2^j$ 다. 일반적으로 샘플링 시각 $j$ 에 고려할 불확실성이 $m$ 개라면 최소화 문제의 결정 변수 개수는 $\sum_{j=1}^{N} m^j$ 다.
+> **인과성(causality) 논증**을 쓰면 결정 변수 개수를 줄일 수 있지만, **추가 제약을 넣어야 하므로 문제가 더 복잡**해진다. 이 방법은 **아주 작은 문제를 제외하면 비실용적**이라고 평가된다.
+
+> [!tip] 그래도 이 아이디어는 죽지 않았다
+> 이 "결정 트리" 발상은 6.6절의 **트리 기반 MPC(Tree-Based MPC)** 로 다시 살아난다. 차이는 트리를 **모든 가능성**이 아니라 **시나리오에서 식별되는 주요 추세**로만 제한한다는 점이다.
+
+### 예제 6.4 — 폐루프 대 개루프 정식화
+
+다음 공정을 보자.
+
+$$y(t+1) = a\,y(t) + b\,u(t) + \theta(t)$$
+
+| 항목 | 값 |
+|---|---|
+| $a$ | $0.9$ |
+| $b$ | $1$ |
+| 입력 제약 | $|u(t)| \le 10$ |
+| 출력 제약 | $|y(t)| \le 2$ |
+| 불확실성 | $|\theta(t)| \le 1$ |
+
+문제는 $y(t)$ 를 최대한 0에 가깝게 유지하되, 제어 구간의 다음 $N$ 스텝 동안 **불확실성의 모든 가능한 값에 대해** $|y(t+j)| \le 2$ 로 유계이도록 하는 것이다. $y_n(t+j)$ 를 **공칭 예측**(불확실성이 없을 때의 예측)이라 하면 출력은
+
+$$y(t+j) = y_n(t+j) + \sum_{i=1}^{j} a^{j-i}\,\theta(t+i-1)$$
+
+**개루프에서는 답이 없다.** 제어 수순 $(u(t),\dots,u(t+N-1))$ 을 어떻게 조합하든, 공정이 제약 $|y(t)|\le 2$ 를 위반하게 만드는 불확실성 조합 $(\theta(t),\dots,\theta(t+N-1))$ 을 **항상 찾을 수 있다.** 불확실성이 극값 $\theta(t+j)=1$ 또는 $\theta(t+j)=-1$ 을 취하고 $\theta(t+j) = \mathrm{sign}(y_n(t+j))$ 로 고르면
+
+$$|y(t+j)| = |y_n(t+j)| + |(1 + a + \cdots + a^{j-i})| \ge 2 \qquad \text{for } j > 2$$
+
+가 되기 때문이다. 즉 **불확실성의 모든 실현값에 대해 공정 변수가 한계 안에 있도록 보장하는 제어 수순은 존재하지 않는다.**
+
+> [!warning] 원문 수식 확인 필요
+> 위 부등식에서 $\mathrm{sign}$ 을 곱했을 때 절댓값이 더해지는 형태와 지수 $j-i$ 의 표기는 추출 원문 그대로 옮긴 것이다. 논지(불확실성을 부호에 맞춰 고르면 누적 오차가 최대가 되어 한계를 넘는다)는 명확하나, 지수 표기가 $j-i$ 인지 $j-1$ 인지는 원문에서 단정하기 어렵다.
+
+**그런데 피드백을 쓰면 답이 있다.** 조작 변수를 다음처럼 고르면
+
+$$u(t+j) = -\frac{a\,y(t+j)}{b}$$
+
+공칭 예측이 $y_n(t+j)=0$ 이 되고, 따라서
+
+$$y(t+j+1) = \theta(t+j), \qquad |y(t+j)| = |\theta(t+j-1)| \le 1 \le 2$$
+
+즉 **이 단순한 제어 법칙만으로 불확실성의 모든 가능한 값에 대해 제약이 만족된다.**
+
+> [!important] 차이는 단 하나 — 정보
+> 결정적 차이는 이것이다. 이번에는 $u(t+j)$ 가 $\theta(t),\dots,\theta(t+j-1)$ 을 **알고 있는 상태에서** 계산되는 반면, 앞의 경우에는 $u(t+j)$ 가 $\theta(t)\dots\theta(t+j-1)$ 에 대한 **아무 지식 없이** 계산되었다.
+>
+> 보다시피 **단순한 선형 제어기가 피드백을 사용함으로써** 문제의 실현 가능한 해를 찾아낸다. 개루프 MPC는 시각 $t$ 에 이용 가능한 정보만으로 제어 문제의 해를 찾으려 하지만, **현실은 이동 제어 전략 때문에 시각 $t+1$ 에는 시각 $t+1$ 의 공정 상태(따라서 불확실성)에 대한 정보가 이용 가능**하고, 제어 법칙은 이를 활용해 불확실성 띠의 크기를 줄일 수 있다.
+
+> [!question] 자기 점검
+> 개루프 min–max가 이 예제에서 실패한 이유는 "제어 능력이 부족해서"인가, "정보를 늦게 쓰기 때문"인가? (답: 후자다. 입력 한계는 $|u|\le 10$ 으로 넉넉했다.)
+
+---
+
+## 6.4 불확실성 하의 강인한 제약 만족 (Robust Constraint Satisfaction Under Uncertainties)
+
+### 관점의 전환 — 비용함수가 아니라 제약이 문제다
+
+지금까지 보았듯 min–max MPC는 **실현 불가능한 문제**가 될 수 있다. **단일 제어 프로파일 하나로는 가능한 모든 미래 불확실성을 감당하지 못하기** 때문이다. 그런데 여기서 중요한 관점 전환이 일어난다.
+
+> [!important] 이 절의 핵심 주장
+> **비용함수는 최적화기에게 제어 선호를 알려줄 뿐이고, 강인성의 열쇠는 "불확실성의 어떤 실현값에 대해서도 제약이 만족되는가"에 있다.**
+
+따라서 **불확실성·예측 띠·제약 만족 사이의 상호작용**을 더 자세히 들여다볼 가치가 있다. 이것이 **덜 보수적인 최적화 전략**을 구현하는 길을 열어 주기 때문이다.
+
+이를 위해 최적화 문제의 제약을 다음처럼 표현하자.
+
+$$\mathbf{R}_u\mathbf{u} \le \mathbf{r} + \mathbf{R}_\theta\boldsymbol{\theta} + \mathbf{R}_x x(t), \qquad \forall\theta\in\Theta \tag{6.14}$$
+
+이는 **무한 개의 제약 집합**에 해당한다. $\theta$ 의 가능한 실현값마다 하나씩이기 때문이다.
+
+**그러나 제약이 불확실성의 아핀 표현이므로**, 부등식이 $\Theta$ 의 **모든 극점(꼭짓점)** — 그 집합을 $\varepsilon$ 이라 하자 — 에서 성립하면 $\Theta$ 내부의 모든 점에서도 성립한다. 즉 무한 개의 제약을 **유한 개**(보통은 아주 많지만)의 제약으로 대체할 수 있다.
+
+$$\mathbf{R}_u\mathbf{u} \le \mathbf{r} + \mathbf{R}_\theta\theta_i + \mathbf{R}_x x(t), \qquad \forall\theta_i\in\varepsilon \tag{6.15}$$
+
+이 전략은 확장성이 나쁘므로, **제약의 개수를 줄이고 강인 만족의 보수성을 낮추는 것**이 대단히 중요하다. 책은 세 가지 방향을 제시한다.
+
+### 제약 개수 줄이기 (Reducing the Number of Constraints)
+
+식 (6.15)의 제약 개수는 **$\mathbf{R}_u$ 의 행 개수 × 예측 구간을 따라 불확실성을 정의하는 폴리토프의 꼭짓점 개수**($\varepsilon$)다. 이는 앞 장에서 소개한 **제약 제거 방법**을 적용하면 극적으로 줄일 수 있다.
+
+식 (6.15)의 $j$ 번째 행을 보자.
+
+$$\mathbf{r}_{u_j}\mathbf{u} \le \mathbf{r}_j + \mathbf{r}_{\theta_j}\theta_i + \mathbf{r}_{x_j}x(t), \qquad \forall\theta_i\in\varepsilon \tag{6.16}$$
+
+- $\mathbf{r}_{u_j}, \mathbf{r}_{\theta_j}, \mathbf{r}_{x_j}$ : 각각 행렬 $\mathbf{R}_u, \mathbf{R}_\theta, \mathbf{R}_x$ 의 대응하는 행.
+- $\mathbf{r}_j$ : 벡터 $\mathbf{r}$ 의 $j$ 번째 성분(스칼라).
+
+이제 다음을 정의한다.
+
+$$m_j \triangleq \min_{\theta_i\in\varepsilon}\ \mathbf{r}_{\theta_j}\theta_i$$
+
+즉 $m_j$ 는 **이 특정 제약에 불확실성이 미칠 수 있는 영향의 한계**다. 식 (6.16)의 불확실성 항을 이 한계로 **대체하면 제약이 조여지며(tightened)**, 불확실성의 어떤 가능한 실현값에 대해서도 강인해진다. 다음이 만족되면
+
+$$\mathbf{r}_{u_j}\mathbf{u} \le \mathbf{r}_j + m_j + \mathbf{r}_{x_j}x(t)$$
+
+식 (6.16)의 제약도 만족된다는 것을 쉽게 알 수 있다.
+
+> [!example] 비유 — 안전 여유를 미리 떼어 놓기
+> 짐칸에 100 kg까지 실을 수 있는데 저울 오차가 최대 3 kg라고 하자. 매번 "오차가 얼마일까"를 따지는 대신, 아예 **한계를 97 kg으로 낮춰 두면** 오차가 어떻게 나오든 안전하다. 이것이 **제약 조임(constraint tightening)** 이다. 그리고 이 97이라는 숫자는 **오프라인으로 한 번만** 계산하면 된다.
+
+이 **제약 조임 절차는 (6.16)의 각 행 $j$ 와 $\theta_i \in \varepsilon$ 에 대해 오프라인으로 수행**할 수 있고, 그 결과가 벡터 $\mathbf{m}$ 이다($j$ 번째 성분이 $\min_{\theta_i\in\varepsilon}\mathbf{r}_{\theta_j}\theta_i$). 이렇게 하면 제약 (6.14)는 간단히
+
+$$\mathbf{R}_u\mathbf{u} \le \mathbf{r} + \mathbf{m} + \mathbf{R}_x x(t)$$
+
+로 표현되고, **제약 개수가 크게 줄어든다.** 주목할 점은 이 절차가 **제약 집합을 불확실성에 대한 의존성으로부터 해방시킨다**는 것이다. 자세한 것은 [[제약 조임 Constraint Tightening]] 노트를 보자.
+
+**종말 집합에도 같은 것이 적용된다.** MPC의 안정화 장치인 **종말 집합(terminal set)** [13]은 $x(t+N) \in \Omega_T$ 형태의 제약을 부과하는데, $\Omega_T$ 는 보통 폴리토프 $\Omega_T \triangleq \{x : \mathbf{R}_T x \le \mathbf{r}_T\}$ 로 정의된다. 이는 **불확실성의 모든 가능한 값에 대해 최종 상태가 종말 영역에 도달하도록 강제**한다.
+
+> [!note] 종말 집합 제약도 같은 틀로 (각주 8)
+> 예측 상태 벡터는 $\mathbf{x} = \mathbf{G}_u\mathbf{u} + \mathbf{G}_\theta\boldsymbol{\theta} + \mathbf{f}_x x(t)$ 로 쓸 수 있다. $x(t+N)$ 에 해당하는 행들을 골라 종말 영역을 정의하는 부등식에 대입하면
+> $$\mathbf{R}_T\big(\mathbf{g}_{u_N}\mathbf{u} + \mathbf{g}_{\theta_N}\boldsymbol{\theta} + \mathbf{f}_{x_N}x(t)\big) \le \mathbf{r}_T \tag{6.17}$$
+> 여기서 $\mathbf{g}_{u_N}, \mathbf{g}_{\theta_N}, \mathbf{f}_{x_N}$ 은 각각 $\mathbf{G}_u, \mathbf{G}_\theta, \mathbf{F}_x$ 의 마지막 $n$ 개 행이고 $n = \dim(x)$ 다. 따라서 제약 (6.17)을 (6.14) 형태로 변환하는 것은 간단하며, **같은 제약 조임 절차를 그대로 적용**할 수 있다.
+
+### 예측 띠 줄이기 (Reducing Prediction Bands)
+
+앞 절에서 보았듯 **폐루프 예측(과 그로부터 얻은 MPC 제어기)은 개루프보다 덜 보수적**이다. 제어 동작을 두 부분으로 분해하면 이를 쉽게 볼 수 있다. 하나는 상수 피드백 법칙 $K$ 가 주는 것, 다른 하나는 예측 제어기가 주는 $v(t)$ 다.
+
+$$u(t+k) = -K\,x(t+k\mid t) + v(t+k)$$
+
+즉 MPC 제어기의 제어 동작은 **안정화 조절기가 제공하는 입력에 대한 증분**이다. 이 방법은 **미래의 제어기가 미래 공정 상태와 이미 발생한 불확실성(또는 그것이 공정 출력·상태에 미친 영향)에 대한 정보를 바탕으로 어떤 제어 동작을 할 것이라고 고려함으로써 불확실성 예측 띠를 줄인다.**
+
+선형 피드백을 도입하고 나면 공정 방정식은
+
+$$x(t+1) = A_K\,x(t) + B\,v(t) + \theta(t), \qquad y(t) = C\,x(t) \tag{6.18}$$
+
+여기서 $A_K = A - BK$ 다. **새로운 조작 변수 $v(t)$ 와 새로운 행렬 $A_K$ 를 갖는 새 시스템**을 얻은 셈이다. 예측식은 다음이 된다.
+
+$$x(t+k) = A_K^{\,k}\,x(t) + \sum_{j=0}^{k-1} A_K^{\,k-1-j} B\,v(t+j) + \sum_{j=0}^{k-1} A_K^{\,k-1-j}\,\theta(t+j)$$
+
+우변의 **처음 두 항이 공칭 궤적**(불확실성이 0일 때)이고, **세 번째 항이 불확실성이 만드는 오차**다. 이제 개루프($K=0$)와 폐루프 구조에서 불확실성이 유발하는 오차를 나란히 비교할 수 있다.
+
+$$\tilde{x}_o(t+k) = \sum_{j=0}^{k-1} A^{\,k-1-j}\,\theta(t+j) \qquad\text{(개루프)}$$
+
+$$\tilde{x}_c(t+k) = \sum_{j=0}^{k-1} A_K^{\,k-1-j}\,\theta(t+j) \qquad\text{(폐루프)}$$
+
+**차이는 딱 하나, $A$ 냐 $A_K$ 냐다.** 불확실성이 $\|\theta(t)\|_p \le 1$ 로 유계라 하자. 그러면 삼각부등식으로
+
+$$\|\tilde{x}_o(t+k)\|_p \le \sum_{j=0}^{k-1}\|A^{\,k-1-j}\|_p, \qquad \|\tilde{x}_c(t+k)\|_p \le \sum_{j=0}^{k-1}\|A_K^{\,k-1-j}\|_p$$
+
+> [!important] 결론 한 줄
+> **피드백 이득을 $\|A_K\|_p < \|A\|_p$ 가 되도록 고르면, 예측의 불확실성 한계도 개루프의 대응하는 한계보다 작아진다.**
+
+이 효과는 시스템의 **립시츠 상수(Lipschitz constant)** 의 감소로도 볼 수 있다. 립시츠 상수는 입력 변화에 대한 시스템 변화율의 **전역적 한계**를 주며, 불확실성의 효과도 여기에 포함된다. 문헌 [14]가 보인 대로 **립시츠 상수가 낮으면 공칭 예측 궤적과 시스템의 불확실한 실제 진화 사이의 불일치가 줄어든다**(각주 9). 배경은 [[립시츠 상수와 예측 오차]] 노트를 보자.
+
+> [!example] 비유 — 브레이크가 달린 자동차
+> 언덕길에서 차를 굴린다고 하자. 브레이크가 없으면($K=0$) 처음의 작은 밀침 하나가 계속 가속되어 나중엔 걷잡을 수 없다. 브레이크가 있으면($A_K$) 같은 밀침이 곧 잡혀서 궤적에서 크게 벗어나지 않는다. **똑같은 외란인데, 시스템이 그것을 어떻게 증폭하느냐**가 다르다.
+
+### 실현 가능 공간 넓히기 (Increasing Feasibility Space)
+
+예측 띠가 줄어들면 제어 시스템은 **운전 한계에 더 가까이** 갈 수 있다. 이 효과는 제약을 **새 조작 변수 $v(t)$ 로 번역**해 보면 보인다. 원래 문제의 제약이 다음으로 표현되었다고 하자.
+
+$$\mathbf{R}_u\mathbf{u} + \mathbf{R}_\theta\boldsymbol{\theta} \le \mathbf{r} + \mathbf{R}_x x(t) \tag{6.19}$$
+
+피드백 이득 $K$ 를 도입하면 전체 제어 구간에 대한 조작 변수 벡터 $\mathbf{u}$ 는 다음으로 표현된다.
+
+$$\mathbf{u} = \mathbf{M}_x\,x(t) + (\mathbf{I} + \mathbf{M}_v)\,\mathbf{v} + \mathbf{M}_\theta\,\boldsymbol{\theta} \tag{6.20}$$
+
+여기서 $\mathbf{u} = [u(t), u(t+1),\dots,u(t+N-1)]^{T}$, $\mathbf{v} = [v(t),v(t+1),\dots,v(t+N-1)]^{T}$, $\boldsymbol{\theta} = [\theta(t),\theta(t+1),\dots,\theta(t+N-1)]^{T}$ 이고 세 행렬은 다음과 같다.
+
+$$\mathbf{M}_x = -\begin{bmatrix} K \\ K A_K \\ \vdots \\ K A_K^{\,N-1}\end{bmatrix}, \qquad \mathbf{M}_v = -\begin{bmatrix} 0 & 0 & \cdots & 0\\ KB & 0 & \cdots & 0\\ \vdots & \vdots & \ddots & \vdots\\ K A_K^{\,N-2}B & K A_K^{\,N-3}B & \cdots & 0\end{bmatrix}, \qquad \mathbf{M}_\theta = -\begin{bmatrix} 0 & 0 & \cdots & 0\\ K & 0 & \cdots & 0\\ \vdots & \vdots & \ddots & \vdots\\ K A_K^{\,N-2} & K A_K^{\,N-3} & \cdots & 0\end{bmatrix}$$
+
+세 행렬이 모두 **엄격한 하삼각(strictly lower triangular)** 이라는 점에 주목하자([[하삼각 토플리츠 행렬]]과 같은 구조다). **미래의 입력은 아직 일어나지 않은 미래의 외란을 볼 수 없다**는 **인과성**이 행렬의 0 패턴으로 나타난 것이다.
+
+식 (6.20)을 (6.19)에 대입하면 제약이 $\mathbf{v}$ 의 함수로 표현된다.
+
+$$\mathbf{R}_u(\mathbf{I}+\mathbf{M}_v)\mathbf{v} + (\mathbf{R}_u\mathbf{M}_\theta + \mathbf{R}_\theta)\boldsymbol{\theta} \le \mathbf{r} + (\mathbf{R}_x - \mathbf{R}_u\mathbf{M}_x)x \tag{6.21}$$
+
+> [!important] 무엇이 달라졌는가
+> 식 (6.20)에서 **피드백 이득 $K$ 덕분에 $u(t)$ 가 예측 구간을 따라 불확실성의 서로 다른 실현값에 반응해 변한다**는 점을 보라. (6.21)과 (6.19)를 비교하면 제약에 미치는 효과도 분명하다. **$K$ 가 문제 제약을 만족시키기 위한 추가적인 자유도를 제공한다.**
+
+### 예제 6.5 — 피드백 이득으로 예측 띠 줄이기
+
+$x(t+1) = a\,x(t) + b\,u(t) + \theta(t)$ 로 기술되는 시스템을 보자. $\underline{\theta}\le\theta(t)\le\overline{\theta}$, $\underline{u}\le u(t)\le\overline{u}$, $\underline{x}\le x(t)\le\overline{x}$ 다. 제어 구간 $N=3$, 목적함수 $J = \sum_{j=1}^{N} x(t+j\mid t)^2 + \lambda u(t+j-1)^2$ 를 고려한다. 예측식은
+
+$$\begin{bmatrix} x(t+1)\\ x(t+2)\\ x(t+3)\end{bmatrix} = \begin{bmatrix} a\\ a^2\\ a^3\end{bmatrix}x(t) + \begin{bmatrix} b & 0 & 0\\ ab & b & 0\\ a^2b & ab & b\end{bmatrix}\begin{bmatrix} u(t)\\ u(t+1)\\ u(t+2)\end{bmatrix} + \begin{bmatrix} 1 & 0 & 0\\ a & 1 & 0\\ a^2 & a & 1\end{bmatrix}\begin{bmatrix}\theta(t)\\ \theta(t+1)\\ \theta(t+2)\end{bmatrix}$$
+
+더 간결하게는 $\mathbf{x} = \mathbf{G}_x x(t) + \mathbf{G}_u\mathbf{u} + \mathbf{G}_\theta\boldsymbol{\theta}$ 다. 제약은 (6.19) 형태로 다음처럼 쓴다.
+
+$$\mathbf{R}_u = \begin{bmatrix} I\\ -I\\ \mathbf{G}_u\\ -\mathbf{G}_u\end{bmatrix},\quad \mathbf{R}_\theta = \begin{bmatrix} 0\\ 0\\ \mathbf{G}_\theta\\ -\mathbf{G}_\theta\end{bmatrix},\quad \mathbf{r} = \begin{bmatrix} \mathbf{1}\overline{u}\\ -\mathbf{1}\underline{u}\\ \mathbf{1}\overline{x}\\ -\mathbf{1}\underline{x}\end{bmatrix},\quad \mathbf{R}_x = \begin{bmatrix} 0\\ 0\\ -\mathbf{G}_x\\ \mathbf{G}_x\end{bmatrix} \tag{6.22}$$
+
+**네 개의 블록**은 위에서부터 입력 상한, 입력 하한, 상태 상한, 상태 하한이다. min–max MPC는 다음 문제를 푸는 것으로 축소된다.
+
+$$\min_{\mathbf{u}}\max_{\theta}\ \mathbf{x}^T\mathbf{x} + \lambda\,\mathbf{u}^T\mathbf{u} \tag{6.23}$$
+
+$$\text{s.t.}\quad \mathbf{x} = \mathbf{G}_x x(t) + \mathbf{G}_u\mathbf{u} + \mathbf{G}_\theta\boldsymbol{\theta}, \qquad \mathbf{R}_u\mathbf{u} + \mathbf{R}_\theta\boldsymbol{\theta} \le \mathbf{r} + \mathbf{R}_x x(t), \qquad \forall\theta\in\Theta$$
+
+문제 (6.23)의 제약은 $\forall\theta\in\Theta$ 에 대해 만족되어야 하므로 **무한 개의 제약**($\Theta$ 안의 각 점마다 하나)이 된다. 그러나 **꼭짓점에서 만족되면 내부에서도 만족**되므로 **유한 개**로 충분하다.
+
+**구체적 수치.** 공정 모델 파라미터가 다음과 같다고 하자.
+
+| 항목 | 값 |
+|---|---|
+| $a$ | $0.95$ |
+| $b$ | $0.1$ |
+| 입력 제약 | $-20 \le u(t) \le 20$ |
+| 상태 제약 | $-1.2 \le x(t) \le 1.2$ |
+| 기준값 | $r(t) = 0$ |
+| $\lambda$ | $2$ |
+| 불확실성 | $-0.5 \le \theta(t) \le 0.5$ |
+
+이때 제약 행렬은 (6.22)와 함께 다음으로 정의된다.
+
+$$\mathbf{G}_x = \begin{bmatrix} 0.9500\\ 0.9025\\ 0.8574\end{bmatrix},\quad \mathbf{G}_u = \begin{bmatrix} 0.1 & 0 & 0\\ 0.095 & 0.1 & 0\\ 0.0902 & 0.095 & 0.1\end{bmatrix},\quad \mathbf{G}_\theta = \begin{bmatrix} 1 & 0 & 0\\ 0.95 & 1 & 0\\ 0.9025 & 0.95 & 1\end{bmatrix} \tag{6.24}$$
+
+($0.95^2 = 0.9025$, $0.95^3 = 0.857375 \approx 0.8574$ 임을 확인해 보라.)
+
+**개루프에서는 실현 불가능하다.** $x(t)=0$ 이라면 어떤 제어 수순에 대해서든 $t+3$ 에서 불확실성 때문에 생기는 오차는
+
+$$\tilde{x}(t+3) = 0.9025\,\theta(t) + 0.95\,\theta(t+1) + \theta(t+2)$$
+
+$\theta(t)=\theta(t+1)=\theta(t+2)=\overline{\theta}$ 또는 모두 $\underline{\theta}$ 로 두면, 계수의 합이 $0.9025+0.95+1 = 2.8525$ 이므로 오차 띠는
+
+$$2.8525 \times \overline{\theta} = 2.8525 \times 0.5 = 1.4263, \qquad 2.8525 \times \underline{\theta} = -1.4263$$
+
+만큼 커질 수 있다. 즉 공칭 궤적이 $\hat{x}(t+3) \ge 0$ 이면 불확실성을 $\overline{\theta}$ 로 고르는 것만으로 상태가 **허용값 $x(t)\le 1.2$ 를 넘어선다.** $\hat{x}(t+3)\le 0$ 일 때도 마찬가지로 $\underline{\theta}$ 를 고르면 허용값보다 낮아진다. **결국 상태 공간의 어떤 점에서도 문제가 실현 불가능하다.**
+
+**이제 선형 피드백을 넣어 보자.**
+
+$$u(t) = -8.5\,x(t) + v(t)$$
+
+결과 시스템 동특성은
+
+$$x(t+1) = 0.95\,x(t) + 0.1\big(-8.5x(t) + v(t)\big) + \theta(t) = 0.1\,x(t) + 0.1\,v(t) + \theta(t)$$
+
+**극점이 $0.95$ 에서 $0.1$ 로 내려갔다.** $0.95 - 0.1\times 8.5 = 0.95 - 0.85 = 0.1$ 이다. 불확실성이 유발하는 오차는 이제
+
+$$\begin{bmatrix} \tilde{x}(t+1)\\ \tilde{x}(t+2)\\ \tilde{x}(t+3)\end{bmatrix} = \begin{bmatrix} 1 & 0 & 0\\ 0.1 & 1 & 0\\ 0.01 & 0.1 & 1\end{bmatrix}\begin{bmatrix}\theta(t)\\ \theta(t+1)\\ \theta(t+2)\end{bmatrix} \tag{6.25}$$
+
+$t+3$ 의 불확실성 띠는 $\tilde{x}(t+3) = 0.01\theta(t) + 0.1\theta(t+1) + \theta(t+2)$ 이고, 계수 합이 $1.11$ 이므로 오차는 다음으로 유계다.
+
+| 시점 | 오차 한계 | 공칭 궤적의 허용 범위 |
+|---|---|---|
+| $t+1$ | $-0.5 \le \tilde{x} \le 0.5$ | $-0.7 \le \hat{x}(t+1) \le 0.7$ |
+| $t+2$ | $-0.55 \le \tilde{x} \le 0.55$ | $-0.65 \le \hat{x}(t+2) \le 0.65$ |
+| $t+3$ | $-0.555 \le \tilde{x} \le 0.555$ | $-0.645 \le \hat{x}(t+3) \le 0.645$ |
+
+(계산: $1.11 \times 0.5 = 0.555$, 그리고 $1.2 - 0.555 = 0.645$.) 따라서 **공칭 궤적을 한계로부터 $0.5, 0.55, 0.555$ 만큼 떨어뜨려 계산할 수 있으므로 문제가 실현 가능**하며, 모든 $x(t)\in[-1.2,\,1.2]$ 에 대해 실현 가능한 해가 존재한다.
+
+> [!important] 예제 6.5의 결론
+> **개루프 MPC를 썼을 때는 미래 불확실성·교란에도 제약이 만족되는 실현 가능한 해를 전혀 찾을 수 없었다.** 반면 **미래 공정 상태에 대한 정보가 고려될 것이라고(이 예제에서는 선형 피드백으로) 반영하면, 허용 가능한 모든 $x(t)$ 값에 대해 문제가 실현 가능하다.**
+>
+> 숫자로 보면 명확하다. 오차 띠가 $\pm 1.4263$ 에서 $\pm 0.555$ 로, 대략 **1/2.6 로 줄었다.** 상태 한계가 $\pm 1.2$ 이므로 전자는 애초에 불가능하고 후자는 여유가 남는다.
+
+> [!question] 자기 점검
+> 피드백 이득을 $K=8.5$ 보다 더 크게 잡으면 오차 띠는 더 줄어들까? 그 대가는 무엇일까? (힌트: $u = -Kx + v$ 이므로 $K$ 가 커지면 같은 $x$ 에 대해 입력이 커지고, $|u|\le 20$ 제약에 먼저 걸린다.)
+
+---
+
+## 6.5 강인한 제약 만족을 갖는 예측 제어기 (Predictive Controllers with Robust Constraint Satisfaction)
+
+### 최악이 아니라 공칭으로 최적화하기
+
+통상적으로 예측 제어의 목적은 미래 제어 수순 $u(t), u(t+1), \dots, u(t+N_u)$ 를 계산해 최적 $j$ 스텝 앞 예측 $y(t+j\mid t)$ 가 예측 구간 동안 $r(t+j)$ 에 가까워지도록 하는 것이다.
+
+**최적화 관점에서 보면**, min–max MPC처럼 **최악의 외란 실현값을 기준으로** 계산하지 **않는** 편이 나을 수 있다. 대신 최적화기의 목적을 **공정의 공칭 운전(nominal operation)에 더 맞추고**, 보수성은 **강인한 제약 만족을 보장하는 데만** 남겨 두는 것이다.
+
+> [!important] 6.5절의 설계 철학 한 줄
+> **비용은 공칭으로, 제약은 강인하게.** 최악의 경우를 비용함수에 넣으면 제어기가 늘 최악만 대비해 성능이 나빠진다. 최악은 **제약을 조이는 데만** 쓰고, 비용은 **평상시(공칭)** 기준으로 최적화한다.
+
+이 접근은 **평균적으로 더 우수한 성능**을 제공하며, 계산에 **어떤 형태의 피드백을 사용한다**는 특징도 갖는다. 문헌의 대표적인 예 두 가지를 본다.
+
+### 튜브 기반 모델 예측 제어 (Tube-Based Model Predictive Control)
+
+문헌 [15,16]의 이 접근은 공정 상태 $x$ 를 **공칭 성분 $z$** 와 **불확실 오차 항 $e$** 로 나눈다.
+
+$$x = z + e$$
+
+이에 따라 공정 동특성 $x^+ = Ax + Bu + \theta$ 도 두 개로 분해된다.
+
+$$z^+ = Az + Bu \qquad\text{(공칭 시스템)}$$
+$$e^+ = Ae + Bu + \theta \qquad\text{(불확실 시스템)}$$
+
+핵심 아이디어는 **제어 동작 $u$ 를 두 항으로 나누는 것**이다.
+
+$$u = v + K(x - z) \tag{6.26}$$
+
+- $v$ : **MPC 기반 제어 법칙**이 계산하는 입력. 최적화된 수순 $\mathbf{v}^*(z)$ 의 첫 번째 원소다.
+- $K(x-z)$ : **보조 제어 법칙**. 오차 동특성을 제어해 **공칭 상태로부터의 편차를 바로잡아 오차 항을 상쇄**한다.
+
+> [!example] 비유 — 기차와 선로
+> **공칭 궤적 $z$ 는 기차가 달릴 "선로"** 이고, MPC는 그 선로를 어떻게 놓을지 계획한다. 실제 상태 $x$ 는 바람에 흔들리는 기차다. **$K(x-z)$ 는 선로를 벗어나지 않게 잡아 주는 바퀴 플랜지**다. 그리고 흔들릴 수 있는 최대 폭이 곧 **튜브(tube)** 이다. 계획은 선로에 대해 세우고, 안전은 튜브 폭만큼 여유를 남겨 확보한다.
+
+이 분해는 **공칭 궤적 주위의 예측 띠 계산을 단순화**한다. 여기서 이 띠를 **튜브(tube)** 라 부르는데, 불확실성이 유계일 때($\theta\in\Theta$) 튜브는 **피드백 이득 $K$ 가 만드는 오차 동특성의 최소 강인 불변 집합(minimal robust invariant set) $\mathcal{R}$** 로 주어진다(각주 10: 이 맥락에서 튜브의 **단면**이 $\mathcal{R}$ 이다). [[불변 집합 Invariant Set]]과 [[튜브 기반 MPC]] 노트를 함께 보자.
+
+**MPC 문제도 쉽게 정식화된다.** 공칭 동특성은 외란의 영향을 받지 않기 때문이다. 가장 단순한 형태에서(각주 11) 공칭 상태 $z$ 에서 최적화된 제어 동작 수순 $\mathbf{v}^*(z)$ 는 다음을 풀어 얻는다.
+
+$$\min_{\vec{v}}\ V^f\big(z(N)\big) + \sum_{j=0}^{N-1}\ell\big(z(j), v(j)\big)$$
+
+여기서 $\ell$ 은 이차 단계 비용이다.
+
+$$\ell(x,u) = x^{\top}Qx + u^{\top}Ru$$
+
+$Q$ 와 $R$ 은 **양정부호(positive definite) 가중 행렬**이고, $V^f$ 는 **종말 비용**이다. 최적화는 다음 제약에 종속된다.
+
+$$z(j+1) = Az(j) + Bv(j), \quad j=1\dots N-1$$
+$$z(0) = z$$
+$$z(j) \in \mathbb{X} \ominus \mathcal{R}, \quad j=0\dots N-1$$
+$$v(j) \in \mathbb{U} \ominus K\mathcal{R}, \quad j=0\dots N-1$$
+$$z(N) \in \mathbb{X}^f$$
+
+> [!important] $\ominus$ 를 읽는 법이 이 절의 전부다
+> $\ominus$ 는 **폰트랴긴 차집합(Pontryagin difference)** 이다. $\mathbb{X}\ominus\mathcal{R}$ 은 **"거기에 $\mathcal{R}$ 만큼의 튜브를 씌워도 여전히 $\mathbb{X}$ 안에 있는 점들의 집합"** 이다. 즉 **원래 제약에서 튜브 폭만큼 안쪽으로 줄인 집합**이다. 같은 방식으로 $\mathbb{U}\ominus K\mathcal{R}$ 는 **보조 제어 동작 $K(x-z)$ 가 쓸 몫을 미리 떼어 놓은 입력 제약**이다.
+>
+> 이것이 6.4절의 **제약 조임**을 집합 언어로 다시 쓴 것임을 알아채는 것이 중요하다. 자세한 것은 [[민코프스키 합과 집합 연산]] 노트에 있다.
+
+$\mathbb{X}^f$ 는 **공칭 시스템에 안정성 보장을 제공하는 종말 집합**이다. $\mathbb{X}$ 와 $\mathbb{U}$ 로 주어지는 $x$ 와 $u$ 에 대한 제약이 조정되는 이유를 다시 정리하면 다음과 같다. **오차의 어떤 가능한 실현값**(강인 불변 집합 $\mathcal{R}$ 안에 머문다)**에 대해서도, 그리고 피드백 이득 $K$ 가 생성하는 보조 제어 동작**(집합 $K\mathcal{R}$ 안에 놓인다)**에 대해서도 전체 시스템이 실현 가능하도록** 보장하기 위해서다.
+
+> [!note] 튜브 MPC가 주는 것
+> 이 모든 재료를 갖추면, 이 강인 MPC 접근법은 **시스템의 공칭 궤적을 따라 튜브를 만들어** 불확실성과 외란 실현값에도 불구하고 **시스템의 실제 궤적이 그 안에 담기도록** 설계함으로써 불확실성을 관리한다. 또한 이 전략은 **강인 지수 안정성(robust exponential stability)** 을 보장한다 [16].
+
+> [!tip] 알고리즘 요약 (매 샘플마다)
+> 1. 현재 실제 상태 $x$ 를 측정한다.
+> 2. 조여진 제약 $\mathbb{X}\ominus\mathcal{R}$, $\mathbb{U}\ominus K\mathcal{R}$ 아래에서 **공칭 시스템**에 대해 MPC 문제를 풀어 $\mathbf{v}^*(z)$ 를 얻는다.
+> 3. $u = v + K(x-z)$ 를 계산해 **실제 공정에 인가**한다.
+> 4. 공칭 상태를 $z^+ = Az + Bv$ 로 갱신한다.
+> 5. 다음 샘플로 이동한다.
+
+### 최적화된 선형 피드백 정책을 갖는 MPC (MPC with Optimized Linear Feedback Policy)
+
+앞 절에서 MPC 제어기에 **고정된 피드백 이득**을 포함시키는 것의 이점이 분명해졌다. 만약 제어기가 **피드백 정책 자체까지 최적화**할 수 있다면, 즉 $K$ 의 원소들이 최적화의 **추가 자유도**가 될 수 있다면 그 이점은 더 커질 것이다.
+
+> [!warning] 그런데 그건 볼록하지 않다
+> 이 접근은 **다루기 힘든 비선형 최적화 문제**를 낳으며, 허용 가능한 **아핀 상태 피드백 파라미터의 집합이 비볼록(non-convex)** 이다. 이유는 각주 12에 있다. 식 (6.28)을 떠올려 보면 **입력 수순에 $K$ 와 그 거듭제곱이 들어가기** 때문이다. $K, K A_K, K A_K^2, \dots$ 처럼 곱해지는 순간 볼록성이 깨진다.
+
+이 문제를 해결하기 위해 **Goulart 등은 등가인 외란 피드백 파라미터화(disturbance feedback parametrization)** 를 쓸 것을 제안했고, 이는 **볼록 최적화 문제**로 이어진다 [10]. 여기서 피드백 정책은 **구간 내 과거 외란의 아핀 함수**로 정의된다.
+
+$$u(l) = \sum_{j=1}^{l-1} M_{l,j}\,\theta(j) + v(l) \tag{6.27}$$
+
+$l = 0,\dots,N-1$ 이고 각 $M_{l,j}\in\mathbb{R}^{n_u\times n_x}$, $v\in\mathbb{R}^{n_u}$ 다. 그리고
+
+$$\theta(j) = x(j+1) - Ax(j) - Bu(j)$$
+
+> [!important] 발상의 전환 — 상태 대신 외란을 되먹인다
+> **상태 피드백** $u = -Kx + v$ 는 $x$ 가 $u$ 에 의존하고 $u$ 가 다시 $x$ 에 의존하는 **순환** 때문에 $K$ 의 거듭제곱을 만들어낸다. **외란 피드백** $u = \sum M\theta + v$ 는 다르다. **$\theta(j)$ 는 이미 관측된 과거의 값**이고 결정 변수 $M$ 에 의존하지 않는다. 그래서 $u$ 가 $M$ 에 대해 **아핀**이 되고, 문제 전체가 **볼록**해진다.
+>
+> 그리고 $\theta(j) = x(j+1) - Ax(j) - Bu(j)$ 는 **"실제로 일어난 일에서 모델이 예측한 일을 뺀 것"**, 곧 **모델 오차의 실측값**이다. 측정만 되면 바로 계산할 수 있다.
+
+식 (6.27)은 압축된 형태로 다시 쓸 수 있다.
+
+$$\mathbf{u} = \mathbf{v} + \mathbf{M}_\theta\,\boldsymbol{\theta} \tag{6.28}$$
+
+여기서 $\mathbf{u} = [u(t),\dots,u(t+N-1)]^{T}$, $\mathbf{v} = [v(t),\dots,v(t+N-1)]^{T}$, $\boldsymbol{\theta} = [\theta(t),\dots,\theta(t+N-1)]^{T}$ 이고
+
+$$\mathbf{M}_\theta = \begin{bmatrix} 0 & \cdots & \cdots & 0\\ M_{1,0} & 0 & \cdots & 0\\ \vdots & \ddots & \ddots & \vdots\\ M_{N-1,0} & \cdots & M_{N-1,N-2} & 0 \end{bmatrix}$$
+
+**역시 엄격한 하삼각 구조**다. 인과성이 그대로 반영되어 있다. 이 파라미터화는 (6.28)과 유사한 제약 집합으로 이어진다.
+
+$$\mathbf{R}_u\mathbf{v} + (\mathbf{R}_u\mathbf{M}_\theta + \mathbf{R}_\theta)\boldsymbol{\theta} \le \mathbf{r} + \mathbf{R}_x x$$
+
+여느 때처럼 $\theta\in\Theta$ 이면 **가장 보수적인 경우를 고려**해 각 제약의 불확실성 의존성을 제거할 수 있다. 여기서는 **행별(row-wise) 최대화**로 수행한다.
+
+$$\mathbf{R}_u\mathbf{v} + \max_{\theta\in\Theta}(\mathbf{R}_u\mathbf{M}_\theta + \mathbf{R}_\theta)\boldsymbol{\theta} \le \mathbf{r} + \mathbf{R}_x x \tag{6.29}$$
+
+최적화된 제어 동작 수순 $\mathbf{v}^*$ 와 $\mathbf{M}^*$ 는 다음을 풀어 얻는다.
+
+$$\min_{\vec{v},\ \mathbf{M}}\ V^f\big(x(N)\big) + \sum_{j=0}^{N-1}\ell\big(x(j), u(j)\big)$$
+
+이는 (6.29)에 종속되며, $\ell$ 과 $V^f(x(N))$ 은 각각 이차 단계 비용과 종말 비용이고, **상태 변화는 공칭인 경우로 계산된다**(즉 $\mathbf{w} = 0$).
+
+> [!note] 두 방법 비교
+> | 방법 | 결정 변수 | 문제 유형 | 비용은 어디 기준 |
+> |---|---|---|---|
+> | 튜브 기반 MPC | 공칭 입력 $\mathbf{v}$ ($K$ 는 고정) | QP | 공칭 궤적 $z$ |
+> | 외란 피드백 (Goulart) | $\mathbf{v}$ 와 정책 행렬 $\mathbf{M}$ | 볼록 계획 | 공칭 상태($\mathbf{w}=0$) |
+>
+> 튜브는 $K$ 를 미리 고정하고 그 대가로 문제가 아주 가볍다. 외란 피드백은 정책까지 최적화하므로 덜 보수적이지만 결정 변수가 많다.
+
+### 예제 6.6 — 튜브 기반 MPC 제어기
+
+문헌 [17]이 제안하고 예제 3.5에서 자세히 다룬 **4중 탱크 공정(quadruple-tank process)** 을 다시 보자. 단순화를 위해 **아래쪽 두 탱크 각각을 독립적인 MPC 제어기가 제어**한다고 하자.
+
+- **탱크 1의 수위**는 **펌프 1**을 조작해 제어하고, **펌프 2는 외란으로 작용**한다.
+- **탱크 2**는 그 반대다. 수위는 **펌프 2**로 조절되고 **펌프 1이 외부 외란**이 된다.
+
+> [!note] 왜 이런 설정인가
+> 이런 상황은 **대규모 시스템(large-scale systems)** 에서 흔하다. 제어기들이 **결합(coupling)에 대해 강인화(robustify)** 되어야 하는 경우다. 다른 제어기가 무슨 짓을 할지 모르니, 그것을 **유계 외란**으로 취급하고 튜브를 씌우는 것이다.
+
+이를 위해 각 탱크 조절 문제마다 튜브 기반 MPC 제어기를 개발했다. 첫 번째 제어기는 **탱크 1과 3**으로 이루어진 시스템을 다루며 그 수위가 상태 $x_1^1$, $x_1^2$ 에 대응한다. 두 번째 제어기는 **탱크 2와 4**(상태 $x_2^1$, $x_2^2$)에 대해 같은 일을 한다.
+
+설정점 주위에서 공정 동특성을 **선형화한 뒤**, 대응하는 튜브의 단면은 Trodden이 [18]에서 제안한 **폴리토프 강인 양의 불변 집합(polytopic robust positively invariant set)을 계산하는 one-step 접근법**으로 계산했다.
+
+![[mpc_fig_6_5.png]]
+
+> **그림 6.5가 말하는 것.** 두 번째 제어기가 기준값을 추종할 때 상태들의 변화다. **원(circle)으로 표시된 궤적이 공칭 상태**이고, **별표(asterisk)로 표시된 것이 실제 상태의 변화**다. 튜브는 **공칭 궤적을 중심으로** 그려져 있으며 **항상 실제 상태를 포함한다.** 실제 상태는 언제나 튜브 안에 있고 원하는 기준값으로 수렴한다. 마지막으로 **원점은 선형화 지점**을 나타낸다는 점에 주의하자.
+
+> [!question] 자기 점검
+> 이 그림에서 튜브가 넓어지지 않고 **일정한 폭**을 유지하는 이유는? (힌트: 튜브 단면은 오차 동특성의 **최소 강인 불변 집합** $\mathcal{R}$ 이고, 불변 집합은 정의상 시간에 따라 커지지 않는다. 6.1절 예제 6.1의 개루프 예측 띠가 계속 자라던 것과 대조된다.)
+
+---
