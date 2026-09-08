@@ -186,10 +186,12 @@ $$\underline{\mathbf{y}} \le \underbrace{\mathbf{G}\mathbf{u} + \mathbf{f}}_{\ma
 
 여기서 $\mathbf{y} = \mathbf{G}\mathbf{u} + \mathbf{f}$ 는 지금까지 계속 써 온 예측식이다. $\mathbf{G}$ 는 스텝 응답 계수로 만든 동특성 행렬이고, $\mathbf{f}$ 는 **자유 응답(free response)**, 즉 "지금부터 아무것도 안 하면 출력이 어떻게 흘러갈지"이다([[자유 응답과 강제 응답]]). 앞과 같은 요령으로 "$\le$" 방향으로 통일하면:
 
-$$\begin{bmatrix} \mathbf{G} \\ -\mathbf{G}\end{bmatrix}\mathbf{u} \le \begin{bmatrix} \overline{\mathbf{y}} - \mathbf{f} \\ \underline{\mathbf{y}} - \mathbf{f}\end{bmatrix}$$
+$$\begin{bmatrix} \mathbf{G} \\ -\mathbf{G}\end{bmatrix}\mathbf{u} \le \begin{bmatrix} \overline{\mathbf{y}} - \mathbf{f} \\ \mathbf{f} - \underline{\mathbf{y}}\end{bmatrix}$$
 
-> [!warning] 원문 수식 확인 필요
-> 원문 텍스트의 우변 아래쪽 블록이 `y − f` 로 되어 있는데, $-\mathbf{G}\mathbf{u} \le -\underline{\mathbf{y}} + \mathbf{f}$ 가 되려면 부호가 $\mathbf{f} - \underline{\mathbf{y}}$ 여야 한다. 텍스트 추출 과정에서 하한 기호의 위아래 선과 마이너스 부호가 뭉개진 것으로 보인다. **의미는 "출력이 하한 아래로 내려가지 않게 한다"** 로 읽으면 된다.
+유도를 확인해 두자. 상한 쪽은 $\mathbf{G}\mathbf{u}+\mathbf{f} \le \overline{\mathbf{y}}$ 에서 $\mathbf{G}\mathbf{u} \le \overline{\mathbf{y}}-\mathbf{f}$ 다. 하한 쪽은 $\underline{\mathbf{y}} \le \mathbf{G}\mathbf{u}+\mathbf{f}$ 의 양변에 $-1$ 을 곱해 부등호를 뒤집으면 $-\mathbf{G}\mathbf{u} \le \mathbf{f}-\underline{\mathbf{y}}$ 가 된다.
+
+> [!note] 책 원문의 오타
+> 책은 우변 아래쪽 블록을 $\underline{\mathbf{y}}-\mathbf{f}$ 로 인쇄했으나, 위 유도에서 보듯 **부호가 뒤집힌 오타**다. 이 노트는 바로잡은 형태 $\mathbf{f}-\underline{\mathbf{y}}$ 를 쓴다. 어느 쪽이든 의미는 같다 — **출력이 하한 아래로 내려가지 않게 한다.**
 
 > [!note] 하삼각 구조는 공짜 선물이 아니다
 > 책은 여기서 한 마디를 덧붙인다. **제약 행렬의 모든 블록이 하삼각 블록**이며, 나중에(5.4.2절) 여기서 이득을 얻을 수 있다는 것이다. 하삼각이란 "$k$ 번째 제약은 $\mathbf{u}$ 의 앞쪽 $k$ 개 성분에만 의존한다"는 뜻이고, 그래서 **앞에서부터 차례로 범위를 좁혀 나가는** 재귀적 계산이 가능해진다.
@@ -361,7 +363,7 @@ $$\mathbf{u} = \mathbf{u}^p + \mathbf{Z}\mathbf{v}$$
 각 조각의 역할이 명확하다.
 
 - $\mathbf{u}^p$ — **등식 제약을 만족하는 임의의 한 점(particular solution)**. 즉 $\mathbf{A}\mathbf{u}^p = \mathbf{a}$.
-- $\mathbf{Z} \in \mathbb{R}^{n \times (n-m)}$ — $\mathbf{A}^\mathsf{T}$ 의 **영공간(null space)** 을 생성하는 행렬. 즉 $\mathbf{A}\mathbf{Z} = 0$.
+- $\mathbf{Z} \in \mathbb{R}^{n \times (n-m)}$ — $\mathbf{A}^\mathsf{T}$ 의 **영공간(null space)** 을 생성하는 행렬. 즉 $\mathbf{A}\mathbf{Z} = 0$. (책 표기를 따랐으나, 조건 $\mathbf{A}\mathbf{Z}=0$ 자체가 뜻하는 것은 $\mathbf{A}$ 의 영공간이다.)
 
 **왜 이렇게 하면 제약이 자동으로 지켜지는가?** 대입해 보면 즉시 보인다.
 
@@ -658,7 +660,7 @@ $$\min_{\mathbf{d}}\ (\mathbf{d} + \nabla J(\mathbf{u}))^\mathsf{T}(\mathbf{d} +
 
 $$\begin{aligned} J(\mathbf{u}^k+\lambda\mathbf{d}) &= \tfrac{1}{2}(\mathbf{u}^k+\lambda\mathbf{d})^\mathsf{T}\mathbf{H}(\mathbf{u}^k+\lambda\mathbf{d}) + \mathbf{b}^\mathsf{T}(\mathbf{u}^k+\lambda\mathbf{d}) + \mathbf{f}_0 \\ &= \tfrac{1}{2}\mathbf{d}^\mathsf{T}\mathbf{H}\mathbf{d}\,\lambda^2 + (\mathbf{d}^\mathsf{T}\mathbf{H}\mathbf{u}^k + \mathbf{b}^\mathsf{T}\mathbf{d})\lambda + J(\mathbf{u}^k)\end{aligned}$$
 
-$\lambda$ 에 대한 위로 볼록한 포물선이므로, $\lambda$ 로 미분해 0으로 놓으면 최적 걸음이 나온다.
+$\mathbf{H}$ 가 양정치이므로 $\lambda^2$ 의 계수 $\tfrac{1}{2}\mathbf{d}^\mathsf{T}\mathbf{H}\mathbf{d}$ 가 양수다. 즉 **아래로 볼록한(U자) 포물선**이고, 그래서 최솟값이 존재한다. $\lambda$ 로 미분해 0으로 놓으면 최적 걸음이 나온다.
 
 $$\lambda^* = -\frac{\mathbf{d}^\mathsf{T}\mathbf{H}\mathbf{u}^k + \mathbf{b}^\mathsf{T}\mathbf{d}}{\mathbf{d}^\mathsf{T}\mathbf{H}\mathbf{d}} \tag{5.13}$$
 
@@ -692,7 +694,7 @@ $$\lambda_k = \min\!\left(\lambda^*,\ \frac{c_1 - \mathbf{a}_1^\mathsf{T}\mathbf
 
 ### 5.6.2 활성 집합법 (The Active Set Method)
 
-**핵심 아이디어**: 부등식 제약 QP 문제를 **등식 제약 QP 문제들의 수열**로 환원한다. 등식 제약 문제는 5.4.1절에서 봤듯이 선형 방정식 한 번으로 풀리므로, 이 환원은 큰 이득이다.
+**핵심 아이디어**([[활성 집합법 Active Set Method]]): 부등식 제약 QP 문제를 **등식 제약 QP 문제들의 수열**로 환원한다. 등식 제약 문제는 5.4.1절에서 봤듯이 선형 방정식 한 번으로 풀리므로, 이 환원은 큰 이득이다.
 
 절차의 뼈대는 이렇다. 임의의 실현가능점 $\mathbf{u}^k$ 는 $\mathbf{R}\mathbf{u}^k \le \mathbf{c}$ 를 만족하며, 그중 **등식으로 정확히 만족되는 부등식들**, 즉 $\mathbf{r}_i\mathbf{u} = c_i$ 인 $\mathbf{R}$ 의 행 $\mathbf{r}_i$ 들이 **활성 제약 집합**을 이룬다. 이 행들과 대응하는 한계값 $c_i$ 를 쌓으면 등식 제약 $\mathbf{A} = \mathbf{a}$ 가 만들어진다. 이제 5.4.1절의 방법으로 풀어 해 $\mathbf{u}^{k+1}$ 을 얻는다.
 
@@ -710,7 +712,7 @@ $\mathbf{u}^{k+1}$ 이 **비활성 제약들에 대해 실현가능한지**에 �
 
 ### 5.6.3 내점법 (Interior Point Methods)
 
-**핵심 아이디어**: 부등식 제약을 **목적함수 안으로 집어넣는다.** 실현가능 영역의 경계 밖으로 나가려는 시도에 **벌점(penalty)** 을 매기는 **장벽(barrier)** 을 만들어 제약 위반을 막는 것이다.
+**핵심 아이디어**([[내점법 Interior Point Method]]): 부등식 제약을 **목적함수 안으로 집어넣는다.** 실현가능 영역의 경계 밖으로 나가려는 시도에 **벌점(penalty)** 을 매기는 **장벽(barrier)** 을 만들어 제약 위반을 막는 것이다.
 
 **로그 장벽(logarithmic barrier)** 을 쓰면 수정된 목적함수는 다음과 같다.
 
@@ -752,7 +754,7 @@ $\mu > 0$ 은 **장벽 파라미터**로 벌점의 세기를 조절한다.
 *그림 5.6 — 장벽 파라미터 $\mu$ 의 값에 따른 이차 목적함수의 등고선과 최적화 경로*
 
 > [!example] 그림이 말하는 것
-> 각 부분 그림에서 이차 목적함수의 **등고선은 점선**, 부등식 제약이 정의하는 실현가능 영역은 **실선**, 최적점은 **검은 사각형**으로 표시되어 있다. 관찰할 것은 이것이다. **$\mu$ 가 클 때 최적점은 실현가능 영역의 경계에서 멀리 떨어져 있다.** 장벽이 제약 근처의 해에 큰 벌점을 매기기 때문이다. **$\mu$ 가 작아지면 최적점이 경계에 점점 가까워지고**, 결국 원래 문제의 해로 수렴한다. 오른쪽 아래 부분 그림의 **점선이 이 예제에서 최적화기가 따라간 경로**다. 이 경로를 최적화 문헌에서는 **중심 경로(central path)** 라고 부른다.
+> 각 부분 그림에서 이차 목적함수의 **등고선은 점선**, 부등식 제약이 정의하는 실현가능 영역은 **실선**, 최적점은 **검은 사각형**으로 표시되어 있다. 관찰할 것은 이것이다. **$\mu$ 가 클 때 최적점은 실현가능 영역의 경계에서 멀리 떨어져 있다.** 장벽이 제약 근처의 해에 큰 벌점을 매기기 때문이다. **$\mu$ 가 작아지면 최적점이 경계에 점점 가까워지고**, 결국 원래 문제의 해로 수렴한다. 오른쪽 아래 부분 그림의 **점선이 이 예제에서 최적화기가 따라간 경로**다. 최적화 문헌에서는 이런 경로를 흔히 **중심 경로(central path)** 에 비유한다.
 
 ### 5.6.4 프라이멀-듀얼 방법 (The Primal-Dual Method)
 
@@ -835,7 +837,7 @@ $$\mathbf{M} = \begin{bmatrix}\mathbf{0} & -R \\ R^\mathsf{T} & \mathbf{H}\end{b
 
 ### 왜 제곱 대신 절댓값인가?
 
-이차계획 알고리즘은 매우 효율적이다. **그러나 목적함수를 1-노름 형태로 쓰면 훨씬 더 효율적인 선형계획법으로 MPC 문제를 풀 수 있다.**
+이차계획 알고리즘은 매우 효율적이다. **그러나 목적함수를 1-노름 형태로 쓰면 훨씬 더 효율적인 선형계획법으로 MPC 문제를 풀 수 있다**([[선형계획법과 1-노름 목적함수]]).
 
 $$J(\mathbf{u}) = \sum_{j=N_1}^{N_2}\sum_{i=1}^{n}|y_i(t+j)-r_i(t+j)| + \lambda\sum_{j=1}^{N_u}\sum_{i=1}^{m}|\Delta u_i(t+j-1)| \tag{5.21}$$
 
@@ -962,7 +964,7 @@ $$x \in \mathcal{X}, \qquad u \in \mathcal{U}$$
 
 ### 보조 제어 법칙 + 불변 집합이라는 해법
 
-덜 부담스러운 전략은 **적절한 보조 제어 법칙(auxiliary control law)** 을 활용하는 것이다. 상태공간 MPC에서는 **선형 이차 조절기(LQR)** 같은 안정화 피드백 이득 $u(t) = K_\mathrm{LQR}x(t)$ 를 쓰는 것이 일반적이다.
+덜 부담스러운 전략은 **적절한 보조 제어 법칙(auxiliary control law)** 을 활용하는 것이다. 상태공간 MPC에서는 **선형 이차 조절기(LQR)**([[선형 이차 조절기 LQR]]) 같은 안정화 피드백 이득 $u(t) = K_\mathrm{LQR}x(t)$ 를 쓰는 것이 일반적이다.
 
 **기본 아이디어는 무한 지평을 두 부분으로 쪼개는 것이다.**
 
@@ -1031,7 +1033,7 @@ $\rho$ 는 양의 스칼라이고, $P$ 는 보조 피드백 이득을 사용할 
 
 $$V_f(x(t+N_\mathrm{p})) = x(t+N_\mathrm{p})^\mathsf{T}Px(t+N_\mathrm{p})$$
 
-여기서 $P$ 는 4장에서 소개된 **LQR 문제의 대수 리카티 방정식(algebraic Riccati equation)의 해**다.
+여기서 $P$ 는 4장에서 소개된 **LQR 문제의 대수 리카티 방정식(algebraic Riccati equation)의 해**다([[리카티 방정식]]).
 
 > [!tip] 비유 — 남은 거리를 값으로 매기기
 > 내비게이션이 경로를 계획할 때, 계산 범위 끝에서 **"여기서부터 목적지까지 대략 얼마나 더 걸리는지"** 를 추정값으로 더한다. 그래야 "가까워 보이지만 사실 막다른 길"에 속지 않는다. $V_f$ 가 정확히 그 추정값이고, 리카티 방정식이 그 값을 정확히 계산해 준다.
@@ -1275,13 +1277,14 @@ $$J = -K_\alpha\sum_{i=1}^{m}L_i + f(\alpha) \tag{5.24}$$
 
 $$\sum_{j=1}^{i-1}L_j = f-1 \qquad i \ge f$$
 
-즉 $i \ge f$ 에서는 앞의 $f-1$ 개만 1이고 나머지는 0이다. 이제 (5.23)에서 $K_i$ 에 곱해지는 항을 계산해 보자.
+즉 $i \ge f$ 에서는 앞의 $f-1$ 개만 1이고 나머지는 0이다. 책은 이 상황에서 **$K_i$ 에 곱해지는 항이 $i=f$ 에서 0이고, $i>f$ 에서는 1보다 크다**고 서술한다. 그래서 $i>f$ 인 (5.23)의 제약들은 큰 값이 더해져 사실상 꺼지고, **첫 실패 목표 $O_f$ 의 제약만 진짜로 작동한다**는 것이 논지다.
 
-- **$i = f$ 일 때**: $(f-1) + (1-0) - (f-1) = 1$... 원문 텍스트는 이 항이 **$i=f$ 에서 0**이라고 명시한다.
-- **$i > f$ 일 때**: 이 항은 1보다 크다. 따라서 **$i>f$ 인 (5.23)의 모든 제약은 만족된다**(큰 값이 더해져 사실상 꺼지므로).
-
-> [!warning] 원문 수식 확인 필요
-> 원문은 "$i=f$ 에서 $K_i$ 에 곱해지는 항이 0이고, $i>f$ 에서는 1보다 크다"고 서술한다. $L_f=0$ 을 대입하면 $(f-1)+(1-0)-(f-1) = 1$ 이 되어 서술과 어긋난다. 텍스트 추출 과정에서 지표나 부호가 뭉개졌을 가능성이 크다(합의 상한이 $\sum_{j=1}^{i-1}$ 인지 $\sum_{j=1}^{i}$ 인지 등). **논지 자체는 명확하다: 실패한 첫 목표 $O_f$ 에서만 완화 항이 사라져 제약이 진짜로 작동하고, 그보다 낮은 우선순위 목표들의 제약은 자동으로 꺼진다.**
+> [!note] 식 (5.23)에 관한 책 내부의 불일치
+> 위 식은 **책 원문 그대로**다. 그런데 여기에 $L_f=0$ 과 $\sum_{j=1}^{f-1}L_j = f-1$ 을 대입하면 $i=f$ 에서 계수가
+> $$(f-1) + (1-0) - (f-1) = 1$$
+> 이 되어, **"$i=f$ 에서 0"이라는 책 본문의 설명과 맞지 않는다.** 즉 수식과 서술 사이에 책 내부의 불일치가 있다(추출 훼손이 아니라 원문 자체의 문제다). 이 노트는 공식을 임의로 고치지 않고 원문 형태를 그대로 싣는다.
+>
+> **의도는 분명하다.** 첫 실패 목표 $O_f$ 는 여유 변수 $\alpha$ 만으로 최대한 만족시키고, 그보다 낮은 우선순위의 목표들은 $K_i$ 로 완화해 문제가 깨지지 않게 하는 것이다. 아래 3번의 결론은 이 의도에 따른 것이다.
 
 **3. 결과.** 유일하게 활성인 제약은 다음이다.
 
@@ -1299,7 +1302,7 @@ $$\mathbf{R}_f\mathbf{u} \le \mathbf{a}_f + \alpha$$
 
 ---
 
-## 연습문제 (Exercises) 훑어보기
+## 5.11 연습문제 (Exercises) 훑어보기
 
 책의 5.11절 연습문제들이다. 각 문제가 무엇을 훈련시키는지와 접근 힌트를 붙였다.
 
