@@ -2,7 +2,7 @@
 title: "Chapter 2 — 컨볼루션 모델 기반 MPC (MAC과 DMC) (Model Predictive Control Using Convolution Models)"
 book: "Model Predictive Control, 3rd Ed. (Camacho, Bordons, Maestre)"
 chapter: 2
-tags: [MPC, 모델예측제어, MAC, DMC, 임펄스응답, 스텝응답, 동적행렬]
+tags: [MPC, 모델예측제어, MAC, DMC, 컨볼루션모델, 동적행렬]
 ---
 
 # Chapter 2 · 컨볼루션 모델 기반 MPC (MAC과 DMC)
@@ -122,7 +122,7 @@ $$\mathbf{u} = [\underbrace{u(t-N+1)\ \cdots\ u(t-1)}_{\mathbf{u}_-\ (\text{과�
 즉 $\mathbf{u}$는 과거를 담은 $\mathbf{u}_-$ 와 제안을 담은 $\mathbf{u}_+$ 를 이어붙인 것이다. 이제 예측 전체를 행렬로 쓰면:
 
 $$\begin{bmatrix} \hat{y}(t+1) \\ \hat{y}(t+2) \\ \vdots \\ \hat{y}(t+N_\mathrm{p}) \end{bmatrix}
-= \underbrace{\begin{bmatrix} h_N & \cdots & \cdots & h_2 \\ 0 & h_N & \cdots & h_3 \\ 0 & \cdots & \ddots & \vdots \\ 0 & \cdots & 0\ h_N & \cdots \end{bmatrix}}_{\mathbf{H}_-} \mathbf{u}_-
+= \underbrace{\begin{bmatrix} h_N & h_{N-1} & \cdots & h_3 & h_2 \\ 0 & h_N & \cdots & h_4 & h_3 \\ \vdots & \vdots & \ddots & \vdots & \vdots \\ 0 & 0 & \cdots & h_N & h_{N_\mathrm{p}+1} \end{bmatrix}}_{\mathbf{H}_-} \mathbf{u}_-
 + \underbrace{\begin{bmatrix} h_1 & 0 & \cdots & 0 \\ h_2 & h_1 & \cdots & 0 \\ \vdots & \vdots & \ddots & \vdots \\ h_{N_\mathrm{p}} & h_{N_\mathrm{p}-1} & \cdots & h_1 \end{bmatrix}}_{\mathbf{H}_+} \mathbf{u}_+
 + \begin{bmatrix} \hat{d}(t+1) \\ \hat{d}(t+2) \\ \vdots \\ \hat{d}(t+N_\mathrm{p}) \end{bmatrix}$$
 
@@ -135,6 +135,9 @@ $$\mathbf{y} = \mathbf{H}_- \mathbf{u}_- + \mathbf{H}_+ \mathbf{u}_+ + \mathbf{d
 - $\mathbf{y}$: 예측된 출력들의 벡터
 - $\mathbf{H}_-$, $\mathbf{H}_+$: 각각 **과거** 제어 동작 $\mathbf{u}_-$ 와 **제안된** 제어 동작 $\mathbf{u}_+$ 에 대응하는 시스템 응답 원소들을 담은 행렬
 - $\mathbf{d}$: 지평 전체에 걸친 불일치
+
+> [!note] $\mathbf{H}_-$ 의 행 규칙
+> $\mathbf{H}_-$ 는 $\mathbf{u}_-$ 와 곱해지므로 열이 $N-1$ 개다. **$k$ 번째 행은 $[\,0\ \cdots\ 0\ \ h_N\ h_{N-1}\ \cdots\ h_{k+1}\,]$** 로, 왼쪽에서 0이 하나씩 늘어나고 오른쪽 끝이 $h_{k+1}$ 에서 끝난다. 오른쪽 끝이 $h_{k+1}$ 인 이유는, $k$ 스텝 뒤 예측에서 **$h_1 \dots h_k$ 는 미래 입력에 걸려 이미 $\mathbf{H}_+$ 쪽으로 넘어갔기** 때문이다. 왼쪽에 0이 늘어나는 이유는 멀리 내다볼수록 아주 오래된 입력의 여운($h_N$ 보다 뒤)이 잘려 나가기 때문이다.
 
 > [!note] $\mathbf{H}_+$ 의 모양을 눈여겨보라
 > $\mathbf{H}_+$ 는 **하삼각(lower triangular)** 이고, 각 대각선을 따라 같은 값이 반복된다(**토플리츠 행렬, Toeplitz matrix**). 이는 우연이 아니라 **인과성의 직접적 표현**이다. 첫 행에 $h_1$ 하나뿐인 이유는, 한 스텝 뒤의 출력은 **바로 직전에 넣은 입력 하나**에만 영향을 받기 때문이다. 미래의 입력이 과거의 출력을 바꿀 수는 없으므로 우상단은 전부 0이다. [[하삼각 토플리츠 행렬]] 참고.
@@ -208,16 +211,36 @@ $\mathbf{e} = \mathbf{r} - \mathbf{H}_+\mathbf{u}_+ - \mathbf{f}$ 를 그대로 
 
 $$J = (\mathbf{r} - \mathbf{H}_+\mathbf{u}_+ - \mathbf{f})^\mathrm{T}(\mathbf{r} - \mathbf{H}_+\mathbf{u}_+ - \mathbf{f}) + \lambda\,\mathbf{u}_+^\mathrm{T}\mathbf{u}_+$$
 
-이 곱을 전개해서 $\mathbf{u}_+$ 의 차수별로 묶으면 (2차항, 1차항, 상수항 순서로):
+보기 좋게 $\mathbf{v} = \mathbf{r} - \mathbf{f}$ 로 줄여 쓰자. 그러면 괄호 안이 $\mathbf{v} - \mathbf{H}_+\mathbf{u}_+$ 이므로
 
-$$J = \mathbf{u}_+^\mathrm{T}(\mathbf{H}_+^\mathrm{T}\mathbf{H}_+ + \lambda \mathbf{I})\,\mathbf{u}_+ + 2(\mathbf{r}-\mathbf{f})^\mathrm{T}\mathbf{H}_+\mathbf{u}_+ + (\mathbf{r}-\mathbf{f})^\mathrm{T}(\mathbf{r}-\mathbf{f})$$
+$$J = (\mathbf{v} - \mathbf{H}_+\mathbf{u}_+)^\mathrm{T}(\mathbf{v} - \mathbf{H}_+\mathbf{u}_+) + \lambda\,\mathbf{u}_+^\mathrm{T}\mathbf{u}_+$$
 
-> [!warning] 원문 수식 확인 필요 — 1차항의 부호
-> 텍스트 추출본에는 1차항이 $+2(\mathbf{r}-\mathbf{f})^\mathrm{T}\mathbf{H}_+\mathbf{u}_+$ 로 나와 있으나, $(\mathbf{r}-\mathbf{f}-\mathbf{H}_+\mathbf{u}_+)^\mathrm{T}(\cdot)$ 를 직접 전개하면 교차항은 $-2(\mathbf{r}-\mathbf{f})^\mathrm{T}\mathbf{H}_+\mathbf{u}_+$ 가 된다. 최종 해 (2.2)의 부호가 양수인 것으로 보아 전개식의 부호는 $-$ 가 맞다고 판단된다. 원서 지면에서 확인이 필요하다.
+이 곱을 항별로 전개하면 네 덩어리가 나온다.
+
+$$J = \mathbf{v}^\mathrm{T}\mathbf{v} - \mathbf{v}^\mathrm{T}\mathbf{H}_+\mathbf{u}_+ - \mathbf{u}_+^\mathrm{T}\mathbf{H}_+^\mathrm{T}\mathbf{v} + \mathbf{u}_+^\mathrm{T}\mathbf{H}_+^\mathrm{T}\mathbf{H}_+\mathbf{u}_+ + \lambda\,\mathbf{u}_+^\mathrm{T}\mathbf{u}_+$$
+
+가운데 두 항은 서로 **전치 관계**이고 각각 $1\times1$ 스칼라이므로 값이 같다. 따라서 둘을 합쳐 $-2\mathbf{v}^\mathrm{T}\mathbf{H}_+\mathbf{u}_+$ 하나로 쓸 수 있다. $\mathbf{u}_+$ 의 차수별로 묶으면 (2차항, 1차항, 상수항 순서로):
+
+$$J = \mathbf{u}_+^\mathrm{T}(\mathbf{H}_+^\mathrm{T}\mathbf{H}_+ + \lambda \mathbf{I})\,\mathbf{u}_+ - 2(\mathbf{r}-\mathbf{f})^\mathrm{T}\mathbf{H}_+\mathbf{u}_+ + (\mathbf{r}-\mathbf{f})^\mathrm{T}(\mathbf{r}-\mathbf{f})$$
+
+> [!note] 1차항의 부호 — 책에는 $+2$ 로 인쇄되어 있으나 $-2$ 가 맞다
+> 원서 지면에는 이 1차항이 $+2(\mathbf{r}-\mathbf{f})^\mathrm{T}\mathbf{H}_+\mathbf{u}_+$ 로 인쇄되어 있다(텍스트 추출 오류가 아니라 **책의 오탈자**다). 바로 위 전개에서 보듯 교차항은 $-\mathbf{v}^\mathrm{T}\mathbf{H}_+\mathbf{u}_+$ 와 $-\mathbf{u}_+^\mathrm{T}\mathbf{H}_+^\mathrm{T}\mathbf{v}$ 이므로 부호는 **음수**여야 한다. 더 결정적인 근거는 최종 결과다. $-2$ 로 두어야 미분 후 정리했을 때 책 자신의 식 (2.2)가 그대로 나오고, $+2$ 라면 해의 부호가 뒤집혀 $-(\cdots)^{-1}\mathbf{H}_+^\mathrm{T}(\mathbf{r}-\mathbf{f})$ 가 되어 버린다. 이 노트에서는 $-2$ 로 쓴다.
 
 이 형태를 보면 $J$ 는 $\mathbf{u}_+$ 에 대한 **2차 형식(quadratic form)** 이다. 2차항의 계수 행렬 $\mathbf{H}_+^\mathrm{T}\mathbf{H}_+ + \lambda\mathbf{I}$ 는 $\lambda > 0$ 이면 항상 양정치(positive definite)이므로, $J$ 는 아래로 볼록한 밥그릇 모양이고 **최소점이 딱 하나 존재**한다. [[볼록 최적화와 이차계획법 QP]] 참고.
 
-제약이 없다면, 해는 **명시적으로** 얻어진다. $J$ 를 결정 변수 벡터 $\mathbf{u}_+$ 로 미분해서 $0$ 으로 놓으면:
+제약이 없다면, 해는 **명시적으로** 얻어진다. 필요한 벡터 미분 공식은 두 개뿐이다.
+
+$$\frac{\partial}{\partial\mathbf{u}}\big(\mathbf{u}^\mathrm{T}A\mathbf{u}\big) = 2A\mathbf{u}\quad (A\ \text{대칭}), \qquad \frac{\partial}{\partial\mathbf{u}}\big(b^\mathrm{T}\mathbf{u}\big) = b$$
+
+$J$ 를 결정 변수 벡터 $\mathbf{u}_+$ 로 미분하면 (상수항은 사라진다):
+
+$$\frac{\partial J}{\partial \mathbf{u}_+} = 2(\mathbf{H}_+^\mathrm{T}\mathbf{H}_+ + \lambda\mathbf{I})\,\mathbf{u}_+ - 2\mathbf{H}_+^\mathrm{T}(\mathbf{r}-\mathbf{f})$$
+
+이것을 $0$ 으로 놓고 양변을 2로 나눈 뒤 $\mathbf{u}_+$ 항만 왼쪽에 남기면
+
+$$(\mathbf{H}_+^\mathrm{T}\mathbf{H}_+ + \lambda\mathbf{I})\,\mathbf{u}_+ = \mathbf{H}_+^\mathrm{T}(\mathbf{r}-\mathbf{f})$$
+
+마지막으로 양변 왼쪽에 $(\mathbf{H}_+^\mathrm{T}\mathbf{H}_+ + \lambda\mathbf{I})^{-1}$ 를 곱하면 (앞서 본 양정치성 덕분에 이 역행렬은 항상 존재한다):
 
 $$\mathbf{u}_+ = (\mathbf{H}_+^\mathrm{T}\mathbf{H}_+ + \lambda\mathbf{I})^{-1}\mathbf{H}_+^\mathrm{T}(\mathbf{r}-\mathbf{f}) \qquad (2.2)$$
 
@@ -278,8 +301,19 @@ $$\hat{y}(t+k \mid t) = \sum_{i=1}^{\infty} g_i\, \Delta u(t+k-i) + \hat{d}(t+k 
 MAC 절과 유사한 절차를 따라 행렬 형태를 쓰면 다음과 같다. 여기서는 **시각 $t$ 의 출력 측정값 $y_m(t)$ 를 일부러 포함**시켰는데, 이는 그 값이 벡터 $\Delta\mathbf{u}_-$ 에 모인 **무한히 많은 과거 스텝들**과 불일치에 의존한다는 점을 강조하기 위해서다.
 
 $$\begin{bmatrix} y_m(t) \\ \hat{y}(t+1) \\ \hat{y}(t+2) \\ \vdots \\ \hat{y}(t+N_\mathrm{p}) \end{bmatrix}
-= \big[\ \cdots\ \big]\begin{bmatrix} \Delta\mathbf{u}_- \\ \Delta\mathbf{u}_+ \end{bmatrix}
-+ \begin{bmatrix} \hat{d}(t) \\ \hat{d}(t+1) \\ \vdots \\ \hat{d}(t+N_\mathrm{p}) \end{bmatrix}$$
+= \left[\begin{array}{ccc|cccc}
+\cdots & g_2 & g_1 & 0 & 0 & \cdots & 0 \\
+\cdots & g_3 & g_2 & g_1 & 0 & \cdots & 0 \\
+\cdots & g_4 & g_3 & g_2 & g_1 & \cdots & 0 \\
+\cdots & \vdots & \vdots & \vdots & \vdots & \ddots & \vdots \\
+\cdots & g_{N_\mathrm{p}+2} & g_{N_\mathrm{p}+1} & g_{N_\mathrm{p}} & g_{N_\mathrm{p}-1} & \cdots & g_1
+\end{array}\right]
+\begin{bmatrix} \Delta\mathbf{u}_- \\ \hline \Delta\mathbf{u}_+ \end{bmatrix}
++ \begin{bmatrix} \hat{d}(t) \\ \hat{d}(t+1) \\ \hat{d}(t+2) \\ \vdots \\ \hat{d}(t+N_\mathrm{p}) \end{bmatrix}$$
+
+이 행렬을 읽는 법은 이렇다. **세로 구분선 왼쪽은 과거 증분 $\Delta\mathbf{u}_-$ 에, 오른쪽은 미래 증분 $\Delta\mathbf{u}_+$ 에 곱해진다.** 왼쪽 블록이 왼쪽으로 무한히 뻗어 있다는 것($\cdots$)이 바로 앞 절에서 말한 "합이 무한대까지"라는 문제다.
+
+행을 따라 내려가며 인덱스가 **한 칸씩 올라가는 것**을 눈여겨보라. 맨 윗행($y_m(t)$)은 $g_1$ 에서 끝나고, 그 아래 행은 $g_2$ 에서, 다음은 $g_3$ 에서 끝난다. 멀리 내다볼수록 **같은 과거 증분이 더 오래 숙성된 효과**($g$ 의 인덱스가 큰 쪽)로 나타나기 때문이다. 그리고 오른쪽 블록은 맨 윗행이 통째로 0이다. $y_m(t)$ 는 **이미 측정된 값**이라 미래 동작이 끼어들 여지가 없기 때문이다.
 
 이제 트릭이 등장한다. 불일치가 지평을 따라 일정하다고 가정하면($\hat{d}(t+k\mid t) = \hat{d}(t\mid t)$), 그리고 공정이 **점근 안정(asymptotically stable)** 하다면, **각 행에서 첫 번째 행을 빼는 것**만으로 무한합이 유한합으로 잘려 나간다.
 
@@ -287,7 +321,9 @@ $$\begin{bmatrix} y_m(t) \\ \hat{y}(t+1) \\ \hat{y}(t+2) \\ \vdots \\ \hat{y}(t+
 
 $$g_{i+k} - g_i \approx 0, \qquad i \ge N,\ k \ge 1$$
 
-즉 첫 행을 뺀 차분 $g_{k+i} - g_i$ 는 $i \ge N$ 에서 사실상 0이 되어 **합이 $N$ 개에서 끝난다.** 동시에 알 수 없는 $\hat{d}$ 항도 소거되고, 대신 **측정 가능한 $y_m(t)$** 가 들어온다. 두 마리 토끼를 한 번에 잡는 셈이다.
+위 행렬에서 $k$ 번째 행에서 첫 행을 빼면 어떻게 되는지 보자. 과거 증분 블록의 같은 열끼리 빼지므로, 각 열의 원소는 $g_{k+i}$ 에서 $g_i$ 를 뺀 **차분 $g_{k+i}-g_i$** 가 된다. 그런데 점근 안정 조건에 의해 이 차분은 $i \ge N$ 에서 사실상 0이므로, **왼쪽으로 무한히 뻗어 있던 열들이 $N$ 개만 남기고 전부 사라진다.** 이것이 무한합을 유한합으로 만드는 트릭의 정체다.
+
+같은 뺄셈이 오른쪽에서도 두 가지 일을 한다. 불일치가 일정하다고 가정했으므로 $\hat{d}$ 항끼리 상쇄되어 **알 수 없는 $\hat{d}$ 가 통째로 소거**되고, 왼쪽 항에서는 $\hat{y}(t+k) - y_m(t)$ 가 되므로 이항하면 **측정 가능한 $y_m(t)$** 가 예측식에 더해지는 형태로 들어온다. 두 마리 토끼를 한 번에 잡는 셈이다.
 
 > [!warning] 이 트릭이 통하지 않는 경우
 > 공정이 점근 안정하지 않으면 그런 $N$ 자체가 **존재하지 않는다.** (다만 불안정성이 순수 적분기(pure integrator)에서 비롯된 경우에는 일반화된 방법이 존재한다.)
@@ -356,7 +392,28 @@ MAC의 목적 함수와 비교해 보면 **차이는 딱 하나**다. 두 번째
 
 #### 2.2.2 해석적 해
 
-행렬 형태로 쓰면 비용 함수는 $J = \mathbf{e}\mathbf{e}^\mathrm{T} + \lambda\,\Delta\mathbf{u}_+^\mathrm{T}\Delta\mathbf{u}_+$ 가 되며, $\mathbf{e}$ 는 예측 지평을 따른 미래 오차 벡터다. 제약이 없으면 대응하는 최소화 문제의 해는 $J$ 를 미분해서 $0$ 으로 놓아 해석적으로 얻어진다.
+행렬 형태로 쓰면 비용 함수는 $J = \mathbf{e}^\mathrm{T}\mathbf{e} + \lambda\,\Delta\mathbf{u}_+^\mathrm{T}\Delta\mathbf{u}_+$ 가 되며, $\mathbf{e}$ 는 예측 지평을 따른 미래 오차 벡터다.
+
+> [!note] 원문 표기에 대하여
+> 책은 이 자리에 $J = \mathbf{e}\mathbf{e}^\mathrm{T}$ 로 적고 있으나, $\mathbf{e}$ 가 열벡터이므로 $\mathbf{e}\mathbf{e}^\mathrm{T}$ 는 스칼라가 아니라 행렬이 된다. 비용은 스칼라여야 하므로 $\mathbf{e}^\mathrm{T}\mathbf{e}$ 가 맞다. 연습문제 2.3에도 같은 표기가 쓰인다.
+
+MAC과 유도 과정이 똑같으므로 한 줄씩 따라가 보자. 예측식 (2.3)에서 $\hat{\mathbf{y}} = \mathbf{G}_+\Delta\mathbf{u}_+ + \mathbf{f}$ 이므로 오차는
+
+$$\mathbf{e} = \mathbf{r} - \hat{\mathbf{y}} = (\mathbf{r}-\mathbf{f}) - \mathbf{G}_+\Delta\mathbf{u}_+$$
+
+이고, 다시 $\mathbf{v} = \mathbf{r}-\mathbf{f}$ 로 줄여 대입해 전개하면 (교차항 두 개가 서로 전치인 스칼라라 합쳐진다):
+
+$$J = \Delta\mathbf{u}_+^\mathrm{T}(\mathbf{G}_+^\mathrm{T}\mathbf{G}_+ + \lambda\mathbf{I})\,\Delta\mathbf{u}_+ - 2\mathbf{v}^\mathrm{T}\mathbf{G}_+\Delta\mathbf{u}_+ + \mathbf{v}^\mathrm{T}\mathbf{v}$$
+
+$\Delta\mathbf{u}_+$ 로 미분하면:
+
+$$\frac{\partial J}{\partial \Delta\mathbf{u}_+} = 2(\mathbf{G}_+^\mathrm{T}\mathbf{G}_+ + \lambda\mathbf{I})\,\Delta\mathbf{u}_+ - 2\mathbf{G}_+^\mathrm{T}(\mathbf{r}-\mathbf{f})$$
+
+이를 $0$ 으로 놓고 2로 나누면
+
+$$(\mathbf{G}_+^\mathrm{T}\mathbf{G}_+ + \lambda\mathbf{I})\,\Delta\mathbf{u}_+ = \mathbf{G}_+^\mathrm{T}(\mathbf{r}-\mathbf{f})$$
+
+양변 왼쪽에 역행렬을 곱하면 해가 나온다.
 
 $$\Delta\mathbf{u} = (\mathbf{G}_+^\mathrm{T}\mathbf{G}_+ + \lambda\mathbf{I})^{-1}\mathbf{G}_+^\mathrm{T}(\mathbf{r} - \mathbf{f})$$
 
@@ -867,7 +924,6 @@ $n \times n$ 차원 MIMO 플랜트를 생각하고, MAC에서 제어 가중치 $
 - [[이동 구간 원리 Receding Horizon]]
 - [[예측 지평과 제어 지평]]
 - [[제어 가중치 람다]]
-- [[볼록 최적화와 이차계획법 QP]]
 - [[볼록 최적화와 이차계획법 QP]]
 - [[다변수 시스템과 상호작용]]
 - [[가중 노름과 대각 가중행렬]]
