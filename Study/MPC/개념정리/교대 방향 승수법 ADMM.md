@@ -29,7 +29,7 @@ $$\min_{\mathbf{x},\mathbf{z}}\ f(\mathbf{x}) + g(\mathbf{z}) \qquad \text{s.t.}
 
 $$L_\rho(\mathbf{x},\mathbf{z},\lambda) = f(\mathbf{x}) + g(\mathbf{z}) + \lambda^\top\bigl(A\mathbf{x}+B\mathbf{z}-c\bigr) + \frac{\rho}{2}\bigl\|A\mathbf{x}+B\mathbf{z}-c\bigr\|_2^2$$
 
-마지막 항이 **증강 항**이며 $\rho>0$이 벌점 파라미터다. 이 항 덕분에 목적함수가 **강볼록(strongly convex)** 이 되어 수렴 성질이 좋아진다. 대신 이 이차항이 $\mathbf{x}$와 $\mathbf{z}$를 곱으로 엮어 버리므로 **더 이상 병렬로 동시에 풀 수 없다** — 그래서 교대로 푼다.
+마지막 항이 **증강 항**이며 $\rho>0$이 벌점 파라미터다. 이 증강 항은 **제약이 위배되는 방향으로 곡률을 더해** 각 부분문제의 조건(conditioning)을 좋게 만든다. 덕분에 $f,g$에 **강볼록 가정이 없어도** 수렴한다(이차항 자체는 $(\mathbf{x},\mathbf{z})$ 전체에 대해 반정부호이므로 목적함수를 강볼록으로 만들어 주지는 않는다). 대신 이 이차항이 $\mathbf{x}$와 $\mathbf{z}$를 곱으로 엮어 버리므로 **더 이상 병렬로 동시에 풀 수 없다** — 그래서 교대로 푼다.
 
 **세 단계 반복.**
 
