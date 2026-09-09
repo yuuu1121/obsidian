@@ -3,7 +3,7 @@ title: "MCSPTE1AK144 (S32K144 + DEVKIT-MOTORGD) 모터 제어 키트 세팅 매�
 kit: "NXP MCSPTE1AK144 — S32K144EVB-Q100 + DEVKIT-MOTORGD + Sunrise 42BLY3A78-24110 PMSM"
 tags: [Embedded, MotorControl, S32K144, PMSM, FOC, FreeMASTER, S32DS, GD3000, 트러블슈팅]
 date: 2026-09-09
-status: 검증 진행 중 (마지막 항목 참고)
+status: 검증 완료 (2026-09-09, 냉간 기동 리셋 없이 opMode 3, 모터 회전 확인)
 ---
 
 # MCSPTE1AK144 모터 제어 키트 세팅 매뉴얼
@@ -23,7 +23,7 @@ status: 검증 진행 중 (마지막 항목 참고)
 | S32K144EVB-Q100 | MCU 보드. Cortex-M4F, FOC 연산, PWM 생성 | 키트 동봉품은 R165/R167 제거·R166/R168 장착·C16 제거 개조가 되어 있음 (엔코더 신호용, 센서리스에는 무관) |
 | DEVKIT-MOTORGD | 전력단. GD3000 게이트 드라이버 + 3상 FET 브리지 + 전류 센싱 | EVB 위에 아두이노 헤더로 결합 |
 | Sunrise 42BLY3A78-24110 | 3상 PMSM, 극쌍 2, 정격 5000 rpm, 정격 6 A | 구형 키트는 Linix 45ZWN24-40 |
-| 12 V 어댑터, USB 케이블 | 전원, OpenSDA 디버거·시리얼 | DC 입력 허용 8~18 V |
+| 12 V 5 A 어댑터, USB 케이블 | 전원, OpenSDA 디버거·시리얼 | DC 입력 허용 8~18 V. 12 V/5 A 어댑터로 검증 |
 
 두 보드 사이 신호는 **J1~J6 아두이노 헤더의 안쪽 줄**로만 오간다. 핀 배치 전체는 QSG 5~6쪽에 표로 있고, 이 노트에서 실제로 쓴 핀은 아래 표다.
 
@@ -311,8 +311,17 @@ Configuration이 `Debug_FLASH [ Active ]`인지 확인하고 Apply and Close. �
 
 "DC 버스 전압 8 V 대기" 방식을 쓰지 않은 이유: 이 시점에는 ADC/PDB 측정 파이프라인이 아직 돌지 않아 전압을 읽을 수 없다. 재시도는 칩 응답을 직접 확인하므로 전원 상승 속도와 무관하다.
 
-> [!todo] 검증 상태 (2026-09-09 16:30 기준)
-> 패치는 빌드·링크까지 확인했고 보드 검증은 아직이다. 검증 절차: 12 V·USB 모두 뽑기 → 12 V → USB 순으로 꽂기 → **리셋 버튼 누르지 않고** FreeMASTER Go → `opMode`가 3인지 → Clear Faults → Run 500 rpm → 회전 확인. 두세 번 반복해 매번 3이면 확정. 결과를 여기에 적을 것.
+**계측 변수** (같이 추가함, FreeMASTER Variable Watch에서 읽기 가능):
+
+| 변수 | 의미 |
+|:---|:---|
+| `gd3000InitRetries` | 몇 번째 시도에서 끝났는지. 0 = 첫 시도 성공, 49 = 50회 전부 실패 |
+| `gd3000InitError` | 마지막 `TPP_Init` 반환값. 0 = 성공, 11507 = 드라이버 내부 오류, -1 = 이 펌웨어가 아님 |
+
+> [!success] 검증 완료 (2026-09-09)
+> 패치 펌웨어를 굽고 12 V(5 A 어댑터) → USB 순으로 냉간 기동, **리셋 버튼 없이** FreeMASTER에서 `opMode = 3`, Clear Faults → Run으로 회전 확인. 무부하 500 rpm에서 상전류 진폭 약 0.7 A(정상, 정격 6 A는 부하 시).
+>
+> 주의: 패치 직후 "리셋을 눌러야 3"으로 보였던 것은 **빌드만 하고 굽지 않은 상태**였다. 소스를 고쳤으면 반드시 Debug → F8 → Disconnect까지 해야 보드에 반영된다.
 
 ### 6.6 FreeMASTER `Could not open the communication port (0x80004005)`
 
