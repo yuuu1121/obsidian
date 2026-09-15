@@ -149,29 +149,75 @@ $$SO(3) = \{\mathbf{R} \in \mathbb{R}^{3\times3}\ |\ \mathbf{R}^\top\mathbf{R} =
 
 ## 3. 회전군과 회전행렬
 
-### 3.1 지수사상 — 각속도에서 회전으로
+### 3.1 지수사상 — 제약 조건을 미분하면 리 대수가 나온다
 
-회전하는 강체 위의 점 $\mathbf{x}$ 를 생각하자. 각속도 $\boldsymbol{\omega}$ 로 돌고 있다면 점의 속도는
+> [!important] 이 절이 왜 중요한가
+> 논문의 표현을 그대로 옮기면, 지수사상(과 다음 절의 로그사상)은 **3D 회전 공간을 쉽고도 엄밀하게 다루게 해 주는 강력한 수학 도구**이며, **회전 공간에 맞는 미적분학으로 들어가는 입구**다. 미분·섭동·속도를 제대로 정의하고 조작할 수 있게 해 주므로, **회전 추정 문제에서는 필수적**이다.
 
-$$\dot{\mathbf{x}} = \boldsymbol{\omega}\times\mathbf{x} = [\boldsymbol{\omega}]_\times\mathbf{x}$$
+#### 출발점 — 연속적인 경로를 미분한다
 
-이것은 **선형 미분방정식**이다. 미분방정식 $\dot{\mathbf{x}} = \mathbf{A}\mathbf{x}$ 의 해가 $\mathbf{x}(t) = e^{\mathbf{A}t}\mathbf{x}(0)$ 임을 안다면, 답은 바로 나온다.
+회전은 강체 운동이다. 이 강직성 덕분에 $SO(3)$ 안에 **연속적인 경로 $r(t)$** 를 정의할 수 있다. 초기 자세 $r(0)$ 에서 현재 자세 $r(t)$ 까지 연속적으로 물체를 돌리는 경로다. 연속이므로 **시간 미분을 조사하는 것이 정당하다.**
 
-$$\mathbf{x}(t) = e^{[\boldsymbol{\omega}]_\times t}\,\mathbf{x}(0)$$
+2.1절에서 얻은 두 조건 $\mathbf{R}^\top\mathbf{R}=\mathbf{I}$ 와 $\det\mathbf{R}=+1$ 을 미분해 보자.
 
-즉 **회전행렬은 반대칭행렬의 지수**다.
+#### 먼저, det 조건은 미분할 필요가 없다
 
-$$\mathbf{R} = \exp([\boldsymbol{\omega}]_\times t) = \exp([\boldsymbol{\omega}t]_\times)$$
+> [!tip] 논문의 영리한 관찰
+> **직교 조건을 만족하면서 단위 행렬식 조건을 연속적으로 벗어나는 것은 불가능하다.** 그러려면 행렬식이 $+1$ 에서 $-1$ 로 **점프**해야 하는데, 연속 경로에서는 그런 일이 일어날 수 없기 때문이다.
+>
+> 다르게 말하면 **회전은 연속 변환을 통해 반사가 될 수 없다.** 그러므로 직교 조건 하나만 미분하면 된다.
 
-여기서 $\boldsymbol{\theta} = \boldsymbol{\omega}t = \mathbf{u}\theta$ 를 **회전 벡터(rotation vector)** 라 하면
+#### 직교 조건을 미분한다
 
-$$\mathbf{R} = \exp([\boldsymbol{\theta}]_\times)$$
+$$\frac{d}{dt}(\mathbf{R}^\top\mathbf{R}) = \dot{\mathbf{R}}^\top\mathbf{R} + \mathbf{R}^\top\dot{\mathbf{R}} = 0$$
+
+따라서
+
+$$\mathbf{R}^\top\dot{\mathbf{R}} = -(\mathbf{R}^\top\dot{\mathbf{R}})^\top$$
+
+> [!important] 여기서 모든 것이 결정된다
+> **$\mathbf{R}^\top\dot{\mathbf{R}}$ 은 자기 전치의 음수와 같다.** 즉 **반대칭행렬(skew-symmetric)** 이다.
+>
+> 이것은 가정이 아니라 **직교 조건에서 필연적으로 따라 나온 결과**다. 리 대수가 왜 하필 반대칭행렬인지에 대한 답이 바로 이 두 줄이다.
+
+$3\times3$ 반대칭행렬들의 집합을 **$\mathfrak{so}(3)$** 라 쓰고, **$SO(3)$ 의 리 대수(Lie algebra)** 라 부른다. 이들은 다음 형태를 가진다.
+
+$$[\boldsymbol{\omega}]_\times = \begin{bmatrix}0&-\omega_z&\omega_y\\ \omega_z&0&-\omega_x\\ -\omega_y&\omega_x&0\end{bmatrix}$$
+
+**자유도가 3이고 외적 행렬에 해당**하므로([[Chapter 01 - 쿼터니언의 정의와 성질|1장]] 3.4절의 그 연산자다), 다음 일대일 대응이 성립한다.
+
+$$\boldsymbol{\omega}\in\mathbb{R}^3 \iff [\boldsymbol{\omega}]_\times\in\mathfrak{so}(3)$$
+
+#### 미분방정식과 그 해
+
+$\mathbf{R}^\top\dot{\mathbf{R}} = [\boldsymbol{\omega}]_\times$ 로 두면 **상미분방정식(ODE)** 을 얻는다.
+
+$$\boxed{\dot{\mathbf{R}} = \mathbf{R}\,[\boldsymbol{\omega}]_\times}$$
+
+> [!note] 원점에서의 의미 — 접공간
+> 원점($\mathbf{R}=\mathbf{I}$)에서는 위 식이 $\dot{\mathbf{R}} = [\boldsymbol{\omega}]_\times$ 로 줄어든다. 따라서 **$\mathfrak{so}(3)$ 를 원점에서의 $r(t)$ 의 미분들이 사는 공간**으로 해석할 수 있다. 이것이 $SO(3)$ 에 대한 **접공간(tangent space)**, 또는 **속도 공간**이다.
+>
+> 이 사실로부터 $\boldsymbol{\omega}$ 를 **순간 각속도 벡터**라고 불러도 좋다는 것이 정당화된다. 더 깊은 설명은 [[리 군과 리 대수]]에 있다.
+
+$\boldsymbol{\omega}$ 가 상수라면 위 미분방정식은 시간 적분할 수 있다.
+
+$$\mathbf{R}(t) = \mathbf{R}(0)\,e^{[\boldsymbol{\omega}]_\times t} = \mathbf{R}(0)\,e^{[\boldsymbol{\omega}t]_\times}$$
+
+$\mathbf{R}(0)$ 과 $\mathbf{R}(t)$ 가 모두 회전행렬이므로, $e^{[\boldsymbol{\omega}t]_\times} = \mathbf{R}(0)^\top\mathbf{R}(t)$ 역시 **분명히 회전행렬**이다.
+
+기간 $t$ 동안의 전체 회전을 담는 벡터 $\boldsymbol{\theta} \triangleq \boldsymbol{\omega}t$ 를 **회전 벡터(rotation vector)** 라 정의하면
+
+$$\boxed{\mathbf{R} = e^{[\boldsymbol{\theta}]_\times}}$$
+
+이것이 **지수사상(exponential map)** 이며, $\mathfrak{so}(3)$ 에서 $SO(3)$ 로 가는 사상이다.
+
+$$\exp: \mathfrak{so}(3)\to SO(3);\qquad [\boldsymbol{\theta}]_\times\mapsto\exp([\boldsymbol{\theta}]_\times) = e^{[\boldsymbol{\theta}]_\times}$$
 
 ![[fig_2_2.png]]
 *그림 2.2 — 회전행렬의 지수사상. 벡터 $\mathbf{v}\in\mathbb{R}^3$ 에 스큐 연산자를 씌워 $[\mathbf{v}]_\times\in\mathfrak{so}(3)$ 로 보낸 뒤 지수를 취하면 $\mathbf{R}\in SO(3)$ 가 된다. 이 두 단계를 한꺼번에 묶은 것이 대문자 $\mathrm{Exp}(\cdot)$ 다.*
 
-> [!note] $\mathfrak{so}(3)$ 라는 새 이름
-> 반대칭행렬들의 집합 $\{[\boldsymbol{\theta}]_\times\}$ 를 **$\mathfrak{so}(3)$** 라고 쓰고 "리 대수(Lie algebra)"라 부른다. 이것은 $SO(3)$ 라는 곡면의 **항등원에서의 접평면(tangent space)** 이다. 곡면 위를 직접 계산하는 대신 평평한 접평면에서 계산하고 지수사상으로 올려보내는 것, 이것이 이 논문 전체를 관통하는 전략이다.
+> [!tip] 이 논문 전체를 관통하는 전략
+> $\mathfrak{so}(3)$ 는 $SO(3)$ 라는 곡면의 **항등원에서의 접평면**이다. 곡면 위에서 직접 계산하는 대신 **평평한 접평면에서 계산하고 지수사상으로 올려보낸다.** 4장 이후의 모든 유도가 이 원칙 위에서 진행된다.
 
 ### 3.2 대문자 지수사상 $\mathrm{Exp}(\cdot)$
 
@@ -267,22 +313,68 @@ r(\mathbf{v})\times r(\mathbf{w}) &= \tfrac{1}{2}\left[(\mathbf{q}\mathbf{v}\mat
 
 단위 쿼터니언의 집합은 곱셈 연산 아래 **군(group)** 을 이룬다. 이 군은 위상적으로 **3-구면**, 즉 $\mathbb{R}^4$ 단위 구의 3차원 표면이며 보통 $S^3$ 로 쓴다.
 
-### 4.1 지수사상
+### 4.1 지수사상 — 이번에도 제약 조건을 미분한다
 
-각속도 $\boldsymbol{\omega}$ 로 도는 강체의 자세를 쿼터니언 $\mathbf{q}$ 로 표현하면, 그 미분방정식은
+3.1절에서 $\mathbf{R}^\top\mathbf{R}=\mathbf{I}$ 를 미분했던 것과 **완전히 같은 방식**으로 진행한다. 이번에는 단위 쿼터니언의 조건 $\mathbf{q}^*\otimes\mathbf{q}=1$ 을 미분한다.
 
-$$\dot{\mathbf{q}} = \tfrac{1}{2}\,\mathbf{q}\otimes\boldsymbol{\omega}$$
+$$\frac{d(\mathbf{q}^*\otimes\mathbf{q})}{dt} = \dot{\mathbf{q}}^*\otimes\mathbf{q} + \mathbf{q}^*\otimes\dot{\mathbf{q}} = 0$$
 
-> [!important] 여기에 그 유명한 $1/2$ 이 나타난다
-> 회전행렬의 미분방정식 $\dot{\mathbf{R}} = \mathbf{R}[\boldsymbol{\omega}]_\times$ 에는 없던 $1/2$ 이 쿼터니언 쪽에는 붙는다. 이 인자가 **모든 반각의 근원**이다. 왜 생기는지는 2.8절에서 밝힌다.
+따라서
 
-이 미분방정식을 풀면
+$$\mathbf{q}^*\otimes\dot{\mathbf{q}} = -(\dot{\mathbf{q}}^*\otimes\mathbf{q}) = -(\mathbf{q}^*\otimes\dot{\mathbf{q}})^*$$
 
-$$\mathbf{q} = \exp(\boldsymbol{\omega}t/2) = \exp(\mathbf{u}\theta/2)$$
+> [!important] 이번에는 순허 쿼터니언이 나온다
+> **$\mathbf{q}^*\otimes\dot{\mathbf{q}}$ 는 자기 켤레의 음수와 같다.** 켤레를 취해 부호가 뒤집힌다는 것은 **실수부가 0**이라는 뜻이다. 즉 **순허 쿼터니언(pure quaternion)** 이다.
+>
+> 행렬에서 "반대칭"이 나왔던 자리에 쿼터니언에서는 "순허"가 나온다. 완벽하게 대응된다.
 
-1장 4.4절의 공식을 대입하면
+그러므로 순허 쿼터니언 $\boldsymbol{\Omega}\in\mathbb{H}_p$ 를 써서
 
-$$\boxed{\mathbf{q} = \mathrm{Exp}(\mathbf{u}\theta) \triangleq \exp(\mathbf{u}\theta/2) = \begin{bmatrix}\cos(\theta/2) \\ \mathbf{u}\sin(\theta/2)\end{bmatrix}}$$
+$$\mathbf{q}^*\otimes\dot{\mathbf{q}} = \boldsymbol{\Omega} = \begin{bmatrix}0\\ \boldsymbol{\Omega}\end{bmatrix} \in\mathbb{H}_p$$
+
+왼쪽에 $\mathbf{q}$ 를 곱하면 미분방정식을 얻는다.
+
+$$\dot{\mathbf{q}} = \mathbf{q}\otimes\boldsymbol{\Omega}$$
+
+> [!note] 접공간, 그런데 "절반 속도"의 공간이다
+> 원점($\mathbf{q}=1$)에서는 $\dot{\mathbf{q}}=\boldsymbol{\Omega}\in\mathbb{H}_p$ 가 된다. 따라서 **순허 쿼터니언의 공간 $\mathbb{H}_p$ 가 단위 구면 $S^3$ 의 접공간, 즉 리 대수**다.
+>
+> **다만 쿼터니언의 경우 이 공간은 속도 공간이 아니라 "절반 속도(half-velocities)"의 공간이다.** 논문이 명시적으로 짚는 차이다. 이것이 곧 $1/2$ 의 출처가 된다.
+
+$\boldsymbol{\Omega}$ 가 상수라면 적분할 수 있다.
+
+$$\mathbf{q}(t) = \mathbf{q}(0)\otimes e^{\boldsymbol{\Omega}t}$$
+
+$\mathbf{q}(0)$ 과 $\mathbf{q}(t)$ 가 단위 쿼터니언이므로 $e^{\boldsymbol{\Omega}t}$ 도 단위 쿼터니언이다. [[Chapter 01 - 쿼터니언의 정의와 성질|1장]] 4.4절에서 이미 알고 있던 사실이다. $\mathbf{V}\triangleq\boldsymbol{\Omega}t$ 로 두면
+
+$$\mathbf{q} = e^{\mathbf{V}}$$
+
+이것이 쿼터니언의 지수사상이다.
+
+$$\exp:\mathbb{H}_p\to S^3;\qquad \mathbf{V}\mapsto\exp(\mathbf{V}) = e^{\mathbf{V}}$$
+
+#### 각속도 벡터 도입 — 여기서 $1/2$ 이 나온다
+
+$\boldsymbol{\Omega}$ 는 "절반 속도"이므로, 실제 각속도 벡터를 다음과 같이 정의하는 것이 편하다.
+
+$$\boldsymbol{\omega} \triangleq 2\boldsymbol{\Omega} \in\mathbb{R}^3$$
+
+그러면 위 두 식이 익숙한 형태가 된다.
+
+$$\boxed{\dot{\mathbf{q}} = \tfrac{1}{2}\,\mathbf{q}\otimes\boldsymbol{\omega}, \qquad \mathbf{q} = e^{\boldsymbol{\omega}t/2}}$$
+
+> [!important] $1/2$ 의 정체가 드러났다
+> 회전행렬의 $\dot{\mathbf{R}} = \mathbf{R}[\boldsymbol{\omega}]_\times$ 에는 없던 $1/2$ 이 쿼터니언에는 붙는다. 이유는 이제 명확하다. **쿼터니언의 접공간이 담고 있던 것이 각속도가 아니라 그 절반이었기 때문**이다.
+>
+> 왜 하필 절반인지에 대한 **기하학적** 답은 8절의 등경사 회전에, **대수적** 답은 4.4절의 샌드위치 곱 전개에 있다.
+
+### 4.1b 회전 벡터에서 쿼터니언으로 (원문 2.4.3)
+
+$\boldsymbol{\theta}=\mathbf{u}\theta$ 가 축 $\mathbf{u}$ 를 중심으로 $\theta$ 라디안 회전하는 회전 벡터라 하자. [[Chapter 01 - 쿼터니언의 정의와 성질|1장]] 4.4절의 확장된 오일러 공식을 쓰면
+
+$$\boxed{\mathbf{q} = \mathrm{Exp}(\mathbf{u}\theta) = e^{\mathbf{u}\theta/2} = \cos\frac{\theta}{2} + \mathbf{u}\sin\frac{\theta}{2} = \begin{bmatrix}\cos(\theta/2)\\ \mathbf{u}\sin(\theta/2)\end{bmatrix}}$$
+
+이를 **회전 벡터 → 쿼터니언 변환 공식**이라 부르며, 이 문서에서는 $\mathbf{q}=\mathbf{q}\{\boldsymbol{\theta}\}\triangleq\mathrm{Exp}(\boldsymbol{\theta})$ 로 표기한다. [[Chapter 05 - IMU 기반 오차상태 운동학|5장]] 이후 자주 등장하는 표기다.
 
 ![[fig_2_3.png]]
 *그림 2.3 — 쿼터니언의 지수사상. 벡터 $\mathbf{v}\in\mathbb{R}^3$ 를 2로 나눠 순허 쿼터니언 $\mathbf{V}\in\mathbb{H}_p$ 로 보낸 뒤 지수를 취하면 단위 쿼터니언 $\mathbf{q}\in S^3$ 가 된다. 두 단계를 묶은 것이 $\mathrm{Exp}(\cdot)$ 다.*
@@ -298,9 +390,30 @@ $S^3$ 는 4차원 공간의 **단위 초구(unit 3-sphere)** 로, 단위 쿼터�
 
 ### 4.3 로그사상
 
-$$\mathrm{Log}(\mathbf{q}) = \boldsymbol{\theta} = \mathbf{u}\theta, \qquad \mathbf{u} = \frac{\mathbf{q}_v}{\|\mathbf{q}_v\|}, \quad \theta = 2\arctan(\|\mathbf{q}_v\|, q_w)$$
+지수사상의 역으로 정의한다. 소문자 버전은 [[Chapter 01 - 쿼터니언의 정의와 성질|1장]] 4.6절에서 이미 본 그 정의다.
+
+$$\log: S^3\to\mathbb{H}_p;\qquad \mathbf{q}\mapsto\log(\mathbf{q}) = \mathbf{u}\theta/2$$
+
+대문자 버전은 **3차원 데카르트 공간의 각 $\theta$ 와 축 $\mathbf{u}$ 를 직접** 돌려준다.
+
+$$\mathrm{Log}: S^3\to\mathbb{R}^3;\qquad \mathbf{q}\mapsto\mathrm{Log}(\mathbf{q}) = \mathbf{u}\theta$$
+
+둘의 관계는 자명하다.
+
+$$\mathrm{Log}(\mathbf{q}) \triangleq 2\log(\mathbf{q})$$
+
+실제 구현에서는 **4사분면 $\arctan(y,x)$** 를 써야 한다.
+
+$$\boxed{\theta = 2\arctan(\|\mathbf{q}_v\|,\ q_w), \qquad \mathbf{u} = \mathbf{q}_v/\|\mathbf{q}_v\|}$$
 
 **$\arctan$ 앞에 2가 붙었다.** 지수에서 반으로 나눴으니 로그에서 두 배로 돌려놓는 것이다.
+
+> [!warning] 작은 각에서는 위 식이 발산한다
+> $\theta\to0$ 이면 $\|\mathbf{q}_v\|\to0$ 이므로 $\mathbf{u}=\mathbf{q}_v/\|\mathbf{q}_v\|$ 가 **0으로 나누기**가 된다. 논문은 이 경우 $\arctan$ 을 절단 테일러 급수로 대체하라고 알려 준다.
+>
+> $$\mathrm{Log}(\mathbf{q}) = \mathbf{u}\theta \approx \frac{2\,\mathbf{q}_v}{q_w}\left(1 - \frac{\|\mathbf{q}_v\|^2}{3q_w^2}\right)$$
+>
+> **이 식은 $\mathbf{q}_v$ 로 나누지 않으므로 $\theta\to0$ 에서도 안전하다.** ESKF에서는 오차각이 항상 작으므로, 실전에서 이 분기를 반드시 넣어야 한다. 넣지 않으면 필터가 수렴할수록 NaN이 터지는 역설적인 버그가 생긴다.
 
 ### 4.4 회전 작용 — 곱을 두 번 한다
 
@@ -391,19 +504,63 @@ $$\boxed{\alpha = \phi/2}$$
 
 ## 5. 회전행렬과 쿼터니언 사이의 변환
 
+### 5.0 두 지수사상은 같은 회전을 만든다
+
+회전 벡터 $\boldsymbol{\theta}=\mathbf{u}\theta$ 가 주어지면, 단위 쿼터니언과 회전행렬의 지수사상은 각각 $\mathbf{q}=\mathrm{Exp}(\boldsymbol{\theta})$ 와 $\mathbf{R}=\mathrm{Exp}(\boldsymbol{\theta})$ 를 만들어 내는데, **이 둘은 같은 축 $\mathbf{u}$ 를 중심으로 정확히 같은 각 $\theta$ 만큼 벡터를 돌린다.** 즉
+
+$$\mathbf{q}\otimes\mathbf{x}\otimes\mathbf{q}^* = \mathbf{R}\,\mathbf{x}$$
+
+> [!note] 같은 $\mathrm{Exp}$ 기호를 써도 헷갈리지 않는 이유
+> 논문은 각주에서 이 표기 중의성을 짚는다. $\mathbf{R}=\mathrm{Exp}(\boldsymbol{\theta})$ 와 $\mathbf{q}=\mathrm{Exp}(\boldsymbol{\theta})$ 가 같은 기호를 쓰지만, **맥락으로 쉽게 구분된다.** 반환값의 타입($\mathbf{R}$ 이냐 $\mathbf{q}$ 냐)으로 알 수 있고, 아니면 **쿼터니언 곱 $\otimes$ 의 유무**로 알 수 있다.
+
 ### 5.1 쿼터니언 → 회전행렬
 
-$\mathbf{q}\otimes\mathbf{x}\otimes\mathbf{q}^*$ 를 행렬 형태로 전개하면
-
-$$\mathbf{R}\{\mathbf{q}\} = (q_w^2 - \mathbf{q}_v^\top\mathbf{q}_v)\mathbf{I} + 2\,\mathbf{q}_v\mathbf{q}_v^\top + 2q_w[\mathbf{q}_v]_\times$$
-
-성분으로 풀어 쓰면
+위 항등식의 양변이 $\mathbf{x}$ 에 대해 선형이므로, 좌변을 전개하고 우변과 항을 맞추면 **쿼터니언 → 회전행렬 변환 공식**을 얻는다.
 
 $$\mathbf{R} = \begin{bmatrix}
 q_w^2+q_x^2-q_y^2-q_z^2 & 2(q_xq_y - q_wq_z) & 2(q_xq_z+q_wq_y) \\
 2(q_xq_y+q_wq_z) & q_w^2-q_x^2+q_y^2-q_z^2 & 2(q_yq_z-q_wq_x) \\
 2(q_xq_z-q_wq_y) & 2(q_yq_z+q_wq_x) & q_w^2-q_x^2-q_y^2+q_z^2
 \end{bmatrix}$$
+
+이 문서에서는 이를 $\mathbf{R}=\mathbf{R}\{\mathbf{q}\}$ 로 표기한다.
+
+#### 곱 행렬을 이용한 다른 유도
+
+[[Chapter 01 - 쿼터니언의 정의와 성질|1장]] 3.3절의 좌·우 곱 행렬을 쓰면 더 우아하게 얻을 수 있다.
+
+$$\mathbf{q}\otimes\mathbf{x}\otimes\mathbf{q}^* = [\mathbf{q}^*]_R\,[\mathbf{q}]_L\begin{bmatrix}0\\ \mathbf{x}\end{bmatrix} = \begin{bmatrix}0\\ \mathbf{R}\mathbf{x}\end{bmatrix}$$
+
+이를 전개하면 간결한 형태가 나온다.
+
+$$\boxed{\mathbf{R}\{\mathbf{q}\} = (q_w^2 - \mathbf{q}_v^\top\mathbf{q}_v)\mathbf{I} + 2\,\mathbf{q}_v\mathbf{q}_v^\top + 2q_w[\mathbf{q}_v]_\times}$$
+
+> [!tip] $4\times4$ 행렬 곱이 $3\times3$ 회전을 낳는다
+> $[\mathbf{q}^*]_R[\mathbf{q}]_L$ 은 $4\times4$ 행렬인데, 순허 쿼터니언에 작용한 결과가 다시 순허 쿼터니언이 된다. 즉 **첫 행과 첫 열이 분리되고 나머지 $3\times3$ 블록이 회전행렬**이다. 8절의 등경사 회전이 바로 이 구조를 설명한다.
+
+#### $\mathbf{R}\{\mathbf{q}\}$ 의 네 가지 성질
+
+회전행렬은 쿼터니언에 대해 다음 성질을 갖는다.
+
+$$\mathbf{R}\{[1,0,0,0]^\top\} = \mathbf{I}$$
+$$\mathbf{R}\{-\mathbf{q}\} = \mathbf{R}\{\mathbf{q}\}$$
+$$\mathbf{R}\{\mathbf{q}^*\} = \mathbf{R}\{\mathbf{q}\}^\top$$
+$$\mathbf{R}\{\mathbf{q}_1\otimes\mathbf{q}_2\} = \mathbf{R}\{\mathbf{q}_1\}\,\mathbf{R}\{\mathbf{q}_2\}$$
+
+각각의 의미는 이렇다.
+
+| 식 | 의미 |
+|---|---|
+| 첫째 | **항등 쿼터니언은 영 회전**을 나타낸다 |
+| 둘째 | **쿼터니언과 그 음수는 같은 회전**이다 → $SO(3)$ 의 **이중 덮개** |
+| 셋째 | **켤레 쿼터니언은 역회전**을 나타낸다 |
+| 넷째 | **쿼터니언 곱은 회전행렬과 같은 순서로** 연속 회전을 합성한다 |
+
+추가로 보간에 관한 성질도 있다.
+
+$$\mathbf{R}\{\mathbf{q}^t\} = \mathbf{R}\{\mathbf{q}\}^t$$
+
+이는 실수 $t$ 에 대한 쿼터니언과 회전행렬의 **구면 보간이 서로 대응**함을 뜻한다. (7절 SLERP와 연결된다.)
 
 ### 5.2 회전행렬 → 쿼터니언
 
@@ -491,13 +648,35 @@ $\mathbf{q}_1$ 을 $\mathbf{q}_0$ 에 대해 직교정규화해서 평면의 기
 
 $$\mathbf{q}_\perp = \frac{\mathbf{q}_1 - (\mathbf{q}_0^\top\mathbf{q}_1)\mathbf{q}_0}{\|\mathbf{q}_1 - (\mathbf{q}_0^\top\mathbf{q}_1)\mathbf{q}_0\|}$$
 
-그 평면 안에서 평범하게 각도를 비례 배분한다.
+이 기저로 $\mathbf{q}_1$ 을 다시 쓰면 $\mathbf{q}_1 = \mathbf{q}_0\cos\Delta\theta + \mathbf{q}_\perp\sin\Delta\theta$ 이고, 그 평면 안에서 평범하게 각도를 비례 배분하면 된다.
 
 $$\mathbf{q}(t) = \mathbf{q}_0\cos(t\,\Delta\theta) + \mathbf{q}_\perp\sin(t\,\Delta\theta)$$
 
 두 방법이 같은 결과를 준다는 증명은 Dam et al. (1998)에 있다.
 
-### 7.4 짧은 길로 가기
+> [!warning] $\Delta\theta$ 가 무슨 각인지 혼동하지 말 것
+> 논문이 각주로 명확히 하는 부분이다. $\Delta\theta = \arccos(\mathbf{q}_0^\top\mathbf{q}_1)$ 는 **유클리드 4차원 공간에서 두 쿼터니언 벡터 사이의 각**이지, **3D 공간의 실제 회전각이 아니다.**
+>
+> 실제 3D 회전각은 방법 1에서 구한 $\|\mathrm{Log}(\mathbf{q}_0^*\otimes\mathbf{q}_1)\|$ 이고, 4.5절에서 본 대로 **그 절반**이 $\Delta\theta$ 다. 두 방법의 공식에서 각도 인자가 달라 보이는 이유가 이것이다.
+
+### 7.4 방법 3 — Davis 공식 (실무에서 가장 많이 쓰인다)
+
+Shoemake (1985)가 Glenn Davis의 공로로 소개한 방법이다. 출발점은 단순한 관찰이다. **$\mathbf{q}_0$ 와 $\mathbf{q}_1$ 을 잇는 큰 호 위의 임의의 점은 양 끝점의 선형결합이어야 한다.** 세 벡터가 같은 평면 위에 있기 때문이다.
+
+방법 2에서 구한 $\mathbf{q}_1 = \mathbf{q}_0\cos\Delta\theta+\mathbf{q}_\perp\sin\Delta\theta$ 에서 $\mathbf{q}_\perp$ 를 분리해 $\mathbf{q}(t)$ 식에 대입하고, 삼각항등식 $\sin(\Delta\theta - t\Delta\theta) = \sin\Delta\theta\cos t\Delta\theta - \cos\Delta\theta\sin t\Delta\theta$ 를 적용하면
+
+$$\boxed{\mathbf{q}(t) = \mathbf{q}_0\,\frac{\sin((1-t)\Delta\theta)}{\sin\Delta\theta} + \mathbf{q}_1\,\frac{\sin(t\,\Delta\theta)}{\sin\Delta\theta}}$$
+
+> [!tip] 이 공식의 장점은 대칭성이다
+> 역방향 보간자 $s = 1-t$ 를 정의하면
+> $$\mathbf{q}(s) = \mathbf{q}_1\frac{\sin((1-s)\Delta\theta)}{\sin\Delta\theta} + \mathbf{q}_0\frac{\sin(s\Delta\theta)}{\sin\Delta\theta}$$
+> **$\mathbf{q}_0$ 와 $\mathbf{q}_1$ 의 역할만 맞바꾼 정확히 같은 공식**이다. 어느 쪽에서 출발하든 같은 경로를 준다.
+>
+> 그리고 **로그·지수 사상이 전혀 필요 없고 삼각함수만으로 계산된다.** 그래서 게임 엔진이나 그래픽스 라이브러리의 `slerp()` 구현은 대부분 이 형태다.
+>
+> 단, $\Delta\theta\to0$ 이면 $\sin\Delta\theta\to0$ 이라 **0으로 나누게 된다.** 실무 구현은 이때 선형 보간(LERP) 후 정규화로 분기한다.
+
+### 7.5 짧은 길로 가기
 
 ![[fig_2_7.png]]
 *그림 2.7 — $\mathbf{q}_0$ 와 $\mathbf{q}_1$ 사이에서 최단 경로로 SLERP 하기. 왼쪽: $\Delta\theta > \pi/2$ 이면 $\mathbf{q}_1$ 대신 $-\mathbf{q}_1$ 을 쓴다. 오른쪽: 그러면 실제 3D 회전은 $\Delta\phi > \pi$ 대신 $\Delta\phi' < \pi$ 인 짧은 길을 간다.*
@@ -538,7 +717,12 @@ $$\mathbf{q}_0^\top\mathbf{q}_1 < 0 \quad \Longrightarrow \quad \mathbf{q}_1 \le
 
 ### 8.3 등경사 회전 — 두 각이 같은 특별한 경우
 
-$|\alpha_1| = |\alpha_2|$ 인 회전을 **등경사 회전(isoclinic rotation)** 이라 한다. 여기서 부호에 따라 두 종류가 갈린다.
+$|\alpha_1| = |\alpha_2|$ 인 회전을 **등경사 회전(isoclinic rotation)** 이라 한다.
+
+> [!note] 어원
+> 그리스어 **iso**("같은") + **klinein**("기울다")에서 왔다. **두 불변 평면에서 같은 크기로 기울어진다**는 뜻이다.
+
+부호에 따라 두 종류가 갈린다.
 
 | 종류 | 조건 | 쿼터니언과의 관계 |
 |---|---|---|
@@ -546,7 +730,17 @@ $|\alpha_1| = |\alpha_2|$ 인 회전을 **등경사 회전(isoclinic rotation)**
 | **우 등경사(right-isoclinic)** | $\alpha_1 = -\alpha_2$ | $[\mathbf{q}]_R$ (오른쪽 곱) |
 
 > [!important] 핵심 발견
-> 단위 쿼터니언을 **왼쪽에서 곱하는 것**($[\mathbf{q}]_L$)은 4D 공간의 **좌 등경사 회전**이고, **오른쪽에서 곱하는 것**($[\mathbf{q}]_R$)은 **우 등경사 회전**이다. 1장 3.3절에서 두 행렬의 차이가 오직 부호 하나였던 것을 떠올리면, 그 부호가 바로 $\alpha_2$ 의 부호였던 것이다.
+> 단위 쿼터니언 $\mathbf{q}=e^{\mathbf{u}\phi/2}$ 를 **왼쪽에서 곱하는 것**($[\mathbf{q}]_L$)은 4D 공간의 **좌 등경사 회전**이고, **오른쪽에서 곱하는 것**($[\mathbf{q}]_R$)은 **우 등경사 회전**이다. [[Chapter 01 - 쿼터니언의 정의와 성질|1장]] 3.3절에서 두 행렬의 차이가 오직 부호 하나였던 것을 떠올리면, 그 부호가 바로 $\alpha_2$ 의 부호였던 것이다.
+>
+> 그리고 **이 등경사 회전들의 각도는 정확히 $\phi/2$ 다.** 논문은 각주에서 그 근거를 밝힌다. **등경사 회전 행렬의 고유값을 뽑아 보면, 위상이 $\phi/2$ 인 켤레 복소수 쌍들로 이루어져 있다.** 두 불변 평면도 서로 같다.
+
+#### 좌·우 등경사 회전은 교환된다
+
+등경사 회전의 주목할 만한 성질이 하나 더 있는데, 우리는 이미 [[Chapter 01 - 쿼터니언의 정의와 성질|1장]] 3.5절에서 본 적이 있다.
+
+$$[\mathbf{p}]_R\,[\mathbf{q}]_L = [\mathbf{q}]_L\,[\mathbf{p}]_R$$
+
+**좌 등경사 회전과 우 등경사 회전은 서로 교환된다.** 쿼터니언 곱 자체는 교환되지 않는데 이 행렬들은 교환되는 이유가 이제 분명하다. **서로 직교하는 평면에서 일어나는 독립적인 회전이므로 순서가 상관없기 때문**이다.
 
 ### 8.4 두 회전을 겹치면 무슨 일이 일어나는가
 
@@ -579,7 +773,39 @@ $|\alpha_1| = |\alpha_2|$ 인 회전을 **등경사 회전(isoclinic rotation)**
 > - **왜 곱을 두 번 하는가?** — 한 번만 하면 두 평면이 모두 돌아서 4D 회전이 되어 버린다. 두 번 해야 한 평면의 회전이 상쇄되어, 결과가 "평면 하나만 도는 3D 회전"이 된다. 상쇄된 $\pi_2$ 가 바로 3D 회전의 **회전축**에 해당한다.
 > - **왜 각도가 절반인가?** — 각 곱이 $\theta/2$ 씩 기여하는데 그것이 $\pi_1$ 에서 **두 번 더해져** $\theta$ 가 되기 때문이다. 원하는 결과가 $\theta$ 이니 각 곱은 절반씩 맡아야 한다.
 
-그리고 1장 3.5절에서 본 "$[\mathbf{p}]_R[\mathbf{q}]_L = [\mathbf{q}]_L[\mathbf{p}]_R$" 도 이제 이해된다. **서로 직교하는 평면에서 일어나는 독립적인 회전은 순서를 바꿔도 결과가 같기 때문**이다.
+### 8.5 결과를 행렬로 확인하기
+
+이 이야기를 행렬로 못 박을 수 있다. 5.1절에서 본 곱 행렬 표현
+
+$$\begin{bmatrix}0\\ \mathbf{x}'\end{bmatrix} = \mathbf{q}\otimes\mathbf{x}\otimes\mathbf{q}^* = [\mathbf{q}^*]_R\,[\mathbf{q}]_L\begin{bmatrix}0\\ \mathbf{x}\end{bmatrix}$$
+
+에서 전체 $4\times4$ 회전행렬을 $\mathbf{R}_4$ 라 정의하면
+
+$$\boxed{\mathbf{R}_4 \triangleq [\mathbf{q}^*]_R[\mathbf{q}]_L = [\mathbf{q}]_L[\mathbf{q}^*]_R = \begin{bmatrix}1 & 0\\ 0 & \mathbf{R}\end{bmatrix}}$$
+
+> [!important] 블록 대각 구조가 전부를 말해 준다
+> 왼쪽 위의 **$1$** 이 **상쇄된 평면 $\pi_2$** 다. 아무 일도 일어나지 않았으므로 항등원이다.
+> 오른쪽 아래의 **$\mathbf{R}$** 이 **회전이 누적된 평면**을 포함하는 $\mathbb{R}^3$ 부분공간이며, 여기가 실제 3D 회전이다.
+>
+> 즉 $\mathbf{R}_4$ 는 $\mathbb{R}^4$ 의 벡터를 돌리되 **네 번째 차원은 건드리지 않고** $\mathbb{R}^3$ 부분공간만 회전시킨다. 우리가 원하던 바로 그것이다.
+
+### 8.6 논문 스스로 인정하는 한계
+
+> [!warning] 이 절이 모든 것을 설명하지는 않는다
+> 논문은 이 절 끝에서 솔직하게 덧붙인다. 이 논의는 **이 문서의 범위를 다소 벗어나며, 불완전하다**는 것이다.
+>
+> 구체적으로, $\mathbf{R}_4$ 의 블록 대각 결과 **너머로는**, 왜 하필 $\mathbf{q}\otimes\mathbf{x}\otimes\mathbf{q}^*$ 여야 하고 예컨대 $\mathbf{q}\otimes\mathbf{x}\otimes\mathbf{q}$ 는 안 되는지에 대한 **직관적·기하학적 설명을 제공하지 못한다.** 저자는 독자가 회전의 메커니즘에 대해 조금이나마 더 직관을 얻기를 바라는 마음으로 "또 하나의 해석 방법"으로서 이 절을 넣었다고 밝힌다. 더 알고 싶다면 $\mathbb{R}^4$ 의 등경사 회전에 관한 문헌을 참고하라고 권한다.
+
+> [!note] 다른 곱은 왜 안 되는가 — 각주의 답
+> 그래도 논문은 각주에서 최소한의 답을 준다.
+>
+> | 곱의 형태 | 결과 |
+> |---|---|
+> | $\mathbf{q}\otimes\mathbf{x}\otimes\mathbf{q}^*$ ($\mathbf{q}$ 는 단위) | **회전** ✅ |
+> | $\mathbf{q}_v\otimes\mathbf{x}\otimes\mathbf{q}_v$ ($\mathbf{q}_v$ 는 단위 순허) | **반사(reflection)** — 회전이 아니다 |
+> | $\mathbf{q}\otimes\mathbf{x}\otimes\mathbf{q}$ ($\mathbf{q}$ 는 단위이되 순허가 아님) | 아무런 주목할 성질이 없다 |
+>
+> 즉 **켤레를 쓰는 샌드위치 곱만이 회전을 준다.**
 
 ---
 
