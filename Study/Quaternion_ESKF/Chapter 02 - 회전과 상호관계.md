@@ -177,11 +177,60 @@ $$\log(\mathbf{R}) = [\mathbf{u}\theta]_\times, \qquad \mathrm{Log}(\mathbf{R}) 
 
 $$\mathbf{x}' = \mathbf{R}\,\mathbf{x}$$
 
+이것이 정말로 1.3절의 회전 공식과 같은지 확인해 보자. 로드리게스 공식을 대입하고 $[\mathbf{u}]_\times\mathbf{x} = \mathbf{u}\times\mathbf{x}$, $[\mathbf{u}]_\times^2 = \mathbf{u}\mathbf{u}^\top-\mathbf{I}$ 를 쓰면
+
+$$\begin{aligned}
+\mathbf{x}' &= \left(\mathbf{I} + \sin\phi\,[\mathbf{u}]_\times + (1-\cos\phi)[\mathbf{u}]_\times^2\right)\mathbf{x} \\
+&= \mathbf{x} + \sin\phi\,(\mathbf{u}\times\mathbf{x}) + (1-\cos\phi)(\mathbf{u}\mathbf{u}^\top-\mathbf{I})\mathbf{x} \\
+&= \mathbf{x} + \sin\phi\,(\mathbf{u}\times\mathbf{x}) + (1-\cos\phi)\,\mathbf{x}_\parallel - (1-\cos\phi)\,\mathbf{x} \\
+&= \mathbf{x}_\parallel + (\mathbf{u}\times\mathbf{x})\sin\phi + \mathbf{x}_\perp\cos\phi
+\end{aligned}$$
+
+정확히 **1.3절의 벡터 회전 공식**이다. 회전행렬이 진짜 회전을 한다는 것이 확인되었다.
+
 ---
 
 ## 4. 회전군과 쿼터니언
 
 이제 3절과 **완전히 평행한 이야기**를 쿼터니언 언어로 반복한다. 비교하며 읽으면 좋다.
+
+### 4.0 출발점 — 가설을 세우고 나중에 증명한다
+
+논문은 여기서 교육적인 전개를 택한다. 잘 알려진 쿼터니언 회전 공식
+
+$$r(\mathbf{v}) = \mathbf{q}\otimes\mathbf{v}\otimes\mathbf{q}^*$$
+
+를 **일단 가설로 받아들이고** 시작한다. 그러면 회전행렬에서 했던 논의를 그대로 되짚을 수 있다. 이 가설의 정확성은 4.4절에서 증명되며, 그것이 전체 접근을 정당화한다.
+
+#### 단위 노름 조건이 저절로 나온다
+
+회전은 길이를 보존해야 한다. 위 가설을 길이 보존 조건에 넣어 보자.
+
+$$\|\mathbf{q}\otimes\mathbf{v}\otimes\mathbf{q}^*\| = \|\mathbf{q}\|^2\|\mathbf{v}\| = \|\mathbf{v}\|$$
+
+([[Chapter 01 - 쿼터니언의 정의와 성질|1장]] 3.8절의 $\|\mathbf{p}\otimes\mathbf{q}\|=\|\mathbf{p}\|\|\mathbf{q}\|$ 를 썼다.) 따라서 $\|\mathbf{q}\|^2=1$, 즉
+
+$$\mathbf{q}^*\otimes\mathbf{q} = 1 = \mathbf{q}\otimes\mathbf{q}^*$$
+
+> [!important] 회전행렬의 직교 조건과 판박이다
+> $$\mathbf{q}^*\otimes\mathbf{q} = 1 \qquad \longleftrightarrow \qquad \mathbf{R}^\top\mathbf{R} = \mathbf{I}$$
+> 논문은 독자에게 **이 유사성 앞에서 잠시 멈춰 보라**고 권한다. 단위 쿼터니언 조건은 임의로 정한 것이 아니라, **길이를 보존하라는 요구에서 필연적으로 따라 나온 것**이다.
+
+#### 외적도 보존된다
+
+상대적 방향 조건도 만족한다. [[Chapter 01 - 쿼터니언의 정의와 성질|1장]] 4.1절의 교환자 관계를 두 번 쓰면
+
+$$\begin{aligned}
+r(\mathbf{v})\times r(\mathbf{w}) &= \tfrac{1}{2}\left[(\mathbf{q}\mathbf{v}\mathbf{q}^*)(\mathbf{q}\mathbf{w}\mathbf{q}^*) - (\mathbf{q}\mathbf{w}\mathbf{q}^*)(\mathbf{q}\mathbf{v}\mathbf{q}^*)\right] \\
+&= \tfrac{1}{2}\,\mathbf{q}\otimes(\mathbf{v}\otimes\mathbf{w} - \mathbf{w}\otimes\mathbf{v})\otimes\mathbf{q}^* \\
+&= \mathbf{q}\otimes(\mathbf{v}\times\mathbf{w})\otimes\mathbf{q}^* = r(\mathbf{v}\times\mathbf{w})
+\end{aligned}$$
+
+즉 **회전시킨 두 벡터의 외적 = 외적을 회전시킨 것**이다. 오른손 좌표계가 유지된다는 뜻이며, 거울 반사가 아니라는 확인이다.
+
+#### $S^3$ 라는 이름
+
+단위 쿼터니언의 집합은 곱셈 연산 아래 **군(group)** 을 이룬다. 이 군은 위상적으로 **3-구면**, 즉 $\mathbb{R}^4$ 단위 구의 3차원 표면이며 보통 $S^3$ 로 쓴다.
 
 ### 4.1 지수사상
 
@@ -224,7 +273,33 @@ $$\mathrm{Log}(\mathbf{q}) = \boldsymbol{\theta} = \mathbf{u}\theta, \qquad \mat
 
 $$\boxed{\mathbf{x}' = \mathbf{q}\otimes\mathbf{x}\otimes\mathbf{q}^*}$$
 
-이 **이중 곱(double product)** 을 전개하면 정확히 1.3절의 로드리게스 공식이 나온다. 즉 쿼터니언의 이중 곱은 진짜로 회전이다.
+여기서 $\mathbf{q} = \mathrm{Exp}(\mathbf{u}\phi)$ 이고, 벡터 $\mathbf{x}$ 는 순허 쿼터니언 형태로 쓴다.
+
+$$\mathbf{x} = x\,i + y\,j + z\,k = \begin{bmatrix}0\\ \mathbf{x}\end{bmatrix} \in \mathbb{H}_p$$
+
+이 **이중 곱(샌드위치 곱, sandwich product)** 이 정말로 회전을 수행하는지 증명해 보자. 4.1절의 $\mathbf{q}=[\cos\tfrac{\phi}{2},\ \mathbf{u}\sin\tfrac{\phi}{2}]$ 와 [[Chapter 01 - 쿼터니언의 정의와 성질|1장]]의 곱 공식을 쓴다.
+
+$$\begin{aligned}
+\mathbf{x}' &= \mathbf{q}\otimes\mathbf{x}\otimes\mathbf{q}^* \\
+&= \left(\cos\tfrac{\phi}{2}+\mathbf{u}\sin\tfrac{\phi}{2}\right)(0+\mathbf{x})\left(\cos\tfrac{\phi}{2}-\mathbf{u}\sin\tfrac{\phi}{2}\right) \\
+&= \mathbf{x}\cos^2\tfrac{\phi}{2} + (\mathbf{u}\otimes\mathbf{x}-\mathbf{x}\otimes\mathbf{u})\sin\tfrac{\phi}{2}\cos\tfrac{\phi}{2} - \mathbf{u}\otimes\mathbf{x}\otimes\mathbf{u}\sin^2\tfrac{\phi}{2} \\
+&= \mathbf{x}\cos^2\tfrac{\phi}{2} + 2(\mathbf{u}\times\mathbf{x})\sin\tfrac{\phi}{2}\cos\tfrac{\phi}{2} - \left(\mathbf{x}(\mathbf{u}^\top\mathbf{u})-2\mathbf{u}(\mathbf{u}^\top\mathbf{x})\right)\sin^2\tfrac{\phi}{2} \\
+&= \mathbf{x}\left(\cos^2\tfrac{\phi}{2}-\sin^2\tfrac{\phi}{2}\right) + (\mathbf{u}\times\mathbf{x})\left(2\sin\tfrac{\phi}{2}\cos\tfrac{\phi}{2}\right) + \mathbf{u}(\mathbf{u}^\top\mathbf{x})\left(2\sin^2\tfrac{\phi}{2}\right) \\
+&= \mathbf{x}\cos\phi + (\mathbf{u}\times\mathbf{x})\sin\phi + \mathbf{u}(\mathbf{u}^\top\mathbf{x})(1-\cos\phi)
+\end{aligned}$$
+
+마지막 줄에서 **반각 공식** $\cos^2\tfrac{\phi}{2}-\sin^2\tfrac{\phi}{2}=\cos\phi$, $2\sin\tfrac{\phi}{2}\cos\tfrac{\phi}{2}=\sin\phi$, $2\sin^2\tfrac{\phi}{2}=1-\cos\phi$ 를 썼다.
+
+$\mathbf{x}_\parallel = \mathbf{u}\mathbf{u}^\top\mathbf{x}$ 로 다시 묶으면
+
+$$\mathbf{x}' = \mathbf{x}_\perp\cos\phi + (\mathbf{u}\times\mathbf{x})\sin\phi + \mathbf{x}_\parallel$$
+
+**정확히 1.3절의 벡터 회전 공식이다.** 4.0절의 가설이 증명되었다.
+
+> [!important] 반각이 여기서 사라진다
+> 유도 과정을 보라. $\phi/2$ 로 들어간 각도가 **반각 공식을 거치면서 $\phi$ 로 복원**되었다. $\cos^2\tfrac{\phi}{2}-\sin^2\tfrac{\phi}{2}=\cos\phi$ 라는 삼각항등식이 "곱을 두 번 하면 각도가 두 배"라는 사실의 대수적 표현인 셈이다.
+>
+> 이것이 왜 쿼터니언에 절반의 각도를 넣어야 하는지에 대한 **계산적인 답**이다. 기하학적인 답은 8절의 등경사 회전에 있다.
 
 > [!question] 왜 곱을 두 번 해야 하는가?
 > 한 번만 곱하면($\mathbf{q}\otimes\mathbf{x}$) 결과가 순허 쿼터니언이 아니게 되어 3D 벡터로 되돌릴 수 없다. 켤레로 한 번 더 감싸야 실수부가 상쇄되어 다시 3D 벡터가 된다.
@@ -241,6 +316,36 @@ $\mathbf{q}$ 와 $-\mathbf{q}$ 를 회전 작용에 넣어 보자.
 $$(-\mathbf{q})\otimes\mathbf{x}\otimes(-\mathbf{q})^* = (-1)(-1)\,\mathbf{q}\otimes\mathbf{x}\otimes\mathbf{q}^* = \mathbf{q}\otimes\mathbf{x}\otimes\mathbf{q}^*$$
 
 **부호가 두 번 곱해져 상쇄된다.** 즉 $\mathbf{q}$ 와 $-\mathbf{q}$ 는 **완전히 같은 회전**을 나타낸다.
+
+#### 왜 "이중" 덮개인가 — 각도를 세어 보자
+
+이 이름의 근거를 정확히 따져 보자. 단위 쿼터니언 $\mathbf{q}$ 를 그냥 **4차원 벡터**로 보고, 방향의 원점에 해당하는 항등 쿼터니언 $\mathbf{q}_1=[1,0,0,0]$ 과의 사이각을 $\alpha$ 라 하자. 4D 내적으로 구하면
+
+$$\cos\alpha = \mathbf{q}_1^\top\mathbf{q} = q_w$$
+
+한편 이 쿼터니언이 3D 공간의 물체를 돌리는 각도 $\phi$ 는
+
+$$\mathbf{q} = \begin{bmatrix}q_w\\ \mathbf{q}_v\end{bmatrix} = \begin{bmatrix}\cos(\phi/2)\\ \mathbf{u}\sin(\phi/2)\end{bmatrix}$$
+
+두 식에서 $q_w$ 를 비교하면 $\cos\alpha = \cos(\phi/2)$, 즉
+
+$$\boxed{\alpha = \phi/2}$$
+
+> [!important] 4D에서의 각도는 3D 회전각의 절반이다
+> **쿼터니언 벡터가 4D 공간에서 $\alpha$ 만큼 기울어져 있을 때, 3D 공간에서는 그 두 배인 $\phi=2\alpha$ 만큼 회전이 일어난다.**
+>
+> 그림 2.4가 이것을 보여 준다. 숫자로 따라가 보자.
+>
+> | 4D 쿼터니언 각 $\alpha$ | 3D 회전각 $\phi$ | 상태 |
+> |---|---|---|
+> | $0$ | $0$ | 시작 |
+> | $\pi/2$ | $\pi$ | 3D는 이미 **반 바퀴** |
+> | $\pi$ | $2\pi$ | 3D는 **한 바퀴 완주**, 쿼터니언은 반 바퀴 |
+> | $2\pi$ | $4\pi$ | 3D는 **두 바퀴**, 쿼터니언은 한 바퀴 |
+>
+> 쿼터니언이 3-구면 위를 **한 바퀴** 도는 동안 3D 회전은 **두 바퀴**를 돈다. 즉 쿼터니언 공간이 회전 매니폴드를 **두 번 덮는다.** 이것이 "이중 덮개(double cover)"라는 이름의 뜻이다.
+>
+> $\alpha=\pi$ 인 지점, 즉 $\mathbf{q}$ 와 $-\mathbf{q}$ 가 3D에서 같은 회전이 되는 것도 이 표에서 자연스럽게 읽힌다.
 
 > [!warning] 이중 덮개가 실무에서 일으키는 문제
 > 하나의 회전에 두 개의 쿼터니언이 대응하므로, **두 쿼터니언을 직접 빼서 "차이"를 재면 안 된다.** $\mathbf{q}_1 - \mathbf{q}_2$ 가 크더라도 실제 회전 차이는 0일 수 있다. 회전 차이는 반드시 $\mathrm{Log}(\mathbf{q}_1^*\otimes\mathbf{q}_2)$ 로 재야 한다.

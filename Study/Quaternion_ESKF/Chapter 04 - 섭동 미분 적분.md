@@ -227,6 +227,41 @@ $$\boxed{\frac{\partial(\mathbf{q}\otimes\mathbf{a}\otimes\mathbf{q}^*)}{\partia
 > [!note] 크기를 보라
 > 이번에는 자코비안이 $3\times3$ 이다. 3.2절의 $3\times4$ 와 비교해 보라. **회전 벡터로 미분하니 정사각 행렬이 나왔다.** 특이하지 않고, 역행렬도 구할 수 있다. ESKF가 오차를 회전 벡터(3개)로 다루는 이유가 여기 또 한 번 드러난다.
 
+### 3.5 회전 합성의 자코비안
+
+$SO(3)$ 의 합성 $\mathbf{P} = \mathbf{Q}\circ\mathbf{R}$ 을 생각하자. 쿼터니언으로도 행렬로도 쓸 수 있다.
+
+$$\mathbf{p} = \mathbf{q}\otimes\mathbf{r}, \qquad \mathbf{P} = \mathbf{Q}\,\mathbf{R}$$
+
+이것은 $SO(3)\to SO(3)$ 함수이므로 2.2절의 정의를 쓴다. 각 인자에 대한 미분을 구해 보자.
+
+**왼쪽 인자에 대해** — 섭동 $\delta\boldsymbol{\theta}_Q$ 를 $\mathbf{Q}$ 에 가한다.
+
+$$\begin{aligned}
+\frac{\partial(\mathbf{Q}\circ\mathbf{R})}{\partial\delta\boldsymbol{\theta}_Q}
+&= \lim_{\delta\boldsymbol{\theta}\to0}\frac{\big((\mathbf{Q}\oplus\delta\boldsymbol{\theta})\mathbf{R}\big)\ominus(\mathbf{Q}\mathbf{R})}{\delta\boldsymbol{\theta}} \\
+&= \lim_{\delta\boldsymbol{\theta}\to0}\frac{\mathrm{Log}\big[(\mathbf{Q}\mathbf{R})^\top\,\mathbf{Q}\,\mathrm{Exp}(\delta\boldsymbol{\theta})\,\mathbf{R}\big]}{\delta\boldsymbol{\theta}} \\
+&= \lim_{\delta\boldsymbol{\theta}\to0}\frac{\mathrm{Log}\big[\mathbf{R}^\top\,\mathrm{Exp}(\delta\boldsymbol{\theta})\,\mathbf{R}\big]}{\delta\boldsymbol{\theta}} \\
+&= \lim_{\delta\boldsymbol{\theta}\to0}\frac{\mathrm{Log}\big[\mathrm{Exp}(\mathbf{R}^\top\delta\boldsymbol{\theta})\big]}{\delta\boldsymbol{\theta}} = \mathbf{R}^\top
+\end{aligned}$$
+
+**오른쪽 인자에 대해** — 섭동을 $\mathbf{R}$ 에 가한다.
+
+$$\begin{aligned}
+\frac{\partial(\mathbf{Q}\circ\mathbf{R})}{\partial\delta\boldsymbol{\theta}_R}
+&= \lim_{\delta\boldsymbol{\theta}\to0}\frac{\mathrm{Log}\big[(\mathbf{Q}\mathbf{R})^\top\,\mathbf{Q}\mathbf{R}\,\mathrm{Exp}(\delta\boldsymbol{\theta})\big]}{\delta\boldsymbol{\theta}} \\
+&= \lim_{\delta\boldsymbol{\theta}\to0}\frac{\mathrm{Log}\big[\mathrm{Exp}(\delta\boldsymbol{\theta})\big]}{\delta\boldsymbol{\theta}} = \mathbf{I}
+\end{aligned}$$
+
+정리하면
+
+$$\boxed{\frac{\partial(\mathbf{Q}\circ\mathbf{R})}{\partial\delta\boldsymbol{\theta}_Q} = \mathbf{R}^\top, \qquad \frac{\partial(\mathbf{Q}\circ\mathbf{R})}{\partial\delta\boldsymbol{\theta}_R} = \mathbf{I}}$$
+
+> [!important] 놀랍도록 단순한 결과
+> 유도 과정에서 쓴 핵심 항등식은 $\mathbf{R}^\top\mathrm{Exp}(\boldsymbol{\theta})\mathbf{R} = \mathrm{Exp}(\mathbf{R}^\top\boldsymbol{\theta})$ 다. 이를 **수반 작용(adjoint)** 이라 부르며, 리 군 이론의 기본 도구다.
+>
+> **오른쪽 인자의 자코비안이 그냥 $\mathbf{I}$** 라는 점이 특히 유용하다. 섭동을 오른쪽(국소)에 정의하면 합성의 자코비안이 공짜가 된다는 뜻이다. [[Chapter 05 - IMU 기반 오차상태 운동학|5장]]에서 자세 갱신 $\mathbf{q}\leftarrow\mathbf{q}\otimes\mathbf{q}\{\boldsymbol{\omega}\Delta t\}$ 의 자코비안을 쉽게 구할 수 있는 이유다.
+
 ---
 
 ## 4. 섭동, 불확실성, 잡음
@@ -340,9 +375,48 @@ $$\dot{\overline{(\mathbf{q}_1\otimes\mathbf{q}_2)}} = \dot{\mathbf{q}}_1\otimes
 
 ---
 
+### 5.5 각속도를 거꾸로 뽑아내기
+
+시간 미분에서 각속도를 역산하는 표현도 유용하다. 국소 각속도는
+
+$$\boldsymbol{\omega}_L = 2\,\mathbf{q}^*\otimes\dot{\mathbf{q}}, \qquad [\boldsymbol{\omega}_L]_\times = \mathbf{R}^\top\dot{\mathbf{R}}$$
+
+전역 각속도는
+
+$$\boldsymbol{\omega}_G = 2\,\dot{\mathbf{q}}\otimes\mathbf{q}^*, \qquad [\boldsymbol{\omega}_G]_\times = \dot{\mathbf{R}}\,\mathbf{R}^\top$$
+
+> [!note] $\mathbf{R}^\top\dot{\mathbf{R}}$ 이 반대칭인 이유
+> $\mathbf{R}^\top\mathbf{R}=\mathbf{I}$ 를 미분하면 $\dot{\mathbf{R}}^\top\mathbf{R}+\mathbf{R}^\top\dot{\mathbf{R}}=0$, 즉 $(\mathbf{R}^\top\dot{\mathbf{R}})^\top = -(\mathbf{R}^\top\dot{\mathbf{R}})$ 이다. **반대칭행렬일 수밖에 없고**, 그래서 각속도 벡터 하나로 표현된다. 이것이 [[리 군과 리 대수|리 대수 $\mathfrak{so}(3)$]] 가 반대칭행렬들의 집합인 근본 이유다.
+
+---
+
 ## 6. 각속도의 시간적분
 
 마지막으로 실전 문제다. **자이로스코프가 각속도를 찍어 주면, 그것을 어떻게 적분해서 자세를 갱신할 것인가?**
+
+우리가 관심 있는 경우에서 각속도는 **국소 센서**가 측정하므로, 이산 시각 $t_n = n\Delta t$ 에서 국소 측정값 $\boldsymbol{\omega}(t_n)$ 을 얻는다. 따라서 국소 미분방정식을 적분한다.
+
+$$\dot{\mathbf{q}}(t) = \tfrac{1}{2}\mathbf{q}(t)\otimes\boldsymbol{\omega}(t)$$
+
+### 6.0 테일러 급수 — 모든 적분법의 출발점
+
+0차·1차 적분법은 전부 $\mathbf{q}(t_n+\Delta t)$ 를 $t=t_n$ 주변에서 테일러 전개한 것에서 나온다. $\mathbf{q}\triangleq\mathbf{q}(t)$, $\mathbf{q}_n\triangleq\mathbf{q}(t_n)$ 으로 쓰면
+
+$$\mathbf{q}_{n+1} = \mathbf{q}_n + \dot{\mathbf{q}}_n\Delta t + \tfrac{1}{2!}\ddot{\mathbf{q}}_n\Delta t^2 + \tfrac{1}{3!}\dddot{\mathbf{q}}_n\Delta t^3 + \tfrac{1}{4!}\ddddot{\mathbf{q}}_n\Delta t^4 + \cdots$$
+
+각 미분값은 $\dot{\mathbf{q}} = \tfrac{1}{2}\mathbf{q}\otimes\boldsymbol{\omega}$ 를 반복 적용해서 얻는다. $\dot{\boldsymbol{\omega}}=0$ 인 경우(각속도가 일정)
+
+$$\begin{aligned}
+\dot{\mathbf{q}}_n &= \tfrac{1}{2}\mathbf{q}_n\boldsymbol{\omega}_n \\
+\ddot{\mathbf{q}}_n &= \tfrac{1}{2^2}\mathbf{q}_n\boldsymbol{\omega}_n^2 + \tfrac{1}{2}\mathbf{q}_n\dot{\boldsymbol{\omega}}_n \\
+\dddot{\mathbf{q}}_n &= \tfrac{1}{2^3}\mathbf{q}_n\boldsymbol{\omega}_n^3 + \tfrac{1}{4}\mathbf{q}_n\dot{\boldsymbol{\omega}}_n\boldsymbol{\omega}_n + \tfrac{1}{2}\dot{\mathbf{q}}_n\dot{\boldsymbol{\omega}}_n \\
+\mathbf{q}_n^{(i\ge4)} &= \tfrac{1}{2^i}\mathbf{q}_n\boldsymbol{\omega}_n^i + \cdots
+\end{aligned}$$
+
+여기서 표기를 아끼려고 $\otimes$ 기호를 생략했다. **모든 곱과 $\boldsymbol{\omega}$ 의 거듭제곱은 쿼터니언 곱으로 해석해야 한다.**
+
+> [!tip] 이 급수가 뒤의 모든 공식을 낳는다
+> $\dot{\boldsymbol{\omega}}=0$ 으로 두고 항을 모으면 $\mathbf{q}_n\otimes\exp(\boldsymbol{\omega}\Delta t/2)$ 가 되어 **0차 적분**이 나온다. $\dot{\boldsymbol{\omega}}\neq0$ 항까지 살리면 **1차 적분**의 외적 보정 항이 나온다.
 
 ![[fig_4_3.png]]
 *그림 4.3 — 적분을 위한 각속도 근사. 빨강: 실제 각속도. 파랑: 0차 근사(아래부터 위로 forward, midward, backward). 초록: 1차 근사.*
