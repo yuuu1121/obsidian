@@ -165,9 +165,22 @@ $$\mathbf{x}_B = \mathbf{q}_{passive}\otimes\mathbf{x}_A\otimes\mathbf{q}_{passi
 
 > [!note] 둘은 서로 역이다
 > 좌표계를 $+\theta$ 만큼 돌리는 것과 벡터를 $-\theta$ 만큼 돌리는 것은 같은 결과를 낸다. 따라서
-> $$\mathbf{q}_{passive} = \mathbf{q}_{active}^*, \qquad \mathbf{R}_{passive} = \mathbf{R}_{active}^\top$$
+> $$\mathbf{q}_{active} = \mathbf{q}_{passive}^*, \qquad \mathbf{R}_{active} = \mathbf{R}_{passive}^\top$$
 >
 > **Hamilton과 JPL은 둘 다 수동적(passive) 해석을 쓴다.** 4개 선택지 중 유일하게 일치하는 항목이다. 로보틱스에서 회전은 대개 "좌표계 A에서 좌표계 B로의 변환"으로 쓰이므로 수동적 해석이 자연스럽다.
+
+#### 방향 코사인 행렬 (DCM)
+
+일부 저자는 수동적 연산자를 **회전 연산자가 아니라 자세 명세(orientation specification)** 로 이해하고, **방향 코사인 행렬(direction cosine matrix, DCM)** 이라는 이름을 붙인다.
+
+$$\mathbf{C} = \begin{bmatrix}c_{xx}&c_{yx}&c_{zx}\\ c_{xy}&c_{yy}&c_{zy}\\ c_{xz}&c_{yz}&c_{zz}\end{bmatrix}$$
+
+각 성분 $c_{ij}$ 는 **출발 좌표계의 축 $i$ 와 도착 좌표계의 축 $j$ 사이 각의 코사인**이다. 그리고
+
+$$\mathbf{C} \triangleq \mathbf{R}_{passive}$$
+
+> [!tip] 항공우주 문헌을 읽을 때 알아 두면 좋다
+> DCM은 **수동적 회전행렬의 다른 이름일 뿐**이다. 항공우주·관성항법 문헌에서 "DCM"이라는 용어가 자주 등장하는데, 새로운 개념이 아니라 이미 아는 그것이다. 이름이 다른 이유는 관점의 차이다. "물체를 돌리는 연산"으로 보느냐, "두 좌표계 축 사이의 방향 관계를 적어 둔 표"로 보느냐.
 
 ### 3.4 연산의 방향 — Local-to-Global이냐 그 반대냐
 
@@ -185,6 +198,33 @@ $$\mathbf{q} \triangleq \mathbf{q}_{LG}, \qquad \mathbf{x}_L = \mathbf{q}\otimes
 > [[Chapter 02 - 회전과 상호관계|2장]] 6절에서 강조했듯이, $\mathbf{q}_{GL}$ 처럼 **두 인덱스를 항상 명시**하면 기본값이 무엇이든 헷갈리지 않는다. 논문도 모호한 곳에서는 항상 인덱스를 붙인다.
 >
 > 실무 팁: 변수 이름에 방향을 넣자. `q_world_body` 나 `T_cam_imu` 처럼 쓰면, 곱할 때 인덱스가 맞물리는지 눈으로 확인할 수 있다. `q_world_body * q_body_cam = q_world_cam` 처럼.
+
+#### "Global"과 "Local"은 상대적인 말이다
+
+논문이 짚어 두는 점이다. $\mathcal{G}$ 와 $\mathcal{L}$ 은 절대적인 지위가 아니라 **상대적 정의**다. $\mathcal{G}$ 는 $\mathcal{L}$ 에 대해 전역이고, $\mathcal{L}$ 은 $\mathcal{G}$ 에 대해 국소다. 다시 말해 **$\mathcal{L}$ 은 기준계 $\mathcal{G}$ 안에서 명세된 좌표계**다.
+
+각주에 따르면 다른 이름들도 흔히 쓰인다.
+
+| 이름 쌍 | 언제 편한가 |
+|---|---|
+| {global, local} | 일반적인 경우 |
+| **{parent, child}** | 시스템에 좌표계가 셋 이상 얽힐 때 (예: 휴머노이드 로봇의 각 링크) |
+| **{world, body}** | 하나의 기준계 안에서 움직이는 단일 강체 (예: 비행기, 자동차) |
+
+#### 규약을 섞으면 이런 일이 생긴다
+
+논문은 마지막에 경고성 예시를 든다. 네 가지 선택지를 섞어 추적해 보면
+
+$$\mathbf{q}_{JPL} \triangleq \mathbf{q}_{LG,left} = \mathbf{q}_{LG,right}^* = \mathbf{q}_{GL,right} \triangleq \mathbf{q}_{Hamilton}$$
+
+> [!warning] $\mathbf{q}_{JPL} = \mathbf{q}_{Hamilton}$ 이라는 결론의 함정
+> 위 전개는 특별히 유용하지는 않지만, **규약을 섞을 때 얼마나 쉽게 혼란에 빠지는지**를 보여 준다.
+>
+> 결론적으로 $\mathbf{q}_{JPL} = \mathbf{q}_{Hamilton}$ 이라고 쓸 수는 있다. 그러나 이것은 **아름다운 결과가 아니라 엄청난 혼란의 근원**이라고 논문은 못박는다. 이유는 이렇다.
+>
+> **같은 것은 쿼터니언의 숫자값뿐이고, 두 쿼터니언은 공식에 투입되었을 때 서로 다른 것을 의미하고 다른 것을 표현한다.**
+>
+> 즉 메모리에 든 네 개의 실수는 같아도, 그 숫자로 무엇을 해야 하는지가 다르다. **숫자가 같으니 그냥 가져다 쓰면 되겠지**라고 생각하는 순간 버그가 시작된다.
 
 ---
 

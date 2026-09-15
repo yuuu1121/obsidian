@@ -117,11 +117,29 @@ $f:\mathbb{R}^m\to SO(3)$ 에 대해 입력에는 $+$, 출력에는 $\ominus$ �
 
 $$\frac{\partial f(\mathbf{x})}{\partial\mathbf{x}} \triangleq \lim_{\delta\mathbf{x}\to 0}\frac{f(\mathbf{x}+\delta\mathbf{x})\ominus f(\mathbf{x})}{\delta\mathbf{x}} = \lim_{\delta\mathbf{x}\to 0}\frac{\mathrm{Log}(f^{-1}(\mathbf{x})f(\mathbf{x}+\delta\mathbf{x}))}{\delta\mathbf{x}} \in \mathbb{R}^{3\times m}$$
 
+오일러 적분은
+
+$$f(\mathbf{x}+\Delta\mathbf{x}) \approx f(\mathbf{x})\oplus\frac{\partial f}{\partial\mathbf{x}}\Delta\mathbf{x} = f(\mathbf{x})\,\mathrm{Exp}\!\left(\frac{\partial f}{\partial\mathbf{x}}\Delta\mathbf{x}\right)$$
+
 ### 2.4 SO(3) → 벡터 공간
 
 $f: SO(3)\to\mathbb{R}^n$ 에 대해 입력에는 $\oplus$, 출력에는 $-$ 를 쓴다.
 
 $$\frac{\partial f(\mathbf{R})}{\partial\boldsymbol{\theta}} \triangleq \lim_{\delta\boldsymbol{\theta}\to 0}\frac{f(\mathbf{R}\oplus\delta\boldsymbol{\theta}) - f(\mathbf{R})}{\delta\boldsymbol{\theta}} = \lim_{\delta\boldsymbol{\theta}\to 0}\frac{f(\mathbf{R}\,\mathrm{Exp}(\delta\boldsymbol{\theta})) - f(\mathbf{R})}{\delta\boldsymbol{\theta}} \in \mathbb{R}^{n\times 3}$$
+
+오일러 적분은
+
+$$f(\mathbf{R}\oplus\Delta\boldsymbol{\theta}) \approx f(\mathbf{R}) + \frac{\partial f}{\partial\boldsymbol{\theta}}\Delta\boldsymbol{\theta}$$
+
+> [!note] 네 경우의 오일러 적분 한눈에 보기
+> | 입력 → 출력 | 미분 정의 | 오일러 적분 |
+> |---|---|---|
+> | $\mathbb{R}^m\to\mathbb{R}^n$ | $\{+,-\}$ | $f(\mathbf{x})+\mathbf{J}\Delta\mathbf{x}$ |
+> | $SO(3)\to SO(3)$ | $\{\oplus,\ominus\}$ | $f(\mathbf{R})\,\mathrm{Exp}(\mathbf{J}\Delta\boldsymbol{\theta})$ |
+> | $\mathbb{R}^m\to SO(3)$ | $\{+,\ominus\}$ | $f(\mathbf{x})\,\mathrm{Exp}(\mathbf{J}\Delta\mathbf{x})$ |
+> | $SO(3)\to\mathbb{R}^n$ | $\{\oplus,-\}$ | $f(\mathbf{R})+\mathbf{J}\Delta\boldsymbol{\theta}$ |
+>
+> **출력이 $SO(3)$ 이면 $\mathrm{Exp}$ 로 곱하고, 출력이 벡터면 그냥 더한다.** 입력이 무엇이든 상관없다.
 
 > [!tip] 규칙은 하나다
 > **회전이 있는 쪽에는 $\oplus$/$\ominus$ 를, 벡터가 있는 쪽에는 $+$/$-$ 를 쓴다.** 네 가지를 외울 필요 없이 이 원칙만 기억하면 된다.

@@ -281,17 +281,30 @@ $$\mathbf{p}\otimes\mathbf{q} = \begin{bmatrix} -\mathbf{p}_v^\top\mathbf{q}_v \
 
 즉 **실수부에는 내적(부호 반대)이, 벡터부에는 외적이** 들어간다. 내적과 외적이 한 연산 안에 동시에 들어 있는 셈이다.
 
+자기 자신과 곱하면 외적이 0이 되므로
+
+$$\mathbf{q}_v\otimes\mathbf{q}_v = -\mathbf{q}_v^\top\mathbf{q}_v = -\|\mathbf{q}_v\|^2$$
+
+그리고 **순허 단위 쿼터니언** $\mathbf{u}\in\mathbb{H}_p$, $\|\mathbf{u}\|=1$ 에 대해서는
+
+$$\boxed{\mathbf{u}\otimes\mathbf{u} = -1}$$
+
+> [!important] 허수 단위와 완전히 같다
+> 복소수의 $i\cdot i = -1$ 과 **정확히 같은 식**이다. 즉 **임의의 순허 단위 쿼터니언은 허수 단위처럼 행동한다.**
+>
+> 복소수에는 그런 원소가 $\pm i$ 둘뿐이지만, 쿼터니언에는 **3차원 단위구 전체**가 그런 원소다. 무한히 많은 "허수 단위"가 있는 셈이고, 그중 어느 방향을 고르느냐가 곧 **회전축을 고르는 것**이 된다. 이것이 쿼터니언이 3D 회전을 담을 수 있는 대수적 뿌리다.
+
 ### 4.3 순허 쿼터니언의 거듭제곱
 
-$\mathbf{v} = \mathbf{u}\theta$ ($\mathbf{u}$는 단위벡터)라는 순허 쿼터니언을 생각하자. 위 식에서 $\mathbf{p}=\mathbf{q}=\mathbf{v}$ 로 두면 외적이 0이 되어
+$\mathbf{v} = \mathbf{u}\theta$ ($\mathbf{u}$는 단위벡터, $\theta=\|\mathbf{v}\|$)라는 순허 쿼터니언을 생각하자. 위 결과를 반복 적용하면 **주기적인 패턴**이 나온다.
 
-$$\mathbf{v}^2 = \mathbf{v}\otimes\mathbf{v} = -\mathbf{v}^\top\mathbf{v} = -\theta^2$$
+$$\mathbf{v}^2 = -\theta^2, \quad \mathbf{v}^3 = -\mathbf{u}\theta^3, \quad \mathbf{v}^4 = \theta^4, \quad \mathbf{v}^5 = \mathbf{u}\theta^5, \quad \mathbf{v}^6 = -\theta^6, \ \dots$$
 
-가 되어 **실수**가 나온다. 계속 거듭제곱하면
+**실수와 벡터가 번갈아 나오며 부호가 두 번마다 뒤집힌다.** 순허 단위 쿼터니언 $\mathbf{u}$ 만 놓고 보면 더 간단해진다.
 
-$$\mathbf{v}^2 = -\theta^2, \quad \mathbf{v}^3 = -\mathbf{u}\theta^3, \quad \mathbf{v}^4 = \theta^4, \quad \mathbf{v}^5 = \mathbf{u}\theta^5, \ \dots$$
+$$\mathbf{u}^2 = -1, \quad \mathbf{u}^3 = -\mathbf{u}, \quad \mathbf{u}^4 = 1, \quad \mathbf{u}^5 = \mathbf{u}, \quad \mathbf{u}^6 = -1, \ \dots$$
 
-**실수와 벡터가 번갈아 나오며 부호가 2번마다 뒤집힌다.** 이것은 허수 단위 $i$ 의 거듭제곱($i^2=-1, i^3=-i, i^4=1,\dots$)과 정확히 같은 패턴이다. 그래서 다음 결과가 나온다.
+허수 단위의 거듭제곱($i^2=-1$, $i^3=-i$, $i^4=1$, …)과 **글자 하나 다르지 않다.** 그래서 다음 결과가 나온다.
 
 ### 4.4 순허 쿼터니언의 지수 — 오일러 공식의 3D 판
 
@@ -309,6 +322,23 @@ $$\boxed{e^{\mathbf{v}} = \exp(\mathbf{u}\theta) = \cos\theta + \mathbf{u}\sin\t
 > 그리고 결과를 보라. 우변은 3.10절에서 본 **단위 쿼터니언의 일반형과 정확히 같다.** 즉 **순허 쿼터니언의 지수는 항상 단위 쿼터니언**이다. $\|e^{\mathbf{v}}\| = \sqrt{\cos^2\theta+\sin^2\theta} = 1$ 이니 당연하다.
 >
 > 이 사실이 뜻하는 바는 크다. **"회전축과 각도(= 3개의 숫자)"를 넣으면 "회전 쿼터니언(= 4개의 숫자, 단위 길이)"이 튀어나오는 변환기**를 우리가 손에 넣은 것이다. 이것이 [[리 군과 리 대수|리 대수에서 리 군으로 가는 지수사상]]이다.
+
+유용한 성질이 하나 더 있다.
+
+$$e^{-\mathbf{v}} = (e^{\mathbf{v}})^*$$
+
+**지수의 부호를 뒤집는 것과 켤레를 취하는 것이 같다.** 회전으로 읽으면 "반대로 돌리기 = 켤레"라는 3.10절의 이야기와 정확히 같은 말이다.
+
+#### 작은 각에서의 근사 — 실무에서 매일 쓰는 식
+
+> [!warning] $\theta\to0$ 이면 $\mathbf{u}=\mathbf{v}/\|\mathbf{v}\|$ 가 0으로 나눈다
+> 로그사상과 같은 문제다. 논문은 $\sin\theta$ 와 $\cos\theta$ 의 테일러 급수를 잘라서 쓰라고 알려 준다. 절단 차수에 따라 근사가 달라진다.
+>
+> $$e^{\mathbf{v}} \approx \begin{bmatrix}1-\theta^2/2 \\ \mathbf{v}(1-\theta^2/6)\end{bmatrix} \approx \begin{bmatrix}1 \\ \mathbf{v}\end{bmatrix} \approx \begin{bmatrix}1 \\ \mathbf{0}\end{bmatrix}$$
+>
+> 오른쪽으로 갈수록 거친 근사다. **가운데 형태 $[1,\ \mathbf{v}]$ 가 ESKF에서 가장 많이 쓰인다.** $\mathbf{v}$ 로 나누는 연산이 없으므로 $\theta=0$ 에서도 안전하다.
+>
+> [[Chapter 04 - 섭동 미분 적분|4장]] 4.1절의 $\mathbf{q}\{\delta\boldsymbol{\theta}\}\approx[1,\ \delta\boldsymbol{\theta}/2]$ 가 바로 이 근사에 $\mathbf{v}=\delta\boldsymbol{\theta}/2$ 를 넣은 것이다. ESKF의 모든 자코비안이 단순해지는 출발점이 여기다.
 
 ### 4.5 일반 쿼터니언의 지수
 

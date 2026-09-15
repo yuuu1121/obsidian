@@ -140,9 +140,101 @@ $$\begin{aligned}
 > $$\boldsymbol{\Phi} = \mathbf{R}\{-\mathbf{u}\theta\} = \mathbf{R}^\top\{\boldsymbol{\omega}\Delta t\}$$
 > [[Chapter 05 - IMU 기반 오차상태 운동학|5장]] $\mathbf{F}_x$ 의 각오차 대각 블록에 있던 $\mathbf{R}^\top\{(\boldsymbol{\omega}_m-\boldsymbol{\omega}_b)\Delta t\}$ 가 **근사가 아니라 정확한 폐형식 해**였던 것이다. 오일러 근사 $\mathbf{I}-[\boldsymbol{\omega}]_\times\Delta t$ 를 쓰는 대신 이걸 쓰면 그 블록만큼은 오차가 없다.
 
-## B.2~B.3 IMU 예제
+## B.2 단순화된 IMU 예제 — 블록별로 폐형식 구하기
 
-논문은 이어서 **단순화된 IMU 예제**(B.2)와 **완전한 IMU 예제**(B.3)에 대해 같은 방식으로 폐형식 전이행렬을 유도한다. 위치·속도·자세가 얽힌 블록 구조라서 식이 길어지지만, 원리는 동일하다. 각 블록마다 $\mathbf{A}^k$ 를 계산해 급수를 묶는 것이다.
+중력과 센서 바이어스를 생략한 단순한 IMU 시스템을 보자.
+
+$$\dot{\delta\mathbf{p}} = \delta\mathbf{v}, \qquad \dot{\delta\mathbf{v}} = -\mathbf{R}[\mathbf{a}]_\times\delta\boldsymbol{\theta}, \qquad \dot{\delta\boldsymbol{\theta}} = -[\boldsymbol{\omega}]_\times\delta\boldsymbol{\theta}$$
+
+상태 벡터와 동역학 행렬은
+
+$$\delta\mathbf{x} = \begin{bmatrix}\delta\mathbf{p}\\ \delta\mathbf{v}\\ \delta\boldsymbol{\theta}\end{bmatrix}, \qquad
+\mathbf{A} = \begin{bmatrix}0&\mathbf{P}_v&0\\ 0&0&\mathbf{V}_\theta\\ 0&0&\boldsymbol{\Theta}_\theta\end{bmatrix}$$
+
+$$\mathbf{P}_v = \mathbf{I}, \qquad \mathbf{V}_\theta = -\mathbf{R}[\mathbf{a}]_\times, \qquad \boldsymbol{\Theta}_\theta = -[\boldsymbol{\omega}]_\times$$
+
+### B.2.1 거듭제곱의 규칙성을 찾는다
+
+$\mathbf{A}$ 의 거듭제곱을 몇 개 써 보면 패턴이 드러난다.
+
+$$\mathbf{A}^2 = \begin{bmatrix}0&0&\mathbf{P}_v\mathbf{V}_\theta\\ 0&0&\mathbf{V}_\theta\boldsymbol{\Theta}_\theta\\ 0&0&\boldsymbol{\Theta}_\theta^2\end{bmatrix}, \qquad
+\mathbf{A}^3 = \begin{bmatrix}0&0&\mathbf{P}_v\mathbf{V}_\theta\boldsymbol{\Theta}_\theta\\ 0&0&\mathbf{V}_\theta\boldsymbol{\Theta}_\theta^2\\ 0&0&\boldsymbol{\Theta}_\theta^3\end{bmatrix}$$
+
+따라서 $k>1$ 에 대해
+
+$$\mathbf{A}^{k>1} = \begin{bmatrix}0&0&\mathbf{P}_v\mathbf{V}_\theta\boldsymbol{\Theta}_\theta^{k-2}\\ 0&0&\mathbf{V}_\theta\boldsymbol{\Theta}_\theta^{k-1}\\ 0&0&\boldsymbol{\Theta}_\theta^k\end{bmatrix}$$
+
+> [!important] 관찰이 열쇠다
+> **고정된 부분과 $\boldsymbol{\Theta}_\theta$ 의 증가하는 거듭제곱**으로 이루어져 있다. 그리고 $\boldsymbol{\Theta}_\theta = -[\boldsymbol{\omega}]_\times$ 의 거듭제곱은 B.1절에서 본 대로 **주기적**이다. 그래서 급수를 닫힌 형태로 묶을 수 있다.
+
+전이행렬을 블록으로 나눠 쓴다.
+
+$$\boldsymbol{\Phi} = \begin{bmatrix}\mathbf{I}&\boldsymbol{\Phi}_{pv}&\boldsymbol{\Phi}_{p\theta}\\ 0&\mathbf{I}&\boldsymbol{\Phi}_{v\theta}\\ 0&0&\boldsymbol{\Phi}_{\theta\theta}\end{bmatrix}$$
+
+### B.2.2 블록 하나씩 정복하기
+
+**대각 블록 두 개** — 위 두 개는 보이는 대로 단위행렬이다.
+
+**회전 대각 블록** $\boldsymbol{\Phi}_{\theta\theta}$ — B.1절의 결과 그대로다.
+
+$$\boldsymbol{\Phi}_{\theta\theta} = \sum_{k=0}^\infty\frac{1}{k!}\boldsymbol{\Theta}_\theta^k\Delta t^k = \mathbf{R}^\top\{\boldsymbol{\omega}\Delta t\}$$
+
+**위치-속도 블록** — 가장 쉽다.
+
+$$\boldsymbol{\Phi}_{pv} = \mathbf{P}_v\Delta t = \mathbf{I}\Delta t$$
+
+**속도-각도 블록** $\boldsymbol{\Phi}_{v\theta}$ — 여기서부터 기교가 필요하다. 급수를 쓰면
+
+$$\boldsymbol{\Phi}_{v\theta} = \mathbf{V}_\theta\Delta t + \tfrac{1}{2}\mathbf{V}_\theta\boldsymbol{\Theta}_\theta\Delta t^2 + \tfrac{1}{3!}\mathbf{V}_\theta\boldsymbol{\Theta}_\theta^2\Delta t^3 + \cdots = \mathbf{V}_\theta\,\boldsymbol{\Sigma}_1$$
+
+$$\boldsymbol{\Sigma}_1 = \mathbf{I}\Delta t + \tfrac{1}{2}\boldsymbol{\Theta}_\theta\Delta t^2 + \tfrac{1}{3!}\boldsymbol{\Theta}_\theta^2\Delta t^3 + \cdots$$
+
+> [!note] $\boldsymbol{\Sigma}_1$ 의 아래첨자 "1"이 뜻하는 것
+> 이 급수는 $\boldsymbol{\Phi}_{\theta\theta}$ 의 급수와 닮았지만 **두 가지가 어긋난다.**
+> 1. **각 항에서 $\boldsymbol{\Theta}_\theta$ 의 거듭제곱이 하나씩 모자란다.**
+> 2. **급수 앞쪽의 항 하나가 빠져 있다.**
+>
+> 아래첨자 "1"이 바로 "하나씩 모자라다"는 뜻이다.
+
+첫 번째 문제는 $[\mathbf{u}]_\times^3 = -[\mathbf{u}]_\times$ 성질([[Chapter 02 - 회전과 상호관계|2장]] 3.3절)에서 나오는 항등식으로 해결한다.
+
+$$\boldsymbol{\Theta}_\theta = \frac{\boldsymbol{\Theta}_\theta^3}{\|\boldsymbol{\omega}\|^2} = \frac{-\boldsymbol{\Theta}_\theta^3}{\|\boldsymbol{\omega}\|^2}$$
+
+**이 식으로 $\boldsymbol{\Theta}_\theta$ 의 지수를 2씩 올릴 수 있다.** 두 번째 문제는 **빠진 항을 더했다 빼서** 완전한 급수로 만든 뒤 닫힌 형태로 치환하면 된다. 결과는
+
+$$\boldsymbol{\Sigma}_1 = \mathbf{I}\Delta t - \frac{\boldsymbol{\Theta}_\theta}{\|\boldsymbol{\omega}\|^2}\left(\mathbf{R}^\top\{\boldsymbol{\omega}\Delta t\} - \mathbf{I} - \boldsymbol{\Theta}_\theta\Delta t\right)$$
+
+따라서 최종적으로
+
+$$\boldsymbol{\Phi}_{v\theta} = \begin{cases}
+-\mathbf{R}[\mathbf{a}]_\times\Delta t & \boldsymbol{\omega}=0 \\[6pt]
+-\mathbf{R}[\mathbf{a}]_\times\left(\mathbf{I}\Delta t + \dfrac{[\boldsymbol{\omega}]_\times}{\|\boldsymbol{\omega}\|^2}\left(\mathbf{R}^\top\{\boldsymbol{\omega}\Delta t\}-\mathbf{I}+[\boldsymbol{\omega}]_\times\Delta t\right)\right) & \boldsymbol{\omega}\neq0
+\end{cases}$$
+
+**위치-각도 블록** $\boldsymbol{\Phi}_{p\theta}$ — 같은 요령을 한 번 더 쓴다. 이번에는 $\boldsymbol{\Theta}_\theta$ 가 **두 개씩** 모자라므로 $\boldsymbol{\Sigma}_2$ 를 쓴다.
+
+$$\boldsymbol{\Phi}_{p\theta} = \mathbf{P}_v\mathbf{V}_\theta\,\boldsymbol{\Sigma}_2, \qquad \boldsymbol{\Sigma}_2 = \tfrac{1}{2}\mathbf{I}\Delta t^2 + \tfrac{1}{3!}\boldsymbol{\Theta}_\theta\Delta t^3 + \tfrac{1}{4!}\boldsymbol{\Theta}_\theta^2\Delta t^4 + \cdots$$
+
+닫힌 형태로 바꾸면
+
+$$\boldsymbol{\Sigma}_2 = \tfrac{1}{2}\mathbf{I}\Delta t^2 - \frac{1}{\|\boldsymbol{\omega}\|^2}\left(\mathbf{R}^\top\{\boldsymbol{\omega}\Delta t\} - \mathbf{I} - \boldsymbol{\Theta}_\theta\Delta t - \tfrac{1}{2}\boldsymbol{\Theta}_\theta^2\Delta t^2\right)$$
+
+$$\boldsymbol{\Phi}_{p\theta} = \begin{cases}
+-\mathbf{R}[\mathbf{a}]_\times\dfrac{\Delta t^2}{2} & \boldsymbol{\omega}=0 \\[6pt]
+-\mathbf{R}[\mathbf{a}]_\times\,\boldsymbol{\Sigma}_2 & \boldsymbol{\omega}\neq0
+\end{cases}$$
+
+> [!tip] 이 절에서 배울 기법
+> 개별 공식을 외울 필요는 없다. **요령 세 가지**가 핵심이다.
+> 1. $\mathbf{A}^k$ 의 **패턴을 찾아** 블록별로 분리한다.
+> 2. 지수가 모자란 급수는 $[\mathbf{u}]_\times^3=-[\mathbf{u}]_\times$ **항등식으로 지수를 보충**한다.
+> 3. 앞쪽 항이 빠진 급수는 **더했다 빼서** 완전한 급수로 만든 뒤 닫힌 형태로 치환한다.
+>
+> 그리고 실무적 결론은 명확하다. **$\boldsymbol{\omega}=0$ 분기가 반드시 필요하다.** $\|\boldsymbol{\omega}\|^2$ 로 나누기 때문이다. 정지 상태에서 NaN이 나는 버그의 전형적 원인이다.
+
+## B.3 완전한 IMU 예제
+
+논문은 이어서 **바이어스와 중력까지 포함한 완전한 IMU 시스템**(B.3)에 대해 같은 방식으로 폐형식 전이행렬을 유도한다. 상태가 $18$ 차원이라 블록이 훨씬 많아지지만, **위에서 본 세 가지 요령을 그대로 반복 적용**하는 것이 전부다.
 
 ---
 
