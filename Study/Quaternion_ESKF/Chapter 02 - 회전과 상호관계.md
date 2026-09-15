@@ -76,9 +76,44 @@ $$\boxed{\mathbf{x}' = \mathbf{x}\cos\phi + (\mathbf{u}\times\mathbf{x})\sin\phi
 
 ## 2. 회전군 SO(3)
 
-### 2.1 회전이란 무엇을 보존하는 변환인가
+### 2.0 표현에 앞서 — 회전은 "무엇을 보존하는가"로 정의된다
 
-회전을 "각도와 길이를 유지하면서 원점을 고정하는 변환"이라고 하자. 선형변환 $\mathbf{R}$ 이 이 조건을 만족하려면 임의의 두 벡터의 내적이 보존되어야 한다.
+논문은 행렬이나 쿼터니언 같은 **표현을 먼저 고르지 않고**, 회전이 지켜야 할 성질부터 적는다. 회전 연산자 $r:\mathbb{R}^3\to\mathbb{R}^3$ 가 만족해야 하는 조건은 세 가지다.
+
+**(a) 벡터의 길이를 보존한다.**
+
+$$\|r(\mathbf{v})\| = \|\mathbf{v}\|, \qquad \forall\,\mathbf{v}\in\mathbb{R}^3$$
+
+**(b) 벡터 사이의 각도를 보존한다.**
+
+$$\langle r(\mathbf{v}), r(\mathbf{w})\rangle = \langle\mathbf{v},\mathbf{w}\rangle = \|\mathbf{v}\|\|\mathbf{w}\|\cos\alpha$$
+
+**(c) 벡터들의 상대적 방향(손잡이)을 보존한다.**
+
+$$\mathbf{u}\times\mathbf{v}=\mathbf{w} \quad\Longrightarrow\quad r(\mathbf{u})\times r(\mathbf{v}) = r(\mathbf{w})$$
+
+> [!note] (a)와 (b)는 사실 같은 조건이다
+> 내적은 $\langle\mathbf{v},\mathbf{w}\rangle = \tfrac{1}{2}(\|\mathbf{v}+\mathbf{w}\|^2-\|\mathbf{v}\|^2-\|\mathbf{w}\|^2)$ 처럼 길이만으로 쓸 수 있다. 따라서 길이를 보존하면 각도도 자동으로 보존된다. 논문도 "처음 두 조건이 동치임은 쉽게 증명된다"고 적는다.
+
+따라서 회전군은 이렇게 정의된다.
+
+$$SO(3) : \{r:\mathbb{R}^3\to\mathbb{R}^3\ /\ \forall\mathbf{v},\mathbf{w},\ \|r(\mathbf{v})\|=\|\mathbf{v}\|,\ r(\mathbf{v})\times r(\mathbf{w})=r(\mathbf{v}\times\mathbf{w})\}$$
+
+> [!important] 왜 로보틱스에서 중요한가
+> 강체 운동(rigid motion)이 요구하는 것이 정확히 이것이다. **강체 내부의 거리·각도·상대적 방향이 운동 중에 보존되어야 한다.** 그렇지 않다면 그 물체를 강체라고 부를 수 없다.
+>
+> 그리고 (c)의 외적 조건이 **거울 반사를 배제**한다. 반사는 길이와 각도를 보존하지만 손잡이를 뒤집는다. 실제 물체를 아무리 돌려도 왼손을 오른손으로 만들 수는 없다.
+
+> [!tip] 이 절의 핵심 메시지
+> **회전군은 하나지만 표현은 여럿이다.** 회전행렬도 쿼터니언도 똑같이 타당한 표현이며, 개념적으로도 대수적으로도 아주 닮았다. 이 장의 목표가 그 둘이 동등함을 보이는 것이다.
+>
+> 가장 중요한 차이는 하나뿐이다. **단위 쿼터니언 군은 $SO(3)$ 의 이중 덮개**이므로 엄밀히는 $SO(3)$ 그 자체가 아니다. 다만 대부분의 응용에서 치명적이지는 않다. (4.5절 참고.)
+
+### 2.1 행렬로 표현하면 — 직교 조건
+
+이제 위 조건을 행렬 언어로 옮겨 보자. 회전 연산자는 내적과 외적으로 정의되었고 이들이 선형이므로, $r()$ 도 **선형**이다. 따라서 행렬로 쓸 수 있다.
+
+선형변환 $\mathbf{R}$ 이 조건 (b)를 만족하려면 임의의 두 벡터의 내적이 보존되어야 한다.
 
 $$(\mathbf{R}\mathbf{a})^\top(\mathbf{R}\mathbf{b}) = \mathbf{a}^\top\mathbf{R}^\top\mathbf{R}\mathbf{b} = \mathbf{a}^\top\mathbf{b}$$
 
@@ -548,21 +583,52 @@ $|\alpha_1| = |\alpha_2|$ 인 회전을 **등경사 회전(isoclinic rotation)**
 
 ---
 
-## 정리 — 두 언어 대조표
+## 정리 — 두 언어 대조표 (논문 Table 1)
+
+논문이 14쪽에 싣는 Table 1을 옮기고 보충한 것이다. **이 표 하나가 이 장 전체의 요약**이다.
 
 | 개념 | 회전행렬 $\mathbf{R}$ | 쿼터니언 $\mathbf{q}$ |
 |---|---|---|
+| **매개변수 개수** | $3\times3 = 9$ | $1+3 = 4$ |
+| **자유도** | 3 | 3 |
+| **제약 조건 수** | $9-3 = 6$ | $4-3 = 1$ |
+| **제약 조건** | $\mathbf{R}^\top\mathbf{R}=\mathbf{I}$, $\det\mathbf{R}=+1$ | $\mathbf{q}^*\otimes\mathbf{q}=1$ |
+| **미분방정식(ODE)** | $\dot{\mathbf{R}} = \mathbf{R}[\boldsymbol{\omega}]_\times$ | $\dot{\mathbf{q}} = \tfrac{1}{2}\mathbf{q}\otimes\boldsymbol{\omega}$ |
+| **지수사상** | $\mathbf{R}=\exp([\mathbf{u}\theta]_\times)$ | $\mathbf{q}=\exp(\mathbf{u}\theta/2)$ |
+| **로그사상** | $\log(\mathbf{R}) = [\mathbf{u}\theta]_\times$ | $\log(\mathbf{q}) = \mathbf{u}\theta/2$ |
+| **$SO(3)$ 와의 관계** | **단일 덮개(single cover)** | **이중 덮개(double cover)** |
 | 사는 곳 | $SO(3)$ | $S^3$ (단위 3-구면) |
 | 리 대수 | $\mathfrak{so}(3)$ (반대칭행렬) | $\mathbb{H}_p$ (순허 쿼터니언) |
-| 지수 (소문자) | $\exp([\boldsymbol{\theta}]_\times)$ | $\exp(\boldsymbol{\theta}/2)$ |
 | 지수 (대문자) | $\mathrm{Exp}(\boldsymbol{\theta})$ | $\mathrm{Exp}(\boldsymbol{\theta})$ |
-| 구체적 형태 | $\mathbf{I}+\sin\theta[\mathbf{u}]_\times+(1-\cos\theta)[\mathbf{u}]_\times^2$ | $[\cos(\theta/2),\ \mathbf{u}\sin(\theta/2)]$ |
-| 회전 작용 | $\mathbf{R}\mathbf{x}$ | $\mathbf{q}\otimes\mathbf{x}\otimes\mathbf{q}^*$ |
-| 합성 | $\mathbf{R}_1\mathbf{R}_2$ | $\mathbf{q}_1\otimes\mathbf{q}_2$ |
-| 역회전 | $\mathbf{R}^\top$ | $\mathbf{q}^*$ |
-| 미분방정식 | $\dot{\mathbf{R}} = \mathbf{R}[\boldsymbol{\omega}]_\times$ | $\dot{\mathbf{q}} = \tfrac{1}{2}\mathbf{q}\otimes\boldsymbol{\omega}$ |
-| 표현의 유일성 | 1:1 | 1:2 (이중 덮개, $\pm\mathbf{q}$) |
-| 저장 | 숫자 9개 | 숫자 4개 |
+| **항등원** | $\mathbf{I}$ | $1$ |
+| **역원** | $\mathbf{R}^\top$ | $\mathbf{q}^*$ |
+| **합성** | $\mathbf{R}_1\mathbf{R}_2$ | $\mathbf{q}_1\otimes\mathbf{q}_2$ |
+| **회전 연산자** | $\mathbf{I}+\sin\theta[\mathbf{u}]_\times+(1-\cos\theta)[\mathbf{u}]_\times^2$ | $\cos\tfrac{\theta}{2}+\mathbf{u}\sin\tfrac{\theta}{2}$ |
+| **회전 작용** | $\mathbf{R}\mathbf{x}$ | $\mathbf{q}\otimes\mathbf{x}\otimes\mathbf{q}^*$ |
+| **보간 ($\mathbf{R}^t$, $\mathbf{q}^t$)** | $\mathbf{I}+\sin t\theta[\mathbf{u}]_\times+(1-\cos t\theta)[\mathbf{u}]_\times^2$ | $\cos\tfrac{t\theta}{2}+\mathbf{u}\sin\tfrac{t\theta}{2}$ |
+| **SLERP** | $\mathbf{R}_1(\mathbf{R}_1^\top\mathbf{R}_2)^t$ | $\mathbf{q}_1\otimes(\mathbf{q}_1^*\otimes\mathbf{q}_2)^t$ |
+| **SLERP (구면 형태)** | — | $\dfrac{\mathbf{q}_1\sin((1-t)\Delta\theta) + \mathbf{q}_2\sin(t\Delta\theta)}{\sin\Delta\theta}$ |
+
+### 상호 관계 (Cross relations)
+
+두 표현을 잇는 다리다. $\mathbf{R}\{\mathbf{q}\}$ 는 쿼터니언에서 얻은 회전행렬을 뜻한다.
+
+$$\mathbf{R}\{\mathbf{q}\} = (q_w^2-\mathbf{q}_v^\top\mathbf{q}_v)\mathbf{I} + 2\,\mathbf{q}_v\mathbf{q}_v^\top + 2q_w[\mathbf{q}_v]_\times$$
+
+| 성질 | 관계식 |
+|---|---|
+| 이중 덮개 | $\mathbf{R}\{-\mathbf{q}\} = \mathbf{R}\{\mathbf{q}\}$ |
+| 항등원 | $\mathbf{R}\{1\} = \mathbf{I}$ |
+| 역원 | $\mathbf{R}\{\mathbf{q}^*\} = \mathbf{R}\{\mathbf{q}\}^\top$ |
+| 합성 | $\mathbf{R}\{\mathbf{q}_1\otimes\mathbf{q}_2\} = \mathbf{R}\{\mathbf{q}_1\}\,\mathbf{R}\{\mathbf{q}_2\}$ |
+| 보간 | $\mathbf{R}\{\mathbf{q}^t\} = \mathbf{R}\{\mathbf{q}\}^t$ |
+
+> [!important] 이 표가 말하는 것
+> **모든 행이 완벽하게 대응한다.** 쿼터니언 곱은 행렬 곱으로, 켤레는 전치로, 부호 반전은 아무것도 아닌 것으로 옮겨 간다. 수학적으로 이런 관계를 **준동형사상(homomorphism)** 이라 한다.
+>
+> "이중 덮개" 행만 예외다. $\mathbf{R}\{-\mathbf{q}\}=\mathbf{R}\{\mathbf{q}\}$ 이므로 **쿼터니언 → 회전행렬은 2:1 대응**이다. 그래서 단위 쿼터니언 군은 엄밀히 말해 $SO(3)$ 가 아니라 그것을 두 겹으로 덮는 $S^3$ 다.
+>
+> 제약 조건 개수의 차이($6$ vs $1$)도 눈여겨보자. **쿼터니언은 제약이 하나뿐이라 관리가 훨씬 쉽다.** 정규화 한 줄이면 끝이라는 실무적 장점이 여기서 나온다.
 
 > [!tip] 대문자 $\mathrm{Exp}$/$\mathrm{Log}$ 표기의 힘
 > 표에서 보듯 **대문자 연산자를 쓰면 두 열이 거의 같아진다.** 회전 벡터 $\boldsymbol{\theta}\in\mathbb{R}^3$ 를 공통 언어로 삼고, 구체적 표현($\mathbf{R}$ 이냐 $\mathbf{q}$ 냐)은 그때그때 편한 것을 고르면 된다는 뜻이다. [[Chapter 04 - 섭동 미분 적분|4장]] 이후의 모든 유도가 이 원칙 위에서 진행된다.
