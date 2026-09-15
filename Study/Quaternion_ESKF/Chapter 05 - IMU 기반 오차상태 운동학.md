@@ -214,12 +214,90 @@ $$\mathbf{R}_t = \mathbf{R}(\mathbf{I} + [\delta\boldsymbol{\theta}]_\times) + O
 
 $$\mathbf{a}_B \triangleq \mathbf{a}_m - \mathbf{a}_b, \qquad \delta\mathbf{a}_B \triangleq -\delta\mathbf{a}_b - \mathbf{a}_n$$
 
-이를 대입하고 정리하면서 $[\delta\boldsymbol{\theta}]_\times\,\delta\mathbf{a}_B$ 같은 **2차 항을 버리고**, $[\mathbf{a}]_\times\mathbf{b} = -[\mathbf{b}]_\times\mathbf{a}$ 를 써서 $\delta\boldsymbol{\theta}$ 를 오른쪽으로 빼내면 위 결과가 나온다.
+이제 참 가속도를 큰 신호와 작은 신호의 합성으로 쓸 수 있다.
+
+$$\mathbf{a}_t = \mathbf{R}_t(\mathbf{a}_B+\delta\mathbf{a}_B) + \mathbf{g} + \delta\mathbf{g}$$
+
+핵심 요령은 $\dot{\mathbf{v}}_t$ 를 **두 가지 방식으로 전개해 비교**하는 것이다. 왼쪽은 오차 합성 정의로, 오른쪽은 참 운동학으로 계산한다. ($O(\|\delta\boldsymbol{\theta}\|^2)$ 항은 무시한다.)
+
+$$\underbrace{\mathbf{R}\mathbf{a}_B+\mathbf{g}+\dot{\delta\mathbf{v}}}_{\text{좌: }\dot{\mathbf{v}}+\dot{\delta\mathbf{v}}} = \underbrace{\mathbf{R}\mathbf{a}_B + \mathbf{R}\delta\mathbf{a}_B + \mathbf{R}[\delta\boldsymbol{\theta}]_\times\mathbf{a}_B + \mathbf{R}[\delta\boldsymbol{\theta}]_\times\delta\mathbf{a}_B + \mathbf{g}+\delta\mathbf{g}}_{\text{우: }\mathbf{R}(\mathbf{I}+[\delta\boldsymbol{\theta}]_\times)(\mathbf{a}_B+\delta\mathbf{a}_B)+\mathbf{g}+\delta\mathbf{g}}$$
+
+양변에서 공통항 $\mathbf{R}\mathbf{a}_B+\mathbf{g}$ 를 지우면
+
+$$\dot{\delta\mathbf{v}} = \mathbf{R}\left(\delta\mathbf{a}_B + [\delta\boldsymbol{\theta}]_\times\mathbf{a}_B\right) + \mathbf{R}[\delta\boldsymbol{\theta}]_\times\delta\mathbf{a}_B + \delta\mathbf{g}$$
+
+**2차 항** $\mathbf{R}[\delta\boldsymbol{\theta}]_\times\delta\mathbf{a}_B$ 를 버리고, $[\mathbf{a}]_\times\mathbf{b} = -[\mathbf{b}]_\times\mathbf{a}$ 로 외적을 재배치하면
+
+$$\dot{\delta\mathbf{v}} = \mathbf{R}\left(\delta\mathbf{a}_B - [\mathbf{a}_B]_\times\delta\boldsymbol{\theta}\right) + \delta\mathbf{g}$$
+
+정의를 되돌리면 최종 결과가 나온다.
+
+$$\dot{\delta\mathbf{v}} = -\mathbf{R}[\mathbf{a}_m-\mathbf{a}_b]_\times\delta\boldsymbol{\theta} - \mathbf{R}\delta\mathbf{a}_b + \delta\mathbf{g} - \mathbf{R}\mathbf{a}_n$$
 
 > [!note] $-\mathbf{R}[\mathbf{a}_m-\mathbf{a}_b]_\times$ 항의 물리적 의미
 > **자세가 조금 틀어져 있으면 중력 보상이 어긋나고, 그것이 속도 오차로 이어진다**는 뜻이다. 자세 오차 $\delta\boldsymbol{\theta}$ 가 속도 오차 $\delta\mathbf{v}$ 로 흘러 들어가는 통로다.
 >
 > 이 결합이 있기 때문에 **GPS로 위치만 관측해도 자세와 바이어스가 관측 가능해진다.** 위치 오차 → 속도 오차 → 자세 오차로 정보가 거슬러 올라가기 때문이다. ESKF가 작동하는 근본 원리다.
+
+#### 등방성 잡음 가정 — $\mathbf{R}\mathbf{a}_n$ 에서 $\mathbf{R}$ 을 지우기
+
+식을 더 깔끔하게 만들 수 있다. 가속도계 잡음이 **백색이고, 상관이 없고, 등방적(isotropic)** 이라고 가정하는 경우가 많다.
+
+$$\mathbb{E}[\mathbf{a}_n] = 0, \qquad \mathbb{E}[\mathbf{a}_n\mathbf{a}_n^\top] = \sigma_a^2\mathbf{I}$$
+
+즉 **공분산 타원체가 원점 중심의 완전한 구**라는 뜻이고, 따라서 그 평균과 공분산이 **회전에 대해 불변**이다. 증명은 한 줄이다.
+
+$$\mathbb{E}[\mathbf{R}\mathbf{a}_n] = \mathbf{R}\,\mathbb{E}[\mathbf{a}_n] = 0$$
+$$\mathbb{E}[(\mathbf{R}\mathbf{a}_n)(\mathbf{R}\mathbf{a}_n)^\top] = \mathbf{R}\,\mathbb{E}[\mathbf{a}_n\mathbf{a}_n^\top]\,\mathbf{R}^\top = \mathbf{R}(\sigma_a^2\mathbf{I})\mathbf{R}^\top = \sigma_a^2\mathbf{I}$$
+
+**회전시켜도 통계적으로 완전히 같은 확률변수다.** 그러므로 아무 손해 없이 잡음 벡터를 다시 정의할 수 있다.
+
+$$\mathbf{a}_n \leftarrow \mathbf{R}\,\mathbf{a}_n$$
+
+그 결과
+
+$$\boxed{\dot{\delta\mathbf{v}} = -\mathbf{R}[\mathbf{a}_m-\mathbf{a}_b]_\times\delta\boldsymbol{\theta} - \mathbf{R}\,\delta\mathbf{a}_b + \delta\mathbf{g} - \mathbf{a}_n}$$
+
+> [!important] 이것이 $\mathbf{Q}_i$ 에 $\mathbf{R}$ 이 없는 이유다
+> 4.3절의 섭동 행렬 $\mathbf{F}_i$ 와 잡음 공분산 $\mathbf{Q}_i$ 를 보면 **회전행렬이 전혀 등장하지 않는다.** 등방성 가정 덕분에 $\mathbf{R}$ 을 흡수해 버렸기 때문이다.
+>
+> [[Chapter 07 - 전역 각오차를 쓰는 ESKF|7장]]에서 각오차 정의를 바꿔도 $\mathbf{F}_i$, $\mathbf{Q}_i$ 가 그대로인 것도 같은 이유다.
+
+> [!warning] 이 가정이 깨지는 경우
+> 논문은 각주로 경고한다. **세 축의 가속도계가 서로 동일하지 않은 경우에는 이 가정을 쓸 수 없다.** 축마다 잡음 특성이 다르면 공분산이 $\sigma^2\mathbf{I}$ 형태가 아니라 대각 성분이 다른 행렬이 되고, 그러면 $\mathbf{R}\boldsymbol{\Sigma}\mathbf{R}^\top \neq \boldsymbol{\Sigma}$ 가 된다. 이때는 $\mathbf{R}$ 을 명시적으로 끌고 다녀야 한다.
+
+#### 자세 오차 유도의 핵심
+
+같은 "두 가지 방식으로 전개하기" 요령을 쓴다. 각속도도 큰 신호와 작은 신호로 나눈다.
+
+$$\boldsymbol{\omega} \triangleq \boldsymbol{\omega}_m-\boldsymbol{\omega}_b, \qquad \delta\boldsymbol{\omega} \triangleq -\delta\boldsymbol{\omega}_b-\boldsymbol{\omega}_n, \qquad \boldsymbol{\omega}_t = \boldsymbol{\omega}+\delta\boldsymbol{\omega}$$
+
+$\dot{\mathbf{q}}_t$ 를 두 방식으로 계산한다. 왼쪽은 합성 $\mathbf{q}_t=\mathbf{q}\otimes\delta\mathbf{q}$ 를 미분한 것, 오른쪽은 참 운동학이다.
+
+$$\underbrace{\dot{\mathbf{q}}\otimes\delta\mathbf{q} + \mathbf{q}\otimes\dot{\delta\mathbf{q}}}_{\text{좌}} = \underbrace{\tfrac{1}{2}\mathbf{q}\otimes\delta\mathbf{q}\otimes\boldsymbol{\omega}_t}_{\text{우}}$$
+
+좌변의 $\dot{\mathbf{q}} = \tfrac{1}{2}\mathbf{q}\otimes\boldsymbol{\omega}$ 를 대입하고 공통의 $\mathbf{q}$ 를 소거한 뒤 $\dot{\delta\mathbf{q}}$ 에 대해 정리하면
+
+$$2\,\dot{\delta\mathbf{q}} = \delta\mathbf{q}\otimes\boldsymbol{\omega}_t - \boldsymbol{\omega}\otimes\delta\mathbf{q} = \left([\boldsymbol{\omega}_t]_R - [\boldsymbol{\omega}]_L\right)\delta\mathbf{q}$$
+
+[[Chapter 01 - 쿼터니언의 정의와 성질|1장]] 3.3절의 좌·우 곱 행렬을 대입하면 그 차이가 아주 단순해진다.
+
+$$[\boldsymbol{\omega}_t]_R-[\boldsymbol{\omega}]_L = \begin{bmatrix}0 & -\delta\boldsymbol{\omega}^\top \\ \delta\boldsymbol{\omega} & -[\boldsymbol{\omega}_t+\boldsymbol{\omega}]_\times\end{bmatrix} \approx \begin{bmatrix}0 & -\delta\boldsymbol{\omega}^\top \\ \delta\boldsymbol{\omega} & -[2\boldsymbol{\omega}+\delta\boldsymbol{\omega}]_\times\end{bmatrix}$$
+
+$\delta\mathbf{q}\approx[1,\ \tfrac{1}{2}\delta\boldsymbol{\theta}]$ 를 넣고 전개하면 스칼라 식 하나와 벡터 식 하나가 나온다.
+
+$$0 = \delta\boldsymbol{\omega}^\top\delta\boldsymbol{\theta} + O(\|\delta\|^2) \qquad \text{(무한소끼리의 관계, 정보 없음)}$$
+
+$$\dot{\delta\boldsymbol{\theta}} = \delta\boldsymbol{\omega} - [\boldsymbol{\omega}]_\times\delta\boldsymbol{\theta} + O(\|\delta\|^2)$$
+
+2차 항을 버리고 정의를 되돌리면
+
+$$\boxed{\dot{\delta\boldsymbol{\theta}} = -[\boldsymbol{\omega}_m-\boldsymbol{\omega}_b]_\times\delta\boldsymbol{\theta} - \delta\boldsymbol{\omega}_b - \boldsymbol{\omega}_n}$$
+
+> [!note] $-[\boldsymbol{\omega}]_\times\delta\boldsymbol{\theta}$ 항은 어디서 왔나
+> **오차를 회전하는 좌표계(body)에서 재기 때문에** 생기는 항이다. 기준 자체가 돌아가고 있으므로 그만큼 보정이 필요하다. 원심력·코리올리 항이 회전 좌표계에서 나타나는 것과 같은 성격이다.
+>
+> [[Chapter 07 - 전역 각오차를 쓰는 ESKF|7장]]에서 오차를 전역 좌표계에 정의하면 **이 항이 사라진다.** 전역 좌표계는 회전하지 않기 때문이다.
 
 ---
 
