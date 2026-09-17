@@ -119,13 +119,37 @@ $$(\mathbf{R}\mathbf{a})^\top(\mathbf{R}\mathbf{b}) = \mathbf{a}^\top\mathbf{R}^
 
 모든 $\mathbf{a},\mathbf{b}$ 에 대해 성립하려면
 
-$$\mathbf{R}^\top\mathbf{R} = \mathbf{I}$$
+$$\mathbf{R}^\top\mathbf{R} = \mathbf{I} = \mathbf{R}\mathbf{R}^\top$$
 
-이어야 한다. 이런 행렬을 **직교행렬(orthogonal matrix)** 이라 한다. 여기에 조건 하나를 더 붙인다. $\det(\mathbf{R}^\top\mathbf{R}) = (\det\mathbf{R})^2 = 1$ 이므로 $\det\mathbf{R} = \pm1$ 인데, **$-1$ 인 경우는 거울 반사(reflection)** 라서 실제 물체를 돌려서는 만들 수 없다. 그래서 $+1$ 만 남긴다.
+#### 직교 조건이 뜻하는 것
 
-$$SO(3) = \{\mathbf{R} \in \mathbb{R}^{3\times3}\ |\ \mathbf{R}^\top\mathbf{R} = \mathbf{I},\ \det\mathbf{R} = 1\}$$
+$\mathbf{R} = [\mathbf{r}_1, \mathbf{r}_2, \mathbf{r}_3]$ 로 열벡터를 써서 위 조건에 대입해 보면, **열벡터들이 단위 길이이고 서로 직교**함을 알 수 있다.
 
-이것이 **특수직교군(Special Orthogonal group) SO(3)** 다. "Special"은 $\det=+1$ 조건을, "Orthogonal"은 직교 조건을 가리킨다.
+$$\langle\mathbf{r}_i,\mathbf{r}_i\rangle = \mathbf{r}_i^\top\mathbf{r}_i = 1, \qquad \langle\mathbf{r}_i,\mathbf{r}_j\rangle = \mathbf{r}_i^\top\mathbf{r}_j = 0 \ \ (i\neq j)$$
+
+이것이 **직교행렬(orthogonal matrix)** 이라는 이름의 유래다. 벡터의 노름과 각도를 보존하는 변환들의 집합을 그래서 **직교군 $O(3)$** 라 부른다.
+
+> [!important] 역회전이 전치라는 사실도 여기서 나온다
+> 직교 조건에서 곧바로
+> $$\boxed{\mathbf{R}^{-1} = \mathbf{R}^\top}$$
+> 이 따라 나온다. **역회전을 구하려면 전치만 하면 된다.** 역행렬을 계산할 필요가 없다. 쿼터니언의 $\mathbf{q}^{-1}=\mathbf{q}^*$ 에 대응하는 성질이다.
+>
+> 그리고 $O(3)$ 가 **군**인 이유도 이 두 사실이다. 직교행렬의 곱은 다시 직교행렬이고($\mathbf{Q}^\top\mathbf{Q} = \mathbf{Q}_2^\top\mathbf{Q}_1^\top\mathbf{Q}_1\mathbf{Q}_2 = \mathbf{I}$), 모든 직교행렬은 역원을 갖는다.
+
+#### 반사를 걷어내면 SO(3)
+
+그런데 $O(3)$ 는 아직 너무 넓다. **회전(강체 운동)과 반사(강체 운동이 아님)를 모두 포함**하기 때문이다. 2.0절의 조건 (c), 즉 상대적 방향 보존을 추가하면 반사가 걸러지고 조건 하나가 더 붙는다.
+
+$$\det(\mathbf{R}) = +1$$
+
+> [!note] 왜 $\det$ 로 갈리는가
+> $\det(\mathbf{R}^\top\mathbf{R}) = (\det\mathbf{R})^2 = 1$ 이므로 $\det\mathbf{R}=\pm1$ 뿐이다. 그리고 **반사는 $\det=-1$** 이다. 논문은 각주에서 반사가 군을 이루지 못하는 이유도 짚는다. 반사를 두 번 하면 $|\mathbf{R}_1\mathbf{R}_2| = (-1)(-1) = +1$ 이 되어 **반사가 아니게 되므로**, 닫힘 조건이 깨진다.
+
+행렬식이 양의 단위값인 직교행렬을 **고유(proper)** 또는 **특수(special)** 직교행렬이라 부른다. 그 집합이 $O(3)$ 의 부분군인 **특수직교군 $SO(3)$** 다.
+
+$$SO(3) = \{\mathbf{R} \in \mathbb{R}^{3\times3}\ |\ \mathbf{R}^\top\mathbf{R} = \mathbf{I},\ \det\mathbf{R} = +1\}$$
+
+"Special"은 $\det=+1$ 조건을, "Orthogonal"은 직교 조건을 가리킨다. 군이므로 **두 회전행렬의 곱은 언제나 회전행렬**이다.
 
 ### 2.2 왜 "군(group)"인가
 
@@ -237,7 +261,31 @@ $$[\mathbf{u}]_\times^2 = \mathbf{u}\mathbf{u}^\top - \mathbf{I}, \qquad [\mathb
 
 $$\boxed{\mathbf{R} = \mathrm{Exp}(\mathbf{u}\theta) = \mathbf{I} + \sin\theta\,[\mathbf{u}]_\times + (1-\cos\theta)\,[\mathbf{u}]_\times^2}$$
 
-이것이 **로드리게스 회전 공식의 행렬 버전**이다. 1.3절에서 기하학적으로 얻은 벡터 공식과 같은 내용이며, 실제로 양변에 $\mathbf{x}$ 를 곱해 보면 서로 일치한다.
+이것이 **로드리게스 회전 공식의 행렬 버전**이며, 이 문서에서 $\mathbf{R}\{\boldsymbol{\theta}\}\triangleq\mathrm{Exp}(\boldsymbol{\theta})$ 로 표기한다. 1.3절에서 기하학적으로 얻은 벡터 공식과 같은 내용이며, 실제로 양변에 $\mathbf{x}$ 를 곱해 보면 서로 일치한다.
+
+#### 변형 — $\mathbf{u}\mathbf{u}^\top$ 형태 (원문 식 78)
+
+이 공식은 몇 가지 변형을 허용한다. 위에서 쓴 $[\mathbf{u}]_\times^2 = \mathbf{u}\mathbf{u}^\top-\mathbf{I}$ 를 대입해 $[\mathbf{u}]_\times^2$ 를 없애면
+
+$$\mathbf{R} = \mathbf{I} + \sin\theta\,[\mathbf{u}]_\times + (1-\cos\theta)(\mathbf{u}\mathbf{u}^\top-\mathbf{I})$$
+
+$\mathbf{I}$ 항을 묶어 정리하면
+
+$$\boxed{\mathbf{R} = \mathbf{I}\cos\theta + [\mathbf{u}]_\times\sin\theta + \mathbf{u}\mathbf{u}^\top(1-\cos\theta)}$$
+
+> [!tip] 두 형태 중 어느 것을 쓸까
+> **수학적으로 완전히 같은 식**이다. 쓰임새만 다르다.
+>
+> | 형태 | 특징 |
+> |---|---|
+> | $\mathbf{I}+\sin\theta[\mathbf{u}]_\times+(1-\cos\theta)[\mathbf{u}]_\times^2$ | **구현에 유리하다.** $[\mathbf{u}]_\times$ 를 한 번 만들어 제곱만 하면 되므로, 스큐 행렬 하나로 두 항을 모두 처리한다 |
+> | $\mathbf{I}\cos\theta+[\mathbf{u}]_\times\sin\theta+\mathbf{u}\mathbf{u}^\top(1-\cos\theta)$ | **구조가 눈에 보인다.** 1.1절의 벡터 분해와 항이 일대일로 대응한다 |
+>
+> 두 번째 형태를 1.3절의 벡터 공식과 나란히 놓아 보자.
+>
+> $$\mathbf{x}' = \underbrace{\mathbf{x}\cos\theta}_{\mathbf{I}\cos\theta} + \underbrace{(\mathbf{u}\times\mathbf{x})\sin\theta}_{[\mathbf{u}]_\times\sin\theta} + \underbrace{\mathbf{u}(\mathbf{u}^\top\mathbf{x})(1-\cos\theta)}_{\mathbf{u}\mathbf{u}^\top(1-\cos\theta)}$$
+>
+> **세 항이 정확히 맞물린다.** 첫째는 수직 성분의 회전, 둘째는 90° 돌린 성분, 셋째는 축 방향 성분($\mathbf{u}\mathbf{u}^\top$ 는 1.1절에서 본 **축으로의 정사영 행렬**)이다. 행렬 공식이 벡터 공식의 단순한 재포장임이 이 형태에서 가장 잘 드러난다.
 
 ### 3.4 로그사상 — 회전에서 각도로
 
@@ -698,6 +746,35 @@ $$\mathbf{q}_0^\top\mathbf{q}_1 < 0 \quad \Longrightarrow \quad \mathbf{q}_1 \le
 
 > **의문 1.** 왜 곱을 두 번 해야 하는가? ($\mathbf{q}\otimes\mathbf{x}\otimes\mathbf{q}^*$)
 > **의문 2.** 왜 각도가 절반인가? ($\theta/2$)
+
+4.4절의 대수적 증명과 4.5절의 이중 덮개 논의를 넘어서는 **기하학적 설명**을 원하는 것이다.
+
+### 8.0 출발점 — 곱 행렬은 4D 회전행렬이다
+
+5.1절에서 본 표현을 다시 가져오자.
+
+$$\mathbf{q}\otimes\mathbf{x}\otimes\mathbf{q}^* = [\mathbf{q}^*]_R\,[\mathbf{q}]_L\begin{bmatrix}0\\ \mathbf{x}\end{bmatrix} = \begin{bmatrix}0\\ \mathbf{R}\mathbf{x}\end{bmatrix}$$
+
+단위 쿼터니언 $\mathbf{q}$ 에 대해, 곱 행렬 $[\mathbf{q}]_L$ 과 $[\mathbf{q}]_R$ 은 **주목할 만한 두 가지 성질**을 만족한다.
+
+$$[\mathbf{q}]^\top[\mathbf{q}] = \mathbf{I}_4$$
+$$\det([\mathbf{q}]) = +1$$
+
+> [!important] 이 두 줄이 8절 전체의 논리적 토대다
+> 2.1절에서 $SO(3)$ 를 정의했던 조건과 **똑같은 형태**임을 보라. $\mathbf{R}^\top\mathbf{R}=\mathbf{I}$, $\det\mathbf{R}=+1$ 이었다. 차이는 크기가 $4\times4$ 라는 것뿐이다.
+>
+> 따라서 $[\mathbf{q}]_L$ 과 $[\mathbf{q}]_R$ 은 **$SO(4)$ 의 원소**, 즉 **$\mathbb{R}^4$ 공간의 진짜 회전행렬**이다.
+>
+> 그러므로 위 표현이 말하는 바는 이렇다. **쿼터니언 회전은 $\mathbb{R}^4$ 에서 연달아 일어나는 두 번의 회전이다.** 더 정확히는 **등경사 회전(isoclinic rotation)** 이라는 특별한 종류의 회전인데, 그것이 무엇인지가 이 절의 나머지다.
+
+#### 설명의 순서
+
+쿼터니언 회전의 속내를 이해하려면 $\mathbb{R}^4$ 의 등경사 회전을 알아야 한다. 그러려면 먼저 $\mathbb{R}^4$ 의 일반 회전을 알아야 하고, 그러려면 $\mathbb{R}^3$ 로 돌아가야 한다. $\mathbb{R}^3$ 의 회전이 사실은 **평면 회전**이기 때문이다. 한 계단씩 밟아 올라가자.
+
+```
+ℝ³의 회전 (8.1)  →  ℝ⁴의 회전 (8.2)  →  등경사 회전 (8.3)  →  쿼터니언 (8.4)
+  평면 1개            평면 2개            두 각이 같은 경우      두 번 겹치기
+```
 
 ### 8.1 3D의 회전 — 축 하나, 평면 하나
 
